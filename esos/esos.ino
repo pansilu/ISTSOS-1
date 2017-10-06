@@ -2,6 +2,7 @@
 #include <DallasTemperature.h>
 #include <Wire.h>
 #include <dht.h> 
+#include <BH1750.h> 
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
@@ -15,6 +16,9 @@ OneWire oneWire(EXTERNAL_TEMP_PIN);
 DallasTemperature externalTemp(&oneWire);
 DeviceAddress insideThermometer;
 
+// light meter
+BH1750 lightMeter;
+
 // dht 11 internal temperature
 dht internal_temperature_meter;
 
@@ -26,7 +30,7 @@ double ext_humidity=0;    // external humidity
 double soilemoisture_value=0;// soile mosture 
 double pressure_value=0;     // pressure value;
 double altitude_value=0;    // altitude value
-
+double lux_value=0;         // inetensity value
  
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -73,6 +77,10 @@ void readSensorValues(){
     // altitude value
     altitude_value = readAltitude();
     printValues("Altitude:",altitude_value);
+
+    // lux value
+    lux_value= readItensity();
+    printValues("Intensity:",lux_value);
     
     // station is up
     soundIndicator(1);
@@ -122,6 +130,10 @@ double readPressure(){
   return bmp085GetPressure(bmp085ReadUP()); // kpa
 }
 
+// read lux value
+double readItensity(){
+    return lightMeter.readLightLevel();
+}
 // initialize componants
 void initialize(){
     // one wire intialization
@@ -146,6 +158,9 @@ void initialize(){
 
     // calibrate BMP180 sensor
     bmp085Calibration();
+
+    // start light meter
+    lightMeter.begin();  
     // delay 
     delay(1000);
 }
