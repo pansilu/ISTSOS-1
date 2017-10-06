@@ -20,6 +20,7 @@ dht internal_temperature_meter;
 double ext_temperature=0; // external temperature 
 double int_temperature=0; // internal temperature
 double int_humidity=0;    // internal humidity
+double ext_humidity=0;    // external humidity
 
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -51,7 +52,10 @@ void readSensorValues(){
     int_humidity=readInternalHumidity();
     printValues("Int Humidity:",int_humidity);
 
-    
+    // by pass internal humidity to external humidity
+    ext_humidity = int_humidity;
+    printValues("Ext Humidity:",ext_humidity);
+
     
     // station is up
     soundIndicator(1);
