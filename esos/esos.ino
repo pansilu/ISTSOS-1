@@ -1,9 +1,11 @@
 //includes
 #include <DallasTemperature.h>
 #include <Wire.h>
+#include <dht.h> 
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
+#define DHT11_IN_PIN 13       // internal temperature
 #define BUZZER 12             // buzzer pin
 
 // Dullas Temperature Mesurement
@@ -11,8 +13,13 @@ OneWire oneWire(EXTERNAL_TEMP_PIN);
 DallasTemperature externalTemp(&oneWire);
 DeviceAddress insideThermometer;
 
+// dht 11 internal temperature
+dht internal_temperature_meter;
+
 // global variables
 double ext_temperature=0; // external temperature 
+double int_temperature=0; // internal temperature
+double int_humidity=0;    // internal humidity
 
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -31,16 +38,23 @@ void loop() {
 }
 
 void readSensorValues(){
-      
+  
+    // read External temperature
+    ext_temperature = readExternalTemperature();
+    printValues("Ext Temperature:",ext_temperature);
 
-      // read External temperature
-      ext_temperature = readExternalTemperature();
-      printValues("Ext Temperature:",ext_temperature);
+    // read Internal temperature
+    int_temperature=readInternalTemperature();
+    printValues("Int Temperature:",int_temperature);
 
+    // read Internal humidiy
+    int_humidity=readInternalHumidity();
+    printValues("Int Humidity:",int_humidity);
 
-      
-      // station is up
-      soundIndicator(1);
+    
+    
+    // station is up
+    soundIndicator(1);
       
 }
 
@@ -53,6 +67,17 @@ void printValues(String name_index,double value){
 double readExternalTemperature(){
   externalTemp.requestTemperatures();
   return externalTemp.getTempC(insideThermometer);
+}
+
+double readInternalTemperature(){
+  internal_temperature_meter.read11(DHT11_IN_PIN);
+  return internal_temperature_meter.temperature;
+  
+}
+
+double readInternalHumidity(){
+  internal_temperature_meter.read11(DHT11_IN_PIN);
+  return internal_temperature_meter.humidity;
 }
 
 // initialize componants
