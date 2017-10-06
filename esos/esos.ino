@@ -18,6 +18,10 @@
 #define RAIN_GAUGE_PIN 2
 #define RAIN_GAUGE_INT 0
 #define RAIN_FACTOR 0.2       // rain factor for one tip bucket
+#define POWER_UP_GSM 9        // powerup pin
+#define TEMP_UP 33            // upeer temp for the fan
+#define TEMP_DOWN 30          // lower temperature or fan
+#define FAN_PIN 10            // fan pin
 
 // Factors
 const int MIN_WIND_FACTOR=476;
@@ -43,6 +47,9 @@ const int chipSelect = 53;  // chip select pin for the SD module.it should be co
 
 // log file datetime 
 String logfile="log.txt";
+
+// GSM power up pin
+int isGSM_POWERUP=0;
 
 // dht 11 internal temperature
 dht internal_temperature_meter;
@@ -156,7 +163,9 @@ void readSensorValues(){
     
     // current time and date
     printValues("Time : ",datetime_);
-    
+
+    // Fan operator
+    funcFan();
     // station is up
     soundIndicator(1);
       
@@ -291,6 +300,10 @@ void initialize(){
     // turn on interrupts
     interrupts();
 
+    // check and initialize fan
+    pinMode(FAN_PIN,OUTPUT);
+    digitalWrite(FAN_PIN,HIGH);
+
     //   clock module initialization
     if (! rtc.begin()) {
       printError("RTC Not Connected ... !");
@@ -321,6 +334,13 @@ void initialize(){
       Serial.println("SD Initializes.");
     }  
     }
+
+    // POWER UP GSM
+    gsmPower();     // for GET requests
+
+    // setup GPRS
+    
+    
     delay(1000);
 }
 
@@ -345,6 +365,52 @@ void createFileSD(String fileName)
     {
       Serial.println(fileName+" create failed!");  
     }
+  }
+}
+
+// fan on in the range of temperature high
+void funcFan(){
+    if(int_temperature>TEMP_UP){
+          digitalWrite(FAN_PIN,LOW);
+    }
+
+    if(int_temperature<TEMP_DOWN){
+        digitalWrite(FAN_PIN,HIGH);  
+    }
+}
+
+// GSM power UP
+void gsmPower(){
+  if(isGSM_POWERUP==0){
+    digitalWrite(POWER_UP_GSM,HIGH);
+    digitalWrite(FAN_PIN,LOW);// check fan
+    delay(2000);
+    digitalWrite(POWER_UP_GSM,LOW); 
+    digitalWrite(FAN_PIN,HIGH);
+    Serial.print("Power UP"); 
+    printLCD("GSM PowerUP");
+    delay(100); 
+    isGSM_POWERUP=1;
+  }else if(isGSM_POWERUP==5){
+    Serial.print("Power RESET"); 
+    printLCD("GSM RESET");
+    digitalWrite(POWER_UP_GSM,HIGH);
+    digitalWrite(FAN_PIN,LOW);// check fan
+    delay(2000);
+    digitalWrite(POWER_UP_GSM,LOW); 
+    digitalWrite(FAN_PIN,HIGH);
+    delay(1000);
+    Serial.print("Power UP"); 
+    printLCD("GSM PowerUP");
+    digitalWrite(POWER_UP_GSM,HIGH);
+    digitalWrite(FAN_PIN,LOW);// check fan
+    delay(2000);
+    digitalWrite(POWER_UP_GSM,LOW); 
+    digitalWrite(FAN_PIN,HIGH);
+    delay(1000);
+    isGSM_POWERUP=1;
+  }else{
+    isGSM_POWERUP++;
   }
 }
 
