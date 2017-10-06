@@ -3,6 +3,7 @@
 #include <Wire.h>
 #include <dht.h> 
 #include <BH1750.h> 
+#include "RTClib.h"
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
@@ -10,6 +11,7 @@
 #define BUZZER 12             // buzzer pin
 #define SM_PIN 8              //  for SM sensor
 #define BMP085_ADDRESS 0x77   // bmp sensor Address  
+#define BATT 0                // get battry meter value
 
 // Dullas Temperature Mesurement
 OneWire oneWire(EXTERNAL_TEMP_PIN);
@@ -18,6 +20,14 @@ DeviceAddress insideThermometer;
 
 // light meter
 BH1750 lightMeter;
+
+// Clock module
+RTC_DS1307 rtc;      
+DateTime now;   // now time 
+String datetime_;
+
+// log file datetime 
+String logfile="log.txt";
 
 // dht 11 internal temperature
 dht internal_temperature_meter;
@@ -31,6 +41,7 @@ double soilemoisture_value=0;// soile mosture
 double pressure_value=0;     // pressure value;
 double altitude_value=0;    // altitude value
 double lux_value=0;         // inetensity value
+double battery_value=0;     // battry value
  
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -40,12 +51,37 @@ void setup() {
 
   initialize();
 
+  // read Datetime once
+  RTCDateTime();
   // read sensor values onece
   readSensorValues();
 }
 
 void loop() {
   
+}
+
+// read current time value
+void RTCDateTime()
+{
+    now = rtc.now(); 
+    datetime_=String(now.year(),DEC);
+    datetime_.concat('-');
+    datetime_.concat(String(now.month(), DEC));
+    datetime_.concat('-');
+    datetime_.concat(String(now.day(), DEC));
+    datetime_.concat('-');
+    datetime_.concat(String(now.hour(), DEC));
+    datetime_.concat(':');
+    datetime_.concat(String(now.minute(), DEC));
+    datetime_.concat(':');
+    datetime_.concat(String(now.second(), DEC));
+
+    logfile=String(now.year(),DEC);
+    logfile.concat('-');
+    logfile.concat(String(now.month(),DEC));
+    logfile.concat(".txt");
+    
 }
 
 void readSensorValues(){
@@ -81,16 +117,34 @@ void readSensorValues(){
     // lux value
     lux_value= readItensity();
     printValues("Intensity:",lux_value);
+
+    battery_value=readBatteryVoltage();
+    printValues("Battry Value:",battery_value);
+    
+    // current time and date
+    printValues("Time : ",datetime_);
     
     // station is up
     soundIndicator(1);
       
 }
 
+// print and show values
 void printValues(String name_index,double value){
     Serial.print(name_index);
     Serial.println(value);
 }
+
+void printValues(String name_index,String value){
+    Serial.print(name_index);
+    Serial.println(value);
+}
+
+void printError(char *f){
+  Serial.println(f); 
+}
+
+//==============================
 
 // read external temperature from dullas
 double readExternalTemperature(){
@@ -134,6 +188,12 @@ double readPressure(){
 double readItensity(){
     return lightMeter.readLightLevel();
 }
+
+// read battry values
+double readBatteryVoltage(){
+    return (analogRead(BATT) * 0.0145);
+}
+
 // initialize componants
 void initialize(){
     // one wire intialization
@@ -162,6 +222,25 @@ void initialize(){
     // start light meter
     lightMeter.begin();  
     // delay 
+
+    //   clock module initialization
+    if (! rtc.begin()) {
+      printError("RTC Not Connected ... !");
+      while (1);
+    }
+    
+    if (! rtc.isrunning()) {
+      printError("RTC Not Running \nSet Time ...!");
+      rtc.adjust(DateTime(__DATE__, __TIME__));
+      Serial.print("Date : ");
+    }
+  
+    rtc.adjust(DateTime(__DATE__, __TIME__));
+    if (! rtc.isrunning()) {
+      printError("RTC Not Running ...!");
+      setup();
+    }
+  
     delay(1000);
 }
 
