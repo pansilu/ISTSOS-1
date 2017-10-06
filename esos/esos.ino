@@ -14,10 +14,14 @@
 #define BMP085_ADDRESS 0x77   // bmp sensor Address  
 #define BATT 0                // get battry meter value
 #define WIN_DIRECTION 1         // win directionPin
+// rain guage
+#define RAIN_GAUGE_PIN 2
+#define RAIN_GAUGE_INT 0
+#define RAIN_FACTOR 0.2       // rain factor for one tip bucket
 
 // Factors
-#define MIN_WIND_FACTOR 476
-#define MAX_WIND_FACTOR 780
+const int MIN_WIND_FACTOR=476;
+const int MAX_WIND_FACTOR=780;
 
 // Dullas Temperature Mesurement
 OneWire oneWire(EXTERNAL_TEMP_PIN);
@@ -53,7 +57,13 @@ double pressure_value=0;     // pressure value;
 double altitude_value=0;    // altitude value
 double lux_value=0;         // inetensity value
 double wind_direction=0;    // win direction value
+// rain guage variables
+double rain_guarge=0;
+volatile unsigned long rain_count=0;
+volatile unsigned long rain_last=0; 
+
 double battery_value=0;     // battry value
+
  
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -133,10 +143,16 @@ void readSensorValues(){
 
     // win direction
     wind_direction=readWinDirection();
-    printValues("Win Direction:",wind_direction);
+    printValues("Win Direction (ang):",wind_direction);
 
+    // rain guarge
+    rain_guarge=readRainGuarge();
+    printValues("Rain Guarge:",rain_guarge);
+    
+    // get battery voltage
     battery_value=readBatteryVoltage();
     printValues("Battry Value:",battery_value);
+    
     
     // current time and date
     printValues("Time : ",datetime_);
@@ -211,9 +227,26 @@ double readBatteryVoltage(){
     return (analogRead(BATT) * 0.0145);
 }
 
+// read wind direction
 double readWinDirection(){
-  return (360/ (MAX_WIND_FACTOR-MIN_WIND_FACTOR))* analogRead(WIN_DIRECTION);
+  return (360/ (MAX_WIND_FACTOR-MIN_WIND_FACTOR))* (analogRead(WIN_DIRECTION)-MIN_WIND_FACTOR);
 }
+
+// read rain guarge
+double readRainGuarge(){
+  return rain_count* RAIN_FACTOR;
+}
+
+void rainGageClick()
+{
+    long thisTime=micros()-rain_last;
+    rain_last=micros();
+    if(thisTime>500)
+    {
+      rain_count++;
+    }
+}
+
 
 //write to log file
 void writeLogFile(){
@@ -249,6 +282,14 @@ void initialize(){
     // start light meter
     lightMeter.begin();  
     // delay 
+
+    // win speed // wind componant
+    pinMode(RAIN_GAUGE_PIN,INPUT);
+    digitalWrite(RAIN_GAUGE_PIN,HIGH);  // Turn on the internal Pull Up Resistor
+    attachInterrupt(RAIN_GAUGE_INT,rainGageClick,FALLING);
+
+    // turn on interrupts
+    interrupts();
 
     //   clock module initialization
     if (! rtc.begin()) {
