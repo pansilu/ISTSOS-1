@@ -5,6 +5,8 @@
 #include <BH1750.h> 
 #include "RTClib.h"
 #include <SD.h>
+#include <istsos.h>
+#include <com/sim800.h>
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
@@ -22,6 +24,16 @@
 #define TEMP_UP 33            // upeer temp for the fan
 #define TEMP_DOWN 30          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
+#define SERVER_SETUP 1        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
+#define TIME_RATE 15          // set as sending after every Time rate=15minute
+// GPRS SETTINGS FOR ISTSOS
+
+#define APN "mobitel"
+#define USERNAME ""
+#define PASSWORD ""
+#define PROCEDURE "bb3a14a0988311e78b760800273cbaca"
+#define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
+
 
 // Factors
 const int MIN_WIND_FACTOR=476;
@@ -39,11 +51,17 @@ BH1750 lightMeter;
 RTC_DS1307 rtc;      
 DateTime now;   // now time 
 String datetime_;
+byte l_hour=0,l_minute=0; // to taken time differece of TIME_RATE defined time rate
 
 // saving log file
 File myFile;
 int SDOK=0;
 const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
+
+// SIM800
+Sim800 istsos = Sim800(Serial1, APN, USERNAME, PASSWORD);
+const char server[] = "istsos.org";
+const char uri[] = POSTREQ;
 
 // log file datetime 
 String logfile="log.txt";
@@ -65,13 +83,14 @@ double pressure_value=0;     // pressure value;
 double altitude_value=0;    // altitude value
 double lux_value=0;         // inetensity value
 double wind_direction=0;    // win direction value
+double wind_speed=0;        // wind speed value
+double water_level=0;       // water level
 // rain guage variables
 double rain_guarge=0;
 volatile unsigned long rain_count=0;
 volatile unsigned long rain_last=0; 
 
 double battery_value=0;     // battry value
-
  
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -81,38 +100,144 @@ void setup() {
 
   initialize();
 
+  // ====  initialy send data
+  
   // read Datetime once
   RTCDateTime();
   // read sensor values onece
   readSensorValues();
+  sendData();
 }
 
 void loop() {
-  readSensorValues();
-  delay(3000);
+
+  // read Datetime once
+  RTCDateTime();
+  // read sensor values onece
+  readSensorValues(); 
+  
+  if(l_hour==now.hour()){
+    if((now.minute()-l_minute)==TIME_RATE){
+        sendData();
+    }
+  }else{
+    if(((60+now.minute())-l_minute)==TIME_RATE){
+        sendData();
+    }  
+  }
+}
+
+// send Data To server
+void sendData(){
+  if(SERVER_SETUP==0){
+    sendGPRSDataASGet();
+  }else{
+    sendGPRSDataASPOST();
+  }
+}
+
+//send data as GPRS
+int sendGPRSDataASPOST(){
+    Serial.println("Sending Data");
+     String data =PROCEDURE;
+    data.concat(";");
+    data.concat(datetime_);
+    data.concat(",");
+    data.concat(battery_value);
+    data.concat(",");
+    data.concat(lux_value/1000);
+    data.concat(",");
+    data.concat(rain_count);
+    rain_count=0;   // reset rain counter
+    data.concat(",");
+    data.concat(wind_direction);
+    data.concat(",");
+    data.concat(wind_speed);
+    data.concat(",");
+    data.concat(water_level);
+    data.concat(",");
+    data.concat(soilemoisture_value);
+    data.concat(",");
+    data.concat(altitude_value);
+    data.concat(",");
+    data.concat(pressure_value/1000);
+    data.concat(",");
+    data.concat(ext_temperature);
+    data.concat(",");
+    data.concat(ext_humidity);
+
+    Serial.println(data);
+    int response = istsos.executePost(server, uri, data);
+  
+    if (response != REQUEST_SUCCESS)
+    {
+      Serial.println(F("\nSend Failed"));
+      Serial.println(response);
+      delay(1000);
+      return -1;
+    }
+    else
+    {
+      Serial.println(F("\nSend Success"));
+      delay(1000);
+      return 0;
+    }
+}
+
+// send data as GPRS
+void sendGPRSDataASGet(){
+  int check_gprs;
+  sendGPRSData();
+  check_gprs = ShowSerialData('K');
+  if(check_gprs != 0){      // id GPRS data false to send it tryis 5 times; then print the communication Error
+    for(int i=0;i<5;i++){
+        sendGPRSData();
+        delay(2000);
+        int check_gprs = ShowSerialData('K');
+        if(check_gprs ==0)
+          break;
+    }
+    printError("GPRS IS NOT CONNECTED TO SERVER");
+    writeLogFile();     // write data to log
+  }
+  l_hour=now.hour();
+  l_minute=now.minute();
 }
 
 // read current time value
 void RTCDateTime()
 {
     now = rtc.now(); 
+    now =now - TimeSpan(0, 5, 30, 00);
     datetime_=String(now.year(),DEC);
     datetime_.concat('-');
+    if(now.month()<10)
+      datetime_.concat("0");
     datetime_.concat(String(now.month(), DEC));
     datetime_.concat('-');
+    if(now.day()<10)
+      datetime_.concat("0");
     datetime_.concat(String(now.day(), DEC));
-    datetime_.concat('-');
+    datetime_.concat('T');
+    if(now.hour()<10)
+      datetime_.concat("0");
     datetime_.concat(String(now.hour(), DEC));
     datetime_.concat(':');
-    datetime_.concat(String(now.minute(), DEC));
+    int miniute=now.minute()<2?59:now.minute();
+     if(miniute<10)
+      datetime_.concat("0");
+    datetime_.concat(String(miniute, DEC));
     datetime_.concat(':');
+     if(now.second()<10)
+      datetime_.concat("0");
     datetime_.concat(String(now.second(), DEC));
-
+    datetime_.concat("+0000");
+    
+    
     logfile=String(now.year(),DEC);
     logfile.concat('-');
     logfile.concat(String(now.month(),DEC));
     logfile.concat(".txt");
-    
 }
 
 void readSensorValues(){
@@ -176,6 +301,7 @@ void readSensorValues(){
 void printValues(String name_index,double value){
     Serial.print(name_index);
     Serial.println(value);
+    delay(1000);
 }
 
 void printValues(String name_index,String value){
@@ -336,13 +462,25 @@ void initialize(){
     }  
     }
 
-    // POWER UP GSM
-    gsmPower();     // for GET requests
-
+    Serial.println("Initialize GPRS");
     // setup GPRS
-    if(setupGPRS()==-1){
-         printError("GPRS Init Failed");
-         setup();  
+    if(SERVER_SETUP==0){
+       // POWER UP GSM
+      gsmPower();     // for GET requests
+      if(setupGPRS()==-1){
+           printError("GPRS Init Failed");
+           setup();  
+      }
+    }else{
+      // GSM server
+      if(!istsos.begin()){
+        printError("GPRS Error ... !");
+      }
+      else
+      {
+        Serial.println(F("GPRS Initialization Done : SIM 800"));
+        delay(5000);
+      }  
     }
     
     delay(1000);
@@ -566,3 +704,55 @@ int ShowSerialData(char c){
  else
   return -1;
 }
+
+// get data sender
+void sendGPRSData(){
+  
+  // Start the connection, TCP, domain name, port 
+  Serial1.println("AT+CIPSTART=\"TCP\",\"slpiot.org\",80");
+  delay(1000);
+  ShowSerialData('N');
+
+  // Random Data
+  Serial1.print("AT+CIPSEND\r\n"); 
+  ShowSerialData('N');
+
+ //send the request
+  Serial1.print("GET /insert_data.php?");
+  Serial1.print("H=");
+  Serial1.print(ext_humidity);
+  Serial1.print("&TE=");
+  Serial1.print(ext_temperature);// ext_temperature
+  Serial1.print("&L=");
+  Serial1.print(lux_value);
+  Serial1.print("&TI=");
+  Serial1.print(int_temperature-2);
+  Serial1.print("&WS=");
+  Serial1.print(wind_speed);
+  Serial1.print("&WD=");
+  Serial1.print(wind_direction);
+  Serial1.print("&RG=");
+  Serial1.print(rain_count);
+  rain_count=0;             // set rain count value in to zero
+  Serial1.print("&P=");
+  Serial1.print(pressure_value);
+  Serial1.print("&SM=");
+  Serial1.print(soilemoisture_value);
+  Serial1.print("&AT=");
+  Serial1.print(altitude_value);
+  Serial1.print("&BV=");
+  Serial1.print(battery_value); 
+  Serial1.print("&dt=");
+  Serial1.print(datetime_);
+  Serial1.print("&GUID=");
+  Serial1.print("5bf82c59-7ec0-4f");
+  Serial1.print(" HTTP/1.1\r\nHost: www.slpiot.org\r\nConnection:keep-alive\r\n\r\n");
+  ShowSerialData('N');
+  
+  // Random Data
+  Serial1.write(0x1A);
+  ShowSerialData('N');
+  
+  Serial.println("Data Sent");
+}
+
