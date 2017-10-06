@@ -50,6 +50,7 @@ String logfile="log.txt";
 
 // GSM power up pin
 int isGSM_POWERUP=0;
+String sp;
 
 // dht 11 internal temperature
 dht internal_temperature_meter;
@@ -339,7 +340,10 @@ void initialize(){
     gsmPower();     // for GET requests
 
     // setup GPRS
-    
+    if(setupGPRS()==-1){
+         printError("GPRS Init Failed");
+         setup();  
+    }
     
     delay(1000);
 }
@@ -387,13 +391,11 @@ void gsmPower(){
     delay(2000);
     digitalWrite(POWER_UP_GSM,LOW); 
     digitalWrite(FAN_PIN,HIGH);
-    Serial.print("Power UP"); 
-    printLCD("GSM PowerUP");
+    Serial.print("Power UP");
     delay(100); 
     isGSM_POWERUP=1;
   }else if(isGSM_POWERUP==5){
     Serial.print("Power RESET"); 
-    printLCD("GSM RESET");
     digitalWrite(POWER_UP_GSM,HIGH);
     digitalWrite(FAN_PIN,LOW);// check fan
     delay(2000);
@@ -401,7 +403,6 @@ void gsmPower(){
     digitalWrite(FAN_PIN,HIGH);
     delay(1000);
     Serial.print("Power UP"); 
-    printLCD("GSM PowerUP");
     digitalWrite(POWER_UP_GSM,HIGH);
     digitalWrite(FAN_PIN,LOW);// check fan
     delay(2000);
@@ -473,4 +474,95 @@ void soundIndicator(int count){ // 1KHz 100ms out 1
     noTone(BUZZER);
     delay(10);
   }
+}
+
+// =================   GPRS SETUP FOR GET STATEMENT ==============
+
+int setupGPRS(){
+  int check_gprs;  // check each module is OK;
+  Serial.println("Check The GPRS module : ");
+  
+  Serial1.print("AT\r"); 
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1)
+    return -1;
+    
+  // check pin reset happened : unlocked
+  Serial1.print("AT+CPIN?\r");
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1)
+    return -1;
+    
+  // check sim registered
+  Serial1.print("AT+CREG?\r"); 
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1)
+    return -1;
+    
+  //check GPRS attached :
+  
+  Serial1.print("AT+CGATT?\r"); 
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    return -1;
+  }  
+  // Reset the IP session if any
+  Serial1.print("AT+CIPSHUT\r");
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1)
+    return -1;
+    
+ //Check if the IP stack is initialized
+  Serial1.print("AT+CIPSTATUS\r");
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1)
+    return -1;
+    
+ // To keep things simple, I’m setting up a single connection mode
+  Serial1.print("AT+CIPMUX=0\r"); 
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1)
+    return -1;
+    
+  // Start the task, based on the SIM card you are using, you need to know the APN, username and password for your service provider
+  Serial1.print("AT+CSTT= \"mobitel\", \"\", \"\"\r"); 
+  delay(1000);
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1)
+    return -1;
+    
+  // Now bring up the wireless. Please note, the response to this might take some time
+  Serial1.print("AT+CIICR\r");
+  delay(2000);
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    return -1;
+  }
+    
+  //Get the local IP address. Some people say that this step is not required, but if I do not issue this, it was not working for my case. So I made this mandatory, no harm.
+  Serial1.print(" AT+CIFSR\r");  
+  delay(2000);
+  check_gprs = ShowSerialData('N');
+  if(check_gprs == -1)
+    return -1;
+  delay(1000);
+  return 0;
+}
+
+// visualize Serial Data
+int ShowSerialData(char c){  
+ delay(1000);
+ char retval;
+ sp="";
+ while(Serial1.available()!=0) {
+  retval=Serial1.read(); 
+  sp += retval;
+  Serial.write(retval);
+  if(retval == c)
+    return 0;  
+ }
+ if(c== 'N')
+   return 0;
+ else
+  return -1;
 }
