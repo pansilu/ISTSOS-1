@@ -24,7 +24,8 @@ double int_temperature=0; // internal temperature
 double int_humidity=0;    // internal humidity
 double ext_humidity=0;    // external humidity
 double soilemoisture_value=0;// soile mosture 
-double pressure_value=0;           // pressure value;
+double pressure_value=0;     // pressure value;
+double altitude_value=0;    // altitude value
 
  
 void setup() {
@@ -69,6 +70,10 @@ void readSensorValues(){
     pressure_value=readPressure();
     printValues("Pressure:",pressure_value);
 
+    // altitude value
+    altitude_value = readAltitude();
+    printValues("Altitude:",altitude_value);
+    
     // station is up
     soundIndicator(1);
       
@@ -105,6 +110,11 @@ double readSoileMoisture(){
   }else{
     return 0;
   }  
+}
+
+// read Altitude
+double readAltitude(){
+    return (float)44330 * (1 - pow(((float) pressure_value/101325), 0.190295));
 }
 
 // read pressure value
