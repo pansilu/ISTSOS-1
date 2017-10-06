@@ -4,14 +4,20 @@
 #include <dht.h> 
 #include <BH1750.h> 
 #include "RTClib.h"
+#include <SD.h>
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
 #define DHT11_IN_PIN 13       // internal temperature
 #define BUZZER 12             // buzzer pin
-#define SM_PIN 8              //  for SM sensor
+#define SM_PIN 8            //  for SM sensor
 #define BMP085_ADDRESS 0x77   // bmp sensor Address  
 #define BATT 0                // get battry meter value
+#define WIN_DIRECTION 1         // win directionPin
+
+// Factors
+#define MIN_WIND_FACTOR 476
+#define MAX_WIND_FACTOR 780
 
 // Dullas Temperature Mesurement
 OneWire oneWire(EXTERNAL_TEMP_PIN);
@@ -25,6 +31,11 @@ BH1750 lightMeter;
 RTC_DS1307 rtc;      
 DateTime now;   // now time 
 String datetime_;
+
+// saving log file
+File myFile;
+int SDOK=0;
+const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
 
 // log file datetime 
 String logfile="log.txt";
@@ -41,6 +52,7 @@ double soilemoisture_value=0;// soile mosture
 double pressure_value=0;     // pressure value;
 double altitude_value=0;    // altitude value
 double lux_value=0;         // inetensity value
+double wind_direction=0;    // win direction value
 double battery_value=0;     // battry value
  
 void setup() {
@@ -58,7 +70,8 @@ void setup() {
 }
 
 void loop() {
-  
+  readSensorValues();
+  delay(3000);
 }
 
 // read current time value
@@ -117,6 +130,10 @@ void readSensorValues(){
     // lux value
     lux_value= readItensity();
     printValues("Intensity:",lux_value);
+
+    // win direction
+    wind_direction=readWinDirection();
+    printValues("Win Direction:",wind_direction);
 
     battery_value=readBatteryVoltage();
     printValues("Battry Value:",battery_value);
@@ -194,6 +211,16 @@ double readBatteryVoltage(){
     return (analogRead(BATT) * 0.0145);
 }
 
+double readWinDirection(){
+  return (360/ (MAX_WIND_FACTOR-MIN_WIND_FACTOR))* analogRead(WIN_DIRECTION);
+}
+
+//write to log file
+void writeLogFile(){
+    createFileSD(logfile);
+    writeFileSD(logfile);  
+}
+
 // initialize componants
 void initialize(){
     // one wire intialization
@@ -240,9 +267,96 @@ void initialize(){
       printError("RTC Not Running ...!");
       setup();
     }
-  
+
+    if(SDOK==0){
+    if (!SD.begin(chipSelect)) 
+    {
+      printError("SD Error ... !");
+      setup();
+    }
+    else
+    {
+      SDOK=1;
+      Serial.println("SD Initializes.");
+    }  
+    }
     delay(1000);
 }
+
+// file extention
+void createFileSD(String fileName)
+{
+  if (SD.exists(fileName)) 
+  {
+    Serial.println(fileName+" exists.");
+  }
+  else 
+  {
+    Serial.println("Creating "+fileName+"...");
+    myFile = SD.open(fileName, FILE_WRITE);
+    myFile.close();
+ 
+    if (SD.exists(fileName)) 
+    {
+      Serial.println(fileName+" create success!");
+    }
+    else 
+    {
+      Serial.println(fileName+" create failed!");  
+    }
+  }
+}
+
+void writeFileSD(String fileName)
+{
+
+
+  myFile = SD.open(fileName, FILE_WRITE);
+  if (myFile) 
+  {
+//    Serial.println("Writing to "+fileName+ "...");
+//    myFile.println("");
+//    myFile.print(datetime_);
+//    myFile.println(":{");
+//    myFile.print("HUMIDITY");
+//    myFile.print(humidity);
+//    myFile.print("| ");
+//    myFile.print("EXT_TEMP");
+//    myFile.print(ext_temperature);
+//    myFile.print("| ");
+//    myFile.print("INT_TEMP");
+//    myFile.print(int_temperature);
+//    myFile.print("| ");
+//    myFile.print("LUX");
+//    myFile.print(lux);
+//    myFile.print("| ");
+//    myFile.print("SM");
+//    myFile.print(SM_value);
+//    myFile.print("| ");
+//    myFile.print("PRESSURE");
+//    myFile.print(pressure);
+//    myFile.print("| ");
+//    myFile.print("WIN_SPEED");
+//    myFile.print(wind_speed);
+//    myFile.print("| ");
+//    myFile.print("WIN_DIR");
+//    myFile.print(wind_vane);
+//    myFile.print("| ");
+//    myFile.print("RAIN_GAUGE");
+//    myFile.print(rain_gauge);
+//    myFile.print("| ");
+//    myFile.print("BATT");
+//    myFile.println(batt);
+//    myFile.println("}");
+//    myFile.close();
+//    Serial.println("File Saved.");
+  } 
+  else 
+  {
+    Serial.println("error opening "+fileName);
+  }
+}
+// end of extention
 
 // tone genarator
 void soundIndicator(int count){ // 1KHz 100ms out 1
