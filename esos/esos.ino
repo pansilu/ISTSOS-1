@@ -7,6 +7,7 @@
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
 #define DHT11_IN_PIN 13       // internal temperature
 #define BUZZER 12             // buzzer pin
+#define SM_PIN 8              //  for SM sensor
 
 // Dullas Temperature Mesurement
 OneWire oneWire(EXTERNAL_TEMP_PIN);
@@ -21,6 +22,7 @@ double ext_temperature=0; // external temperature
 double int_temperature=0; // internal temperature
 double int_humidity=0;    // internal humidity
 double ext_humidity=0;    // external humidity
+double soilemoisture_value=0;// soile mosture 
 
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -56,6 +58,9 @@ void readSensorValues(){
     ext_humidity = int_humidity;
     printValues("Ext Humidity:",ext_humidity);
 
+    // soile mosture value
+    soilemoisture_value=readSoileMoisture();
+    printValues("Soile Moisture:",soilemoisture_value);
     
     // station is up
     soundIndicator(1);
@@ -73,6 +78,7 @@ double readExternalTemperature(){
   return externalTemp.getTempC(insideThermometer);
 }
 
+//read interna temoerature
 double readInternalTemperature(){
   internal_temperature_meter.read11(DHT11_IN_PIN);
   return internal_temperature_meter.temperature;
@@ -82,6 +88,16 @@ double readInternalTemperature(){
 double readInternalHumidity(){
   internal_temperature_meter.read11(DHT11_IN_PIN);
   return internal_temperature_meter.humidity;
+}
+
+// read soile moisture
+double readSoileMoisture(){
+  soilemoisture_value = analogRead(SM_PIN);
+  if(soilemoisture_value < 1023){
+    return soilemoisture_value;
+  }else{
+    return 0;
+  }  
 }
 
 // initialize componants
