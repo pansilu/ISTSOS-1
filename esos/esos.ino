@@ -8,6 +8,7 @@
 #define DHT11_IN_PIN 13       // internal temperature
 #define BUZZER 12             // buzzer pin
 #define SM_PIN 8              //  for SM sensor
+#define BMP085_ADDRESS 0x77   // bmp sensor Address  
 
 // Dullas Temperature Mesurement
 OneWire oneWire(EXTERNAL_TEMP_PIN);
@@ -23,7 +24,9 @@ double int_temperature=0; // internal temperature
 double int_humidity=0;    // internal humidity
 double ext_humidity=0;    // external humidity
 double soilemoisture_value=0;// soile mosture 
+double pressure_value=0;           // pressure value;
 
+ 
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
   while (!Serial){}     // wait for Serial Monitor On
@@ -61,7 +64,11 @@ void readSensorValues(){
     // soile mosture value
     soilemoisture_value=readSoileMoisture();
     printValues("Soile Moisture:",soilemoisture_value);
-    
+
+    // pressure value
+    pressure_value=readPressure();
+    printValues("Pressure:",pressure_value);
+
     // station is up
     soundIndicator(1);
       
@@ -100,6 +107,11 @@ double readSoileMoisture(){
   }  
 }
 
+// read pressure value
+double readPressure(){
+  return bmp085GetPressure(bmp085ReadUP()); // kpa
+}
+
 // initialize componants
 void initialize(){
     // one wire intialization
@@ -122,6 +134,8 @@ void initialize(){
     
     externalTemp.setResolution(insideThermometer, 9);     // set the resolution
 
+    // calibrate BMP180 sensor
+    bmp085Calibration();
     // delay 
     delay(1000);
 }
