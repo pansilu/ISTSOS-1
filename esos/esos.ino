@@ -7,6 +7,7 @@
 #include <SD.h>
 #include <istsos.h>
 #include <com/sim800.h>
+#include <LiquidCrystal.h>
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
@@ -34,6 +35,24 @@
 #define PROCEDURE "bb3a14a0988311e78b760800273cbaca"
 #define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
 
+// LCD
+
+/*
+ * LCD RS pin to digital pin 41
+ * LCD Enable pin to digital pin 39
+ * LCD D4 pin to digital pin 37
+ * LCD D5 pin to digital pin 35
+ * LCD D6 pin to digital pin 33
+ * LCD D7 pin to digital pin 31
+ * LCD R/W pin to ground
+ * LCD VSS pin to ground
+ * LCD VCC pin to 5V
+ * 10K resistor:
+ * ends to +5V and ground
+ * wiper to LCD VO pin (pin 3)
+*/
+
+LiquidCrystal lcd(3, 8, 4, 5, 6, 7);
 
 // Factors
 const int MIN_WIND_FACTOR=476;
@@ -70,6 +89,9 @@ String logfile="log.txt";
 int isGSM_POWERUP=0;
 String sp;
 
+// water level calc
+String temp;
+
 // dht 11 internal temperature
 dht internal_temperature_meter;
 
@@ -97,7 +119,11 @@ void setup() {
   while (!Serial){}     // wait for Serial Monitor On
   Serial1.begin(9600);  // serial  for GPRS 
   while (!Serial1){}    // wait for GPRS Monitor
+  Serial3.begin(1200);  // serial  for water level sensor 
+  while (!Serial3){}    // wait for Water Level commuication
 
+  printStr("Station SL");
+  
   initialize();
 
   // ====  initialy send data
@@ -138,7 +164,7 @@ void sendData(){
 
 //send data as GPRS
 int sendGPRSDataASPOST(){
-    Serial.println("Sending Data");
+    printStr("Sending Data");
      String data =PROCEDURE;
     data.concat(";");
     data.concat(datetime_);
@@ -173,12 +199,14 @@ int sendGPRSDataASPOST(){
     {
       Serial.println(F("\nSend Failed"));
       Serial.println(response);
+      printStr("Send Failed");
       delay(1000);
       return -1;
     }
     else
     {
       Serial.println(F("\nSend Success"));
+      printStr("Send Success");
       delay(1000);
       return 0;
     }
@@ -281,7 +309,11 @@ void readSensorValues(){
     // rain guarge
     rain_guarge=readRainGuarge();
     printValues("Rain Guarge:",rain_guarge);
-    
+
+    // water level
+    water_level=readWaterLevel();
+    printValues("Water Level:",water_level);
+
     // get battery voltage
     battery_value=readBatteryVoltage();
     printValues("Battry Value:",battery_value);
@@ -301,16 +333,29 @@ void readSensorValues(){
 void printValues(String name_index,double value){
     Serial.print(name_index);
     Serial.println(value);
+    lcd.clear();
+    printLCDN(name_index,0,0);
+    printLCD(value,3,1);
     delay(1000);
 }
 
 void printValues(String name_index,String value){
     Serial.print(name_index);
     Serial.println(value);
+    printLCDN(name_index,0,0);
+    printLCDN(value,3,1);
+    delay(1000);
 }
 
 void printError(char *f){
   Serial.println(f); 
+  printLCDN(f,0,0);
+  delay(1000);
+}
+
+void printStr(String name_index){
+    Serial.print(name_index);
+    printLCDN(name_index,0,0);
 }
 
 //==============================
@@ -373,6 +418,36 @@ double readRainGuarge(){
   return rain_count* RAIN_FACTOR;
 }
 
+// read water level
+double readWaterLevel(){
+  Serial3.print('1');
+  Serial3.print('\r');
+  int y,count=0;
+  while(1){
+      if(Serial3.available()){
+        y= Serial3.read();
+        if(y=='A'){
+          water_level= temp.toDouble();
+          Serial3.print('0');
+          Serial3.flush();
+          count=0;
+          temp="";
+          return water_level;
+        }
+        else{
+          temp=temp+y;
+        }
+        
+      }
+      count++;
+        if(count>200000)
+        {
+          count=0;
+          return 0;
+        }
+    }
+}
+
 void rainGageClick()
 {
     long thisTime=micros()-rain_last;
@@ -399,6 +474,9 @@ void initialize(){
     soundIndicator(2);
     // Dullas temperature 
     externalTemp.begin();
+
+    // LCD 
+    lcd.begin(16, 2);
     // get device count
     Serial.print("Dullas Count: ");
     Serial.print(externalTemp.getDeviceCount(), DEC);
@@ -461,8 +539,9 @@ void initialize(){
       Serial.println("SD Initializes.");
     }  
     }
+    // LCD 
 
-    Serial.println("Initialize GPRS");
+    printStr("Initialize GPRS");
     // setup GPRS
     if(SERVER_SETUP==0){
        // POWER UP GSM
@@ -591,7 +670,7 @@ Serial.println("Writing to "+fileName+ "...");
     myFile.print(wind_direction);
     myFile.print("| ");
     myFile.print("RAIN_GAUGE");
-    myFile.print(rain_gauge);
+    myFile.print(rain_guarge);
     myFile.print("| ");
     myFile.print("WATER_LEVEL");
     myFile.print(water_level);
@@ -712,7 +791,7 @@ int ShowSerialData(char c){
 
 // get data sender
 void sendGPRSData(){
-  
+  printStr("Send SLPIOT");
   // Start the connection, TCP, domain name, port 
   Serial1.println("AT+CIPSTART=\"TCP\",\"slpiot.org\",80");
   delay(1000);
@@ -760,6 +839,29 @@ void sendGPRSData(){
   Serial1.write(0x1A);
   ShowSerialData('N');
   
-  Serial.println("Data Sent");
+  printStr("Data Sent");
+}
+
+//lcd functions
+// LCD functions
+void printLCD(double val,int i,int j){
+  String s = String(val,2);  
+  lcd.setCursor(i,j);
+  lcd.print(s);
+}
+
+void printLCDN(char *f,int i,int j){
+    lcd.setCursor(i,j);
+    lcd.print(f);
+}
+
+void printLCDN(String f,int i,int j){
+    lcd.setCursor(i,j);
+    lcd.print(f);
+}
+
+void printLCD(char *f){
+    lcd.clear();
+    lcd.print(f);
 }
 
