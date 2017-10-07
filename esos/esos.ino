@@ -479,7 +479,9 @@ void initialize(){
       else
       {
         Serial.println(F("GPRS Initialization Done : SIM 800"));
+        digitalWrite(FAN_PIN,LOW);// check fan
         delay(5000);
+        digitalWrite(FAN_PIN,HIGH);
       }  
     }
     
@@ -560,42 +562,45 @@ void writeFileSD(String fileName)
   myFile = SD.open(fileName, FILE_WRITE);
   if (myFile) 
   {
-//    Serial.println("Writing to "+fileName+ "...");
-//    myFile.println("");
-//    myFile.print(datetime_);
-//    myFile.println(":{");
-//    myFile.print("HUMIDITY");
-//    myFile.print(humidity);
-//    myFile.print("| ");
-//    myFile.print("EXT_TEMP");
-//    myFile.print(ext_temperature);
-//    myFile.print("| ");
-//    myFile.print("INT_TEMP");
-//    myFile.print(int_temperature);
-//    myFile.print("| ");
-//    myFile.print("LUX");
-//    myFile.print(lux);
-//    myFile.print("| ");
-//    myFile.print("SM");
-//    myFile.print(SM_value);
-//    myFile.print("| ");
-//    myFile.print("PRESSURE");
-//    myFile.print(pressure);
-//    myFile.print("| ");
-//    myFile.print("WIN_SPEED");
-//    myFile.print(wind_speed);
-//    myFile.print("| ");
-//    myFile.print("WIN_DIR");
-//    myFile.print(wind_vane);
-//    myFile.print("| ");
-//    myFile.print("RAIN_GAUGE");
-//    myFile.print(rain_gauge);
-//    myFile.print("| ");
-//    myFile.print("BATT");
-//    myFile.println(batt);
-//    myFile.println("}");
-//    myFile.close();
-//    Serial.println("File Saved.");
+Serial.println("Writing to "+fileName+ "...");
+    myFile.println("");
+    myFile.print(datetime_);
+    myFile.println(":{");
+    myFile.print("HUMIDITY");
+    myFile.print(ext_humidity);
+    myFile.print("| ");
+    myFile.print("EXT_TEMP");
+    myFile.print(ext_temperature);
+    myFile.print("| ");
+    myFile.print("INT_TEMP");
+    myFile.print(int_temperature);
+    myFile.print("| ");
+    myFile.print("LUX");
+    myFile.print(lux_value);
+    myFile.print("| ");
+    myFile.print("SM");
+    myFile.print(soilemoisture_value);
+    myFile.print("| ");
+    myFile.print("PRESSURE");
+    myFile.print(pressure_value);
+    myFile.print("| ");
+    myFile.print("WIN_SPEED");
+    myFile.print(wind_speed);
+    myFile.print("| ");
+    myFile.print("WIN_DIR");
+    myFile.print(wind_direction);
+    myFile.print("| ");
+    myFile.print("RAIN_GAUGE");
+    myFile.print(rain_gauge);
+    myFile.print("| ");
+    myFile.print("WATER_LEVEL");
+    myFile.print(water_level);
+    myFile.print("| ");
+    myFile.print("BATT");
+    myFile.println(battery_value);
+    myFile.println("}");
+    myFile.close();
+    Serial.println("File Saved.");
   } 
   else 
   {
@@ -738,6 +743,8 @@ void sendGPRSData(){
   Serial1.print(pressure_value);
   Serial1.print("&SM=");
   Serial1.print(soilemoisture_value);
+  Serial1.print("&WL=");
+  Serial1.print(water_level);
   Serial1.print("&AT=");
   Serial1.print(altitude_value);
   Serial1.print("&BV=");
