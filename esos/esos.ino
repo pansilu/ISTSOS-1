@@ -311,8 +311,8 @@ void readSensorValues(){
     printValues("Rain Guarge:",rain_guarge);
 
     // water level
-    water_level=readWaterLevel();
-    printValues("Water Level:",water_level);
+//    water_level=readWaterLevel();
+//    printValues("Water Level:",water_level);
 
     // get battery voltage
     battery_value=readBatteryVoltage();
