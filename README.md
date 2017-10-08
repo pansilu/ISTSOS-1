@@ -36,7 +36,7 @@ C:\[user]\Documents\Arduino\libraries
 ```
 
 
-## Running the tests
+## Running 
 
 1. Run Arduino and open esos.ino file from arduino IDE.
 2. Change Your Communication parameters here
