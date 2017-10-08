@@ -5,7 +5,11 @@ managing and dispatch observations from monitoring sensors according to the Sens
 Istsos has oppotunity to connect datacollectors wia REST API. This Source explains the data collector internal structure.
 
  [More About ISTSOS](http://istsos.org/en/latest/doc/index.html)
-
+ 
+ <p align="center">
+  <img src="https://github.com/HarithKK/ISTSOS/blob/master/img.png"/>
+ </p>
+ 
 ## Getting Started
 
 This Is a Whether station Internal code. this is requested to buy the hardware implementation. this is fully Arduino based implemantation.
