@@ -335,25 +335,28 @@ void printValues(String name_index,double value){
     Serial.println(value);
     lcd.clear();
     printLCDN(name_index,0,0);
-    printLCD(value,3,1);
+    printLCD(value,1,1);
     delay(1000);
 }
 
 void printValues(String name_index,String value){
     Serial.print(name_index);
     Serial.println(value);
+    lcd.clear();
     printLCDN(name_index,0,0);
-    printLCDN(value,3,1);
+    printLCDN(value,1,1);
     delay(1000);
 }
 
 void printError(char *f){
   Serial.println(f); 
+  lcd.clear();
   printLCDN(f,0,0);
   delay(1000);
 }
 
 void printStr(String name_index){
+    lcd.clear();
     Serial.print(name_index);
     printLCDN(name_index,0,0);
 }
@@ -410,7 +413,23 @@ double readBatteryVoltage(){
 
 // read wind direction
 double readWinDirection(){
-  return (360/ (MAX_WIND_FACTOR-MIN_WIND_FACTOR))* (analogRead(WIN_DIRECTION)-MIN_WIND_FACTOR);
+  int val= analogRead(WIN_DIRECTION);
+  if(val> 900 && val <=999)
+    return 0;
+  if(val> 400 && val <=410)
+    return 45;
+  if(val> 410 && val <=450)
+    return 90;
+  if(val> 450 && val <=550)
+    return 135;
+  if(val> 550 && val <=650)
+    return 180;
+  if(val> 650 && val <=740)
+    return 225;
+  if(val> 740 && val <=900)
+    return 270;
+  
+  //return (360/ (MAX_WIND_FACTOR-MIN_WIND_FACTOR))* (analogRead(WIN_DIRECTION)-MIN_WIND_FACTOR);
 }
 
 // read rain guarge
@@ -552,6 +571,7 @@ void initialize(){
       }
     }else{
       // GSM server
+      gsmPower(); 
       if(!istsos.begin()){
         printError("GPRS Error ... !");
       }
