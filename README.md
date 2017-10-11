@@ -29,7 +29,7 @@ C:\[user]\Documents\Arduino\libraries
 ```
   External Libraries:-
   ```
-    1.Adafruit_BME280
+    1.Grove_BME280
     2.BH1750
     3.DallasTemperature
     4.DHT Sensor Library
