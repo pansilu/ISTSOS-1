@@ -26,7 +26,7 @@
 #define TEMP_DOWN 30          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
 #define SERVER_SETUP 1        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
-#define TIME_RATE 15          // set as sending after every Time rate=15minute
+#define TIME_RATE 2          // set as sending after every Time rate=15minute
 // GPRS SETTINGS FOR ISTSOS
 
 #define APN "mobitel"
@@ -69,7 +69,7 @@ BH1750 lightMeter;
 // Clock module
 RTC_DS1307 rtc;      
 DateTime now;   // now time 
-String datetime_;
+String datetime_,datetime__;
 byte l_hour=0,l_minute=0; // to taken time differece of TIME_RATE defined time rate
 
 // saving log file
@@ -201,6 +201,8 @@ int sendGPRSDataASPOST(){
       Serial.println(response);
       printStr("Send Failed");
       delay(1000);
+        l_hour=now.hour();
+        l_minute=now.minute();
       return -1;
     }
     else
@@ -208,6 +210,8 @@ int sendGPRSDataASPOST(){
       Serial.println(F("\nSend Success"));
       printStr("Send Success");
       delay(1000);
+        l_hour=now.hour();
+        l_minute=now.minute();
       return 0;
     }
 }
@@ -235,8 +239,10 @@ void sendGPRSDataASGet(){
 // read current time value
 void RTCDateTime()
 {
+    datetime__="";
     now = rtc.now(); 
     now =now - TimeSpan(0, 5, 30, 00);
+    
     datetime_=String(now.year(),DEC);
     datetime_.concat('-');
     if(now.month()<10)
@@ -260,7 +266,19 @@ void RTCDateTime()
       datetime_.concat("0");
     datetime_.concat(String(now.second(), DEC));
     datetime_.concat("+0000");
-    
+
+    now = rtc.now();
+    datetime__=String(now.year(),DEC);
+    datetime__.concat('-');
+    datetime__.concat(String(now.month(), DEC));
+    datetime__.concat('-');
+    datetime__.concat(String(now.day(), DEC));
+    datetime__.concat('-');
+    datetime__.concat(String(now.hour(), DEC));
+    datetime__.concat(':');
+    datetime__.concat(String(now.minute(), DEC));
+    datetime__.concat(':');
+    datetime__.concat(String(now.second(), DEC));
     
     logfile=String(now.year(),DEC);
     logfile.concat('-');
@@ -321,12 +339,13 @@ void readSensorValues(){
     
     // current time and date
     printValues("Time : ",datetime_);
+    printValues("Currunt Time : ",datetime__);
 
     // Fan operator
     funcFan();
     // station is up
     soundIndicator(1);
-      
+
 }
 
 // print and show values
@@ -335,7 +354,7 @@ void printValues(String name_index,double value){
     Serial.println(value);
     lcd.clear();
     printLCDN(name_index,0,0);
-    printLCD(value,1,1);
+    printLCD(value,0,1);
     delay(1000);
 }
 
@@ -344,7 +363,7 @@ void printValues(String name_index,String value){
     Serial.println(value);
     lcd.clear();
     printLCDN(name_index,0,0);
-    printLCDN(value,1,1);
+    printLCDN(value,0,1);
     delay(1000);
 }
 
@@ -539,7 +558,8 @@ void initialize(){
       rtc.adjust(DateTime(__DATE__, __TIME__));
       Serial.print("Date : ");
     }
-  
+
+    
     rtc.adjust(DateTime(__DATE__, __TIME__));
     if (! rtc.isrunning()) {
       printError("RTC Not Running ...!");
@@ -849,7 +869,7 @@ void sendGPRSData(){
   Serial1.print("&BV=");
   Serial1.print(battery_value); 
   Serial1.print("&dt=");
-  Serial1.print(datetime_);
+  Serial1.print(datetime__);
   Serial1.print("&GUID=");
   Serial1.print("5bf82c59-7ec0-4f");
   Serial1.print(" HTTP/1.1\r\nHost: www.slpiot.org\r\nConnection:keep-alive\r\n\r\n");
