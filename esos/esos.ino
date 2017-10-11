@@ -8,6 +8,7 @@
 #include <istsos.h>
 #include <com/sim800.h>
 #include <LiquidCrystal.h>
+#include "Seeed_BME280.h"
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
@@ -94,6 +95,9 @@ String temp;
 
 // dht 11 internal temperature
 dht internal_temperature_meter;
+
+// BME 280
+BME280 bme280;
 
 // global variables
 double ext_temperature=0; // external temperature 
@@ -300,8 +304,8 @@ void readSensorValues(){
     int_humidity=readInternalHumidity();
     printValues("Int Humidity:",int_humidity);
 
-    // by pass internal humidity to external humidity
-    ext_humidity = int_humidity;
+    // read external humidity
+    ext_humidity = readExternalHumidity();
     printValues("Ext Humidity:",ext_humidity);
 
     // soile mosture value
@@ -400,6 +404,10 @@ double readInternalHumidity(){
   return internal_temperature_meter.humidity;
 }
 
+double readExternalHumidity(){
+  return bme280.getHumidity();
+}
+
 // read soile moisture
 double readSoileMoisture(){
   soilemoisture_value = analogRead(SM_PIN);
@@ -412,12 +420,12 @@ double readSoileMoisture(){
 
 // read Altitude
 double readAltitude(){
-    return (float)44330 * (1 - pow(((float) pressure_value/101325), 0.190295));
+    return bme280.calcAltitude(bme280.getPressure());
 }
 
 // read pressure value
 double readPressure(){
-  return bmp085GetPressure(bmp085ReadUP()); // kpa
+  return bme280.getPressure(); // kpa
 }
 
 // read lux value
@@ -528,8 +536,10 @@ void initialize(){
     
     externalTemp.setResolution(insideThermometer, 9);     // set the resolution
 
-    // calibrate BMP180 sensor
-    bmp085Calibration();
+    // BME 280 calibration
+    if(!bme280.init()){
+      printError("BME is not Working");
+    }
 
     // start light meter
     lightMeter.begin();  
