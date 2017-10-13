@@ -80,6 +80,7 @@ const int chipSelect = 53;  // chip select pin for the SD module.it should be co
 
 // SIM800
 Sim800 istsos = Sim800(Serial1, APN, USERNAME, PASSWORD);
+
 const char server[] = "istsos.org";
 const char uri[] = POSTREQ;
 
@@ -131,7 +132,6 @@ void setup() {
   initialize();
 
   // ====  initialy send data
-  
   // read Datetime once
   RTCDateTime();
   // read sensor values onece
@@ -145,6 +145,7 @@ void loop() {
   RTCDateTime();
   // read sensor values onece
   readSensorValues(); 
+
   
   if(l_hour==now.hour()){
     if((now.minute()-l_minute)==TIME_RATE){
@@ -155,15 +156,26 @@ void loop() {
         sendData();
     }  
   }
+
+  
 }
 
 // send Data To server
 void sendData(){
-  if(SERVER_SETUP==0){
-    sendGPRSDataASGet();
-  }else{
-    sendGPRSDataASPOST();
+ 
+  int check_gprs =sendAsGPRS();
+  if(check_gprs != 0){      // id GPRS data false to send it tryis 5 times; then print the communication Error
+    for(int i=0;i<5;i++){
+        check_gprs=sendAsGPRS();
+        if(check_gprs ==0)
+          break;
+    }
+    printError("GPRS IS NOT CONNECTED TO SERVER");
+    writeLogFile();     // write data to log
   }
+  RTCDateTime();
+  l_hour=now.hour();
+  l_minute=now.minute();
 }
 
 //send data as GPRS
@@ -204,40 +216,27 @@ int sendGPRSDataASPOST(){
       Serial.println(F("\nSend Failed"));
       Serial.println(response);
       printStr("Send Failed");
-      delay(1000);
-        l_hour=now.hour();
-        l_minute=now.minute();
       return -1;
     }
     else
     {
       Serial.println(F("\nSend Success"));
       printStr("Send Success");
-      delay(1000);
-        l_hour=now.hour();
-        l_minute=now.minute();
       return 0;
     }
 }
 
-// send data as GPRS
-void sendGPRSDataASGet(){
-  int check_gprs;
+int sendGPRSDataAsGET(){
   sendGPRSData();
-  check_gprs = ShowSerialData('K');
-  if(check_gprs != 0){      // id GPRS data false to send it tryis 5 times; then print the communication Error
-    for(int i=0;i<5;i++){
-        sendGPRSData();
-        delay(2000);
-        int check_gprs = ShowSerialData('K');
-        if(check_gprs ==0)
-          break;
-    }
-    printError("GPRS IS NOT CONNECTED TO SERVER");
-    writeLogFile();     // write data to log
-  }
-  l_hour=now.hour();
-  l_minute=now.minute();
+  return ShowSerialData('K');
+}
+
+int sendAsGPRS(){
+  if(SERVER_SETUP==0){
+    sendGPRSDataAsGET();
+  }else{
+    sendGPRSDataASPOST();
+  }  
 }
 
 // read current time value
@@ -333,8 +332,8 @@ void readSensorValues(){
     printValues("Rain Guarge:",rain_guarge);
 
     // water level
-//    water_level=readWaterLevel();
-//    printValues("Water Level:",water_level);
+    water_level=readWaterLevel();
+    printValues("Water Level:",water_level);
 
     // get battery voltage
     battery_value=readBatteryVoltage();
@@ -389,7 +388,7 @@ void printStr(String name_index){
 // read external temperature from dullas
 double readExternalTemperature(){
   externalTemp.requestTemperatures();
-  return externalTemp.getTempC(insideThermometer);
+  return externalTemp.getTempCByIndex(0);
 }
 
 //read interna temoerature
@@ -435,7 +434,7 @@ double readItensity(){
 
 // read battry values
 double readBatteryVoltage(){
-    return (analogRead(BATT) * 0.0145);
+    return ((analogRead(BATT) * 0.0145)-2.1);
 }
 
 // read wind direction
@@ -468,7 +467,8 @@ double readRainGuarge(){
 double readWaterLevel(){
   Serial3.print('1');
   Serial3.print('\r');
-  int y,count=0;
+  char y,count=0;
+  long l= millis();
   while(1){
       if(Serial3.available()){
         y= Serial3.read();
@@ -486,9 +486,8 @@ double readWaterLevel(){
         
       }
       count++;
-        if(count>200000)
+        if((millis()-l)>10000)
         {
-          count=0;
           return 0;
         }
     }
@@ -518,23 +517,15 @@ void initialize(){
     
     // tone startup // 2 beeps
     soundIndicator(2);
-    // Dullas temperature 
-    externalTemp.begin();
-
+    
     // LCD 
     lcd.begin(16, 2);
-    // get device count
-    Serial.print("Dullas Count: ");
-    Serial.print(externalTemp.getDeviceCount(), DEC);
-    if (externalTemp.isParasitePowerMode()) // Parasite power
-      Serial.println("Parasite power is : ON");
-    else 
-      Serial.println("Parasite power is : OFF");
-      
-    if (!externalTemp.getAddress(insideThermometer, 0))   // get address of the external temperature device
-      Serial.println("Unable to find address for Device 0");
     
-    externalTemp.setResolution(insideThermometer, 9);     // set the resolution
+    // Dullas temperature 
+    externalTemp.begin();
+    externalTemp.begin();
+    externalTemp.getAddress(insideThermometer, 0);
+    externalTemp.setResolution(insideThermometer, 12);
 
     // BME 280 calibration
     if(!bme280.init()){
@@ -568,9 +559,7 @@ void initialize(){
       rtc.adjust(DateTime(__DATE__, __TIME__));
       Serial.print("Date : ");
     }
-
     
-    rtc.adjust(DateTime(__DATE__, __TIME__));
     if (! rtc.isrunning()) {
       printError("RTC Not Running ...!");
       setup();
@@ -592,16 +581,16 @@ void initialize(){
 
     printStr("Initialize GPRS");
     // setup GPRS
+    
+    gsmPower(); 
     if(SERVER_SETUP==0){
        // POWER UP GSM
-      gsmPower();     // for GET requests
       if(setupGPRS()==-1){
            printError("GPRS Init Failed");
            setup();  
       }
     }else{
       // GSM server
-      gsmPower(); 
       if(!istsos.begin()){
         printError("GPRS Error ... !");
       }
@@ -654,7 +643,8 @@ void funcFan(){
 
 // GSM power UP
 void gsmPower(){
-  if(isGSM_POWERUP==0){
+  int check=istsos.getStatus();
+  if(check==0){
     digitalWrite(POWER_UP_GSM,HIGH);
     digitalWrite(FAN_PIN,LOW);// check fan
     delay(2000);
@@ -662,26 +652,8 @@ void gsmPower(){
     digitalWrite(FAN_PIN,HIGH);
     Serial.print("Power UP");
     delay(100); 
-    isGSM_POWERUP=1;
-  }else if(isGSM_POWERUP==5){
-    Serial.print("Power RESET"); 
-    digitalWrite(POWER_UP_GSM,HIGH);
-    digitalWrite(FAN_PIN,LOW);// check fan
-    delay(2000);
-    digitalWrite(POWER_UP_GSM,LOW); 
-    digitalWrite(FAN_PIN,HIGH);
-    delay(1000);
-    Serial.print("Power UP"); 
-    digitalWrite(POWER_UP_GSM,HIGH);
-    digitalWrite(FAN_PIN,LOW);// check fan
-    delay(2000);
-    digitalWrite(POWER_UP_GSM,LOW); 
-    digitalWrite(FAN_PIN,HIGH);
-    delay(1000);
-    isGSM_POWERUP=1;
-  }else{
-    isGSM_POWERUP++;
   }
+  
 }
 
 void writeFileSD(String fileName)
