@@ -36,6 +36,8 @@
 #define PROCEDURE "bb3a14a0988311e78b760800273cbaca"
 #define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
 
+#define RF_TIMEOUT 5000
+
 // LCD
 
 /*
@@ -325,7 +327,7 @@ void readSensorValues(){
 
     // win direction
     wind_direction=readWinDirection();
-    printValues("Win Direction (ang):",wind_direction);
+    printValues("Win Direction:",wind_direction);
 
     // rain guarge
     rain_guarge=readRainGuarge();
@@ -411,6 +413,9 @@ double readExternalHumidity(){
 double readSoileMoisture(){
   soilemoisture_value = analogRead(SM_PIN);
   if(soilemoisture_value < 1023){
+    soilemoisture_value /= 957.37;
+    soilemoisture_value = log(soilemoisture_value);
+    soilemoisture_value = soilemoisture_value *(-2.9);
     return soilemoisture_value;
   }else{
     return 0;
@@ -460,7 +465,7 @@ double readWinDirection(){
 
 // read rain guarge
 double readRainGuarge(){
-  return rain_count* RAIN_FACTOR;
+  return rain_count * RAIN_FACTOR;
 }
 
 // read water level
@@ -486,7 +491,7 @@ double readWaterLevel(){
         
       }
       count++;
-        if((millis()-l)>10000)
+        if((millis()-l)>RF_TIMEOUT)
         {
           return 0;
         }
