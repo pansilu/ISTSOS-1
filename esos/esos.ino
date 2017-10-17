@@ -1,14 +1,14 @@
 //includes
-#include <DallasTemperature.h>
-#include <Wire.h>
-#include <dht.h> 
-#include <BH1750.h> 
-#include "RTClib.h"
-#include <SD.h>
-#include <istsos.h>
-#include <com/sim800.h>
-#include <LiquidCrystal.h>
-#include "Seeed_BME280.h"
+#include "libs/DallasTemperature.h"
+#include "libs/OneWire.h"
+#include "libs/dht.h" 
+#include "libs/BH1750.h" 
+#include "libs/RTClib.h"
+#include "libs/SD.h"
+#include "libs/istsos.h"
+#include "libs/com/sim800.h"
+#include "libs/LiquidCrystal.h"
+#include "libs/Seeed_BME280.h"
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
@@ -445,7 +445,7 @@ double readBatteryVoltage(){
 // read wind direction
 double readWinDirection(){
   int val= analogRead(WIN_DIRECTION);
-  if(val> 900 && val <=999)
+  if(val> 900 && val <=1500)
     return 0;
   if(val> 400 && val <=410)
     return 45;
