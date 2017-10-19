@@ -22,10 +22,8 @@ This Is a Whether station Internal code. this is requested to buy the hardware i
 ### Installing
 
 1. Install Arduino To Your Computer
-2. Copy Library files in to you extarnal library direcory. 
-
-```
-C:\[user]\Documents\Arduino\libraries
+2. Open esos.ino in Arduino IDE
+3. External Libraries are shown below
 ```
   External Libraries:-
   ```
