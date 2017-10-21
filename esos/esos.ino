@@ -18,7 +18,7 @@
 #define BMP085_ADDRESS 0x77   // bmp sensor Address  
 #define BATT 0                // get battry meter value
 #define WIN_DIRECTION 1         // win directionPin
-// rain guage
+// rain gauge
 #define RAIN_GAUGE_PIN 2
 #define RAIN_GAUGE_INT 0
 #define RAIN_FACTOR 0.2       // rain factor for one tip bucket
@@ -41,12 +41,12 @@
 // LCD
 
 /*
- * LCD RS pin to digital pin 3
- * LCD Enable pin to digital pin 8
- * LCD D4 pin to digital pin 4
- * LCD D5 pin to digital pin 5
- * LCD D6 pin to digital pin 6
- * LCD D7 pin to digital pin 7
+ * LCD RS pin to digital pin 41
+ * LCD Enable pin to digital pin 39
+ * LCD D4 pin to digital pin 37
+ * LCD D5 pin to digital pin 35
+ * LCD D6 pin to digital pin 33
+ * LCD D7 pin to digital pin 31
  * LCD R/W pin to ground
  * LCD VSS pin to ground
  * LCD VCC pin to 5V
@@ -114,8 +114,8 @@ double lux_value=0;         // inetensity value
 double wind_direction=0;    // win direction value
 double wind_speed=0;        // wind speed value
 double water_level=0;       // water level
-// rain guage variables
-double rain_guarge=0;
+// rain gauge variables
+double rain_gauge=0;
 volatile unsigned long rain_count=0;
 volatile unsigned long rain_last=0; 
 
@@ -311,7 +311,7 @@ void readSensorValues(){
 
     // soile mosture value
     soilemoisture_value=readSoileMoisture();
-    printValues("Soile Moisture:",soilemoisture_value);
+    printValues("Soil Moisture:",soilemoisture_value);
 
     // pressure value
     pressure_value=readPressure();
@@ -330,8 +330,8 @@ void readSensorValues(){
     printValues("Win Direction:",wind_direction);
 
     // rain guarge
-    rain_guarge=readRainGuarge();
-    printValues("Rain Guarge:",rain_guarge);
+    rain_gauge=readRainGuarge();
+    printValues("Rain Gauge:",rain_gauge);
 
     // water level
     water_level=readWaterLevel();
@@ -697,7 +697,7 @@ Serial.println("Writing to "+fileName+ "...");
     myFile.print(wind_direction);
     myFile.print("| ");
     myFile.print("RAIN_GAUGE");
-    myFile.print(rain_guarge);
+    myFile.print(rain_gauge);
     myFile.print("| ");
     myFile.print("WATER_LEVEL");
     myFile.print(water_level);
