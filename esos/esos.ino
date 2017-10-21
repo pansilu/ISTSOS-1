@@ -413,9 +413,9 @@ double readExternalHumidity(){
 double readSoileMoisture(){
   soilemoisture_value = analogRead(SM_PIN);
   if(soilemoisture_value < 1023){
-    soilemoisture_value /= 957.37;
+    soilemoisture_value /= 957.35;
     soilemoisture_value = log(soilemoisture_value);
-    soilemoisture_value = soilemoisture_value *(-2.9);
+    soilemoisture_value = soilemoisture_value /(-29);
     return soilemoisture_value;
   }else{
     return 0;
