@@ -1,23 +1,25 @@
 //includes
-#include "libs/DallasTemperature.h"
-#include "libs/OneWire.h"
-#include "libs/dht.h" 
-#include "libs/BH1750.h" 
-#include "libs/RTClib.h"
-#include "libs/SD.h"
-#include "libs/istsos.h"
-#include "libs/com/sim800.h"
-#include "libs/LiquidCrystal.h"
-#include "libs/Seeed_BME280.h"
+#include "DallasTemperature.h"
+#include "OneWire.h"
+#include "dht.h" 
+#include "BH1750.h" 
+#include "RTClib.h"
+#include "SD.h"
+#include "istsos.h"
+#include "com/sim800.h"
+#include "LiquidCrystal.h"
+#include "Seeed_BME280.h"
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
 #define DHT11_IN_PIN 13       // internal temperature
 #define BUZZER 12             // buzzer pin
-#define SM_PIN 8            //  for SM sensor
+#define SM_PIN 8              //  for SM sensor
 #define BMP085_ADDRESS 0x77   // bmp sensor Address  
 #define BATT 0                // get battry meter value
-#define WIN_DIRECTION 1         // win directionPin
+#define WIN_DIRECTION_PIN 1   // wind directionPin
+#define WIND_DIRECTION_VOLTAGE_MIN 1.96  // minimum voltage comes from wind speed sensor
+#define WIND_DIRECTION_VOLTAGE_MAX 3.13  // maximum voltage comes from wind speed sensor
 // rain gauge
 #define RAIN_GAUGE_PIN 2
 #define RAIN_GAUGE_INT 0
@@ -26,8 +28,13 @@
 #define TEMP_UP 33            // upeer temp for the fan
 #define TEMP_DOWN 30          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
-#define SERVER_SETUP 1        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
-#define TIME_RATE 2          // set as sending after every Time rate=15minute
+#define SERVER_SETUP 0        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
+#define TIME_RATE 2           // set as sending after every Time rate=15minute
+
+#define WIN_SPEED_PIN 2       // wind speed pin
+#define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
+#define WIND_VOLTAGE_MIN 10  // minimum voltage comes from wind speed sensor
+#define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        
 // GPRS SETTINGS FOR ISTSOS
 
 #define APN "mobitel"
@@ -112,7 +119,9 @@ double pressure_value=0;     // pressure value;
 double altitude_value=0;    // altitude value
 double lux_value=0;         // inetensity value
 double wind_direction=0;    // win direction value
+// wind speed 
 double wind_speed=0;        // wind speed value
+float sensor_voltage=0;
 double water_level=0;       // water level
 // rain gauge variables
 double rain_gauge=0;
@@ -325,10 +334,14 @@ void readSensorValues(){
     lux_value= readItensity();
     printValues("Intensity:",lux_value);
 
-    // win direction
+    // wind direction
     wind_direction=readWinDirection();
     printValues("Win Direction:",wind_direction);
 
+    // wind speed
+    wind_speed=readWindSpeed();
+    printValues("Win Speed:",wind_speed);
+    
     // rain guarge
     rain_gauge=readRainGuarge();
     printValues("Rain Gauge:",rain_gauge);
@@ -415,7 +428,7 @@ double readSoileMoisture(){
   if(soilemoisture_value < 1023){
     soilemoisture_value /= 957.35;
     soilemoisture_value = log(soilemoisture_value);
-    soilemoisture_value = soilemoisture_value /(-29);
+    soilemoisture_value = soilemoisture_value /(-0.029);
     return soilemoisture_value;
   }else{
     return 0;
@@ -439,28 +452,31 @@ double readItensity(){
 
 // read battry values
 double readBatteryVoltage(){
-    return ((analogRead(BATT) * 0.0145)-2.1);
+    return ((analogRead(BATT)*15/1023));
 }
 
 // read wind direction
 double readWinDirection(){
-  int val= analogRead(WIN_DIRECTION);
-  if(val> 900 && val <=1500)
+
+  sensor_voltage = analogRead(WIN_DIRECTION_PIN) * 0.004882814;  // convert to actual voltage
+  if(sensor_voltage <= WIND_DIRECTION_VOLTAGE_MIN && sensor_voltage >= WIND_DIRECTION_VOLTAGE_MAX)
     return 0;
-  if(val> 400 && val <=410)
-    return 45;
-  if(val> 410 && val <=450)
-    return 90;
-  if(val> 450 && val <=550)
-    return 135;
-  if(val> 550 && val <=650)
-    return 180;
-  if(val> 650 && val <=740)
-    return 225;
-  if(val> 740 && val <=900)
-    return 270;
+  else{
+    return((sensor_voltage-WIND_DIRECTION_VOLTAGE_MIN)* 360 / (WIND_DIRECTION_VOLTAGE_MAX-WIND_DIRECTION_VOLTAGE_MIN));  // convert it to leaniar relationship
+  } 
   
-  //return (360/ (MAX_WIND_FACTOR-MIN_WIND_FACTOR))* (analogRead(WIN_DIRECTION)-MIN_WIND_FACTOR);
+}
+
+// read Wind Speed
+double readWindSpeed(){
+
+  sensor_voltage = analogRead(WIN_SPEED_PIN);  // convert to actual voltage
+  if(sensor_voltage <= WIND_VOLTAGE_MIN)
+    return 0;
+  else{
+    return((sensor_voltage-WIND_VOLTAGE_MIN)* WIND_FACTOR / (WIND_VOLTAGE_MAX - WIND_VOLTAGE_MIN) );  // convert it to leaniar relationship
+  }
+  
 }
 
 // read rain guarge

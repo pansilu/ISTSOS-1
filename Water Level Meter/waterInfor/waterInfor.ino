@@ -15,7 +15,7 @@ void loop() {
   if(Serial.available()){
     if(Serial.read()=='1'){                     // request has pusshed
       Serial.print(ultrasonic.distanceRead());  // read data and send
-      Serial.print('A');s                       // End Charactor
+      Serial.print('A');                       // End Charactor
     }
   }
 }
