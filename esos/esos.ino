@@ -1,14 +1,15 @@
 //includes
-#include "DallasTemperature.h"
-#include "OneWire.h"
-#include "dht.h" 
-#include "BH1750.h" 
-#include "RTClib.h"
+#include <DallasTemperature.h>
+#include <OneWire.h>
+#include <dht.h>
+#include <BH1750.h> 
+#include <RTClib.h>
 #include "SD.h"
-#include "istsos.h"
-#include "com/sim800.h"
-#include "LiquidCrystal.h"
-#include "Seeed_BME280.h"
+#include <istsos.h>
+#include <com/sim800.h>
+#include <LiquidCrystal.h>
+#include <Seeed_BME280.h>
+#include <Wire.h>
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
@@ -28,7 +29,7 @@
 #define TEMP_UP 33            // upeer temp for the fan
 #define TEMP_DOWN 30          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
-#define SERVER_SETUP 0        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
+#define SERVER_SETUP 1        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
 #define TIME_RATE 2           // set as sending after every Time rate=15minute
 
 #define WIN_SPEED_PIN 2       // wind speed pin
@@ -79,7 +80,7 @@ BH1750 lightMeter;
 // Clock module
 RTC_DS1307 rtc;      
 DateTime now;   // now time 
-String datetime_,datetime__;
+String datetime_,datetime__,datetime___;;
 byte l_hour=0,l_minute=0; // to taken time differece of TIME_RATE defined time rate
 
 // saving log file
@@ -194,13 +195,13 @@ int sendGPRSDataASPOST(){
     printStr("Sending Data");
      String data =PROCEDURE;
     data.concat(";");
-    data.concat(datetime_);
+    data.concat(datetime___);
     data.concat(",");
     data.concat(battery_value);
     data.concat(",");
     data.concat(lux_value/1000);
     data.concat(",");
-    data.concat(rain_count);
+    data.concat(rain_gauge);
     rain_count=0;   // reset rain counter
     data.concat(",");
     data.concat(wind_direction);
@@ -243,6 +244,7 @@ int sendGPRSDataAsGET(){
 }
 
 int sendAsGPRS(){
+  
   if(SERVER_SETUP==0){
     sendGPRSDataAsGET();
   }else{
@@ -293,6 +295,32 @@ void RTCDateTime()
     datetime__.concat(String(now.minute(), DEC));
     datetime__.concat(':');
     datetime__.concat(String(now.second(), DEC));
+
+    uint32_t* timepointer=istsos.ntpUpdate("metasntp11.admin.ch",+0000);
+    datetime___="";
+    datetime___.concat(timepointer[0]);
+    datetime___.concat("-");
+    if(timepointer[1]<10)
+      datetime___.concat("0");
+    datetime___.concat(timepointer[1]);
+    datetime___.concat("-");
+    if(timepointer[2]<10)
+      datetime___.concat("0");
+    datetime___.concat(timepointer[2]);
+    datetime___.concat("T");
+    if(timepointer[3]<10)
+      datetime___.concat("0");
+    datetime___.concat(timepointer[3]);
+    datetime___.concat(":");
+    if(timepointer[4]<10)
+      datetime___.concat("0");
+    datetime___.concat(timepointer[4]);
+    datetime___.concat(":");
+    if(timepointer[5]<10)
+      datetime___.concat("0");
+    datetime___.concat(timepointer[5]);
+    datetime___.concat("+0000");
+
     
     logfile=String(now.year(),DEC);
     logfile.concat('-');
@@ -604,7 +632,7 @@ void initialize(){
     // setup GPRS
     
     gsmPower(); 
-    if(SERVER_SETUP==0){
+    if(1){
        // POWER UP GSM
       if(setupGPRS()==-1){
            printError("GPRS Init Failed");
@@ -859,7 +887,7 @@ void sendGPRSData(){
   Serial1.print("&WD=");
   Serial1.print(wind_direction);
   Serial1.print("&RG=");
-  Serial1.print(rain_count);
+  Serial1.print(rain_gauge);
   rain_count=0;             // set rain count value in to zero
   Serial1.print("&P=");
   Serial1.print(pressure_value);
