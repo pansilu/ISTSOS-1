@@ -62,12 +62,7 @@ private:
         Put the shield in sleep mode.
     */
     void sleepMode();
-    /**
-        Get shield status
-
-        @return bool status
-    */
-    bool getStatus();
+   
 
     /**
         To
@@ -175,7 +170,12 @@ public:
         @return bool TODO
     */
     uint8_t begin();
+     /**
+        Get shield status
 
+        @return bool status
+    */
+    bool getStatus();
 
 
     // call this methods inside loop()
