@@ -26,11 +26,12 @@
 #define RAIN_GAUGE_INT 0
 #define RAIN_FACTOR 0.2       // rain factor for one tip bucket
 #define POWER_UP_GSM 9        // powerup pin
-#define TEMP_UP 33            // upeer temp for the fan
-#define TEMP_DOWN 30          // lower temperature or fan
+#define TEMP_UP 40            // upeer temp for the fan
+#define TEMP_DOWN 34          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
-#define SERVER_SETUP 1        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
-#define TIME_RATE 2           // set as sending after every Time rate=15minute
+#define SERVER_SETUP 0         // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 for esos ServerSetup=2 for Both 
+#define TIME_RATE 5           // set as sending after every Time (minutes)
+#define RTC_UPDATE_INTERVAL 1 // the inteval et ween 2 RTC update from ntp (days)
 
 #define WIN_SPEED_PIN 2       // wind speed pin
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
@@ -80,8 +81,9 @@ BH1750 lightMeter;
 // Clock module
 RTC_DS1307 rtc;      
 DateTime now;   // now time 
-String datetime_,datetime__,datetime___;;
+String grinichDateTime,localDateTime;;
 byte l_hour=0,l_minute=0; // to taken time differece of TIME_RATE defined time rate
+int returnCount =0;
 
 // saving log file
 File myFile;
@@ -96,6 +98,7 @@ const char uri[] = POSTREQ;
 
 // log file datetime 
 String logfile="log.txt";
+String logger="logger.txt";
 
 // GSM power up pin
 int isGSM_POWERUP=0;
@@ -169,6 +172,13 @@ void loop() {
     }  
   }
 
+  // make the RTC update
+  if((returnCount * TIME_RATE )>= RTC_UPDATE_INTERVAL * 60 *24){
+      returnCount=0;
+      updateRTC();
+  }
+  writeLogFile();
+  
   
 }
 
@@ -188,6 +198,7 @@ void sendData(){
   RTCDateTime();
   l_hour=now.hour();
   l_minute=now.minute();
+  returnCount ++;
 }
 
 //send data as GPRS
@@ -195,7 +206,7 @@ int sendGPRSDataASPOST(){
     printStr("Sending Data");
      String data =PROCEDURE;
     data.concat(";");
-    data.concat(datetime___);
+    data.concat(grinichDateTime);
     data.concat(",");
     data.concat(battery_value);
     data.concat(",");
@@ -221,7 +232,7 @@ int sendGPRSDataASPOST(){
     data.concat(ext_humidity);
 
     Serial.println(data);
-    int response = istsos.executePost(server, uri, data);
+    int response = executePostMsg(server, uri, data);
   
     if (response != REQUEST_SUCCESS)
     {
@@ -244,88 +255,94 @@ int sendGPRSDataAsGET(){
 }
 
 int sendAsGPRS(){
+
   
   if(SERVER_SETUP==0){
     sendGPRSDataAsGET();
-  }else{
+  }else if(SERVER_SETUP==1){
     sendGPRSDataASPOST();
-  }  
+  }else{
+    sendGPRSDataAsGET();
+    delay(1000);
+    sendGPRSDataASPOST();  
+  }
 }
 
 // read current time value
 void RTCDateTime()
 {
-    datetime__="";
+    // Time genaration for ISTSOS
     now = rtc.now(); 
     now =now - TimeSpan(0, 5, 30, 00);
     
-    datetime_=String(now.year(),DEC);
-    datetime_.concat('-');
+    grinichDateTime=String(now.year(),DEC);
+    grinichDateTime.concat('-');
     if(now.month()<10)
-      datetime_.concat("0");
-    datetime_.concat(String(now.month(), DEC));
-    datetime_.concat('-');
+      grinichDateTime.concat("0");
+    grinichDateTime.concat(String(now.month(), DEC));
+    grinichDateTime.concat('-');
     if(now.day()<10)
-      datetime_.concat("0");
-    datetime_.concat(String(now.day(), DEC));
-    datetime_.concat('T');
+      grinichDateTime.concat("0");
+    grinichDateTime.concat(String(now.day(), DEC));
+    grinichDateTime.concat('T');
     if(now.hour()<10)
-      datetime_.concat("0");
-    datetime_.concat(String(now.hour(), DEC));
-    datetime_.concat(':');
+      grinichDateTime.concat("0");
+    grinichDateTime.concat(String(now.hour(), DEC));
+    grinichDateTime.concat(':');
     int miniute=now.minute()<2?59:now.minute();
      if(miniute<10)
-      datetime_.concat("0");
-    datetime_.concat(String(miniute, DEC));
-    datetime_.concat(':');
+      grinichDateTime.concat("0");
+    grinichDateTime.concat(String(miniute, DEC));
+    grinichDateTime.concat(':');
      if(now.second()<10)
-      datetime_.concat("0");
-    datetime_.concat(String(now.second(), DEC));
-    datetime_.concat("+0000");
+      grinichDateTime.concat("0");
+    grinichDateTime.concat(String(now.second(), DEC));
+    grinichDateTime.concat("+0000");
 
+   // current datetime
     now = rtc.now();
-    datetime__=String(now.year(),DEC);
-    datetime__.concat('-');
-    datetime__.concat(String(now.month(), DEC));
-    datetime__.concat('-');
-    datetime__.concat(String(now.day(), DEC));
-    datetime__.concat('-');
-    datetime__.concat(String(now.hour(), DEC));
-    datetime__.concat(':');
-    datetime__.concat(String(now.minute(), DEC));
-    datetime__.concat(':');
-    datetime__.concat(String(now.second(), DEC));
+    localDateTime=String(now.year(),DEC);
+    localDateTime.concat('-');
+    localDateTime.concat(String(now.month(), DEC));
+    localDateTime.concat('-');
+    localDateTime.concat(String(now.day(), DEC));
+    localDateTime.concat('-');
+    localDateTime.concat(String(now.hour(), DEC));
+    localDateTime.concat(':');
+    localDateTime.concat(String(now.minute(), DEC));
+    localDateTime.concat(':');
+    localDateTime.concat(String(now.second(), DEC));
 
-    uint32_t* timepointer=istsos.ntpUpdate("metasntp11.admin.ch",+0000);
-    datetime___="";
-    datetime___.concat(timepointer[0]);
-    datetime___.concat("-");
-    if(timepointer[1]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[1]);
-    datetime___.concat("-");
-    if(timepointer[2]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[2]);
-    datetime___.concat("T");
-    if(timepointer[3]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[3]);
-    datetime___.concat(":");
-    if(timepointer[4]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[4]);
-    datetime___.concat(":");
-    if(timepointer[5]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[5]);
-    datetime___.concat("+0000");
-
-    
     logfile=String(now.year(),DEC);
     logfile.concat('-');
     logfile.concat(String(now.month(),DEC));
     logfile.concat(".txt");
+}
+
+// update RTC time from ntp time server
+void updateRTC(){
+  uint32_t* timepointer=ntpUpdateTime();
+
+  // init datetime componants
+
+ int yyyy =  timepointer[0];
+ int MM   =  timepointer[1];
+ int dd   =  timepointer[2];
+ int hh   =  timepointer[3];
+ int mm   =  timepointer[4];
+ int ss   =  timepointer[5];
+ 
+ DateTime ds(yyyy,MM,dd,hh,mm,ss);
+ ds =ds + TimeSpan(0, 5, 30, 00);
+ rtc.adjust(ds);
+
+ delay(3000);
+ // Read RTC
+ RTCDateTime();
+
+ printValues("Gr Time : ",grinichDateTime);
+ printValues("Lc Time : ",localDateTime);
+ 
 }
 
 void readSensorValues(){
@@ -384,8 +401,8 @@ void readSensorValues(){
     
     
     // current time and date
-    printValues("Time : ",datetime_);
-    printValues("Currunt Time : ",datetime__);
+    printValues("Gr Time : ",grinichDateTime);
+    printValues("Lc Time : ",localDateTime);
 
     // Fan operator
     funcFan();
@@ -490,7 +507,7 @@ double readWinDirection(){
   if(sensor_voltage <= WIND_DIRECTION_VOLTAGE_MIN && sensor_voltage >= WIND_DIRECTION_VOLTAGE_MAX)
     return 0;
   else{
-    return((sensor_voltage-WIND_DIRECTION_VOLTAGE_MIN)* 360 / (WIND_DIRECTION_VOLTAGE_MAX-WIND_DIRECTION_VOLTAGE_MIN));  // convert it to leaniar relationship
+    return abs(((sensor_voltage-WIND_DIRECTION_VOLTAGE_MIN)* 360 / (WIND_DIRECTION_VOLTAGE_MAX-WIND_DIRECTION_VOLTAGE_MIN)));  // convert it to leaniar relationship
   } 
   
 }
@@ -502,7 +519,7 @@ double readWindSpeed(){
   if(sensor_voltage <= WIND_VOLTAGE_MIN)
     return 0;
   else{
-    return((sensor_voltage-WIND_VOLTAGE_MIN)* WIND_FACTOR / (WIND_VOLTAGE_MAX - WIND_VOLTAGE_MIN) );  // convert it to leaniar relationship
+    return abs(((sensor_voltage-WIND_VOLTAGE_MIN)* WIND_FACTOR / (WIND_VOLTAGE_MAX - WIND_VOLTAGE_MIN) ));  // convert it to leaniar relationship
   }
   
 }
@@ -579,6 +596,7 @@ void initialize(){
     // BME 280 calibration
     if(!bme280.init()){
       printError("BME is not Working");
+      soundIndicator(1,0);
     }
 
     // start light meter
@@ -597,27 +615,11 @@ void initialize(){
     pinMode(FAN_PIN,OUTPUT);
     digitalWrite(FAN_PIN,HIGH);
 
-    //   clock module initialization
-    if (! rtc.begin()) {
-      printError("RTC Not Connected ... !");
-      while (1);
-    }
-    
-    if (! rtc.isrunning()) {
-      printError("RTC Not Running \nSet Time ...!");
-      rtc.adjust(DateTime(__DATE__, __TIME__));
-      Serial.print("Date : ");
-    }
-    
-    if (! rtc.isrunning()) {
-      printError("RTC Not Running ...!");
-      setup();
-    }
-
     if(SDOK==0){
     if (!SD.begin(chipSelect)) 
     {
       printError("SD Error ... !");
+      soundIndicator(2,0);
       setup();
     }
     else
@@ -632,25 +634,29 @@ void initialize(){
     // setup GPRS
     
     gsmPower(); 
-    if(1){
-       // POWER UP GSM
-      if(setupGPRS()==-1){
-           printError("GPRS Init Failed");
-           setup();  
-      }
-    }else{
-      // GSM server
-      if(!istsos.begin()){
-        printError("GPRS Error ... !");
-      }
-      else
-      {
-        Serial.println(F("GPRS Initialization Done : SIM 800"));
-        digitalWrite(FAN_PIN,LOW);// check fan
-        delay(5000);
-        digitalWrite(FAN_PIN,HIGH);
-      }  
+    while(setupGPRS()==-1){
+      printError("\nGPRS ERROR");  
+      soundIndicator(3,0);
+    };
+
+    printStr("Initialize RTC");
+    //   clock module initialization
+    if (! rtc.begin()) {
+      printError("RTC Not Connected ... !");
+      soundIndicator(4,0);
+      setup();
     }
+    
+    
+    if (! rtc.isrunning()) {
+      printError("RTC Not Running ...!");
+      soundIndicator(4,1);
+      updateRTC();
+      setup();
+    }
+    
+    // update rtc from NTP
+    updateRTC();
     
     delay(1000);
 }
@@ -714,7 +720,7 @@ void writeFileSD(String fileName)
   {
 Serial.println("Writing to "+fileName+ "...");
     myFile.println("");
-    myFile.print(datetime_);
+    myFile.print(grinichDateTime);
     myFile.println(":{");
     myFile.print("HUMIDITY");
     myFile.print(ext_humidity);
@@ -769,6 +775,22 @@ void soundIndicator(int count){ // 1KHz 100ms out 1
   }
 }
 
+void soundIndicator(int count1,int count2){ // 1KHz 100ms out 1
+  for(int i=0;i<count1;i++){
+    tone(BUZZER,500);
+    delay(100);
+    noTone(BUZZER);
+    delay(10);
+  }
+
+   for(int i=0;i<count2;i++){
+    tone(BUZZER,1000);
+    delay(100);
+    noTone(BUZZER);
+    delay(10);
+  }
+}
+
 // =================   GPRS SETUP FOR GET STATEMENT ==============
 
 int setupGPRS(){
@@ -777,67 +799,95 @@ int setupGPRS(){
   
   Serial1.print("AT\r"); 
   check_gprs = ShowSerialData('K');
-  if(check_gprs == -1)
+  if(check_gprs == -1){
+    soundIndicator(3,1);
     return -1;
+  
+  }
     
   // check pin reset happened : unlocked
   Serial1.print("AT+CPIN?\r");
   check_gprs = ShowSerialData('K');
-  if(check_gprs == -1)
+  if(check_gprs == -1){
+    soundIndicator(3,2);
     return -1;
+  
+  }
     
   // check sim registered
   Serial1.print("AT+CREG?\r"); 
   check_gprs = ShowSerialData('K');
-  if(check_gprs == -1)
+  if(check_gprs == -1){
+    soundIndicator(3,3);
     return -1;
+  
+  }
     
   //check GPRS attached :
   
   Serial1.print("AT+CGATT?\r"); 
   check_gprs = ShowSerialData('K');
   if(check_gprs == -1){
+    soundIndicator(3,4);
     return -1;
+  
   }  
   // Reset the IP session if any
   Serial1.print("AT+CIPSHUT\r");
+  delay(2000);
   check_gprs = ShowSerialData('K');
-  if(check_gprs == -1)
+  if(check_gprs == -1){
+    soundIndicator(3,5);
     return -1;
+  
+  }
     
  //Check if the IP stack is initialized
   Serial1.print("AT+CIPSTATUS\r");
   check_gprs = ShowSerialData('K');
-  if(check_gprs == -1)
+  if(check_gprs == -1){
+    soundIndicator(3,6);
     return -1;
+  
+  }
     
  // To keep things simple, I’m setting up a single connection mode
   Serial1.print("AT+CIPMUX=0\r"); 
   check_gprs = ShowSerialData('K');
-  if(check_gprs == -1)
+  if(check_gprs == -1){
+    soundIndicator(3,7);
     return -1;
+  
+  }
     
   // Start the task, based on the SIM card you are using, you need to know the APN, username and password for your service provider
   Serial1.print("AT+CSTT= \"mobitel\", \"\", \"\"\r"); 
   delay(1000);
-  check_gprs = ShowSerialData('K');
-  if(check_gprs == -1)
+  if(check_gprs == -1){
+    soundIndicator(3,8);
     return -1;
+  
+  }
     
   // Now bring up the wireless. Please note, the response to this might take some time
   Serial1.print("AT+CIICR\r");
   delay(2000);
   check_gprs = ShowSerialData('K');
   if(check_gprs == -1){
+    soundIndicator(3,9);
     return -1;
+  
   }
     
   //Get the local IP address. Some people say that this step is not required, but if I do not issue this, it was not working for my case. So I made this mandatory, no harm.
   Serial1.print(" AT+CIFSR\r");  
   delay(2000);
   check_gprs = ShowSerialData('N');
-  if(check_gprs == -1)
+  if(check_gprs == -1){
+    soundIndicator(3,10);
     return -1;
+  
+  }
   delay(1000);
   return 0;
 }
@@ -859,6 +909,51 @@ int ShowSerialData(char c){
  else
   return -1;
 }
+
+uint8_t waitResponse(uint32_t timeout, const String expected)
+{
+
+    unsigned long start = millis();
+
+    String response = String("");
+    bool status = false;
+    bool check = false;
+
+    if (expected != "")
+        check = true;
+
+    do
+    {
+        while(Serial1.available() > 0)
+        {
+            char c = Serial1.read();
+            response += c;
+
+            if(check && response.endsWith(expected))
+            {
+                status = true;
+                goto finish;
+            }
+            if(response.endsWith("OK"))
+            {
+                status = true;
+                goto finish;
+            }
+            else if(response.endsWith("ERROR"))
+            {
+                goto finish;
+            }
+        }
+    }while( millis() - start < timeout);
+
+  finish:
+
+    Serial1.flush();
+
+    return status;
+}
+
+
 
 // get data sender
 void sendGPRSData(){
@@ -900,7 +995,7 @@ void sendGPRSData(){
   Serial1.print("&BV=");
   Serial1.print(battery_value); 
   Serial1.print("&dt=");
-  Serial1.print(datetime__);
+  Serial1.print(localDateTime);
   Serial1.print("&GUID=");
   Serial1.print("5bf82c59-7ec0-4f");
   Serial1.print(" HTTP/1.1\r\nHost: www.slpiot.org\r\nConnection:keep-alive\r\n\r\n");
@@ -909,8 +1004,14 @@ void sendGPRSData(){
   // Random Data
   Serial1.write(0x1A);
   ShowSerialData('N');
+
+  delay(1000);
+  Serial1.print("AT+CIPSHUT\r\n"); 
+  delay(2000);
+  ShowSerialData('N');
   
   printStr("Data Sent");
+  
 }
 
 //lcd functions
@@ -935,4 +1036,152 @@ void printLCD(char *f){
     lcd.clear();
     lcd.print(f);
 }
+
+
+uint32_t* ntpUpdateTime(){
+  
+ 
+    Serial1.print("AT+CCLK?\r\n");
+    delay(200);
+
+    String response = "";
+
+    bool flag = false;
+    if (Serial1.available()>0){
+        while (Serial1.available()>0){
+            char c = Serial1.read();
+            if (c == '"'){
+                flag = true;
+            }else if(flag){
+                if (c == '"')
+                    flag = false;
+                else
+                    response += c;
+            }
+        }
+    }
+
+
+    uint32_t* result = new uint32_t[8];
+
+    Serial.println(response);
+
+    String dateStr = getValue(response, ',', 0);
+    String timeStr = getValue(response, ',', 1);
+
+    // get date and time
+    result[0] = (uint32_t)(2000 + getValue(dateStr, '/', 0).toInt());
+    result[1] = (uint32_t)getValue(dateStr, '/', 1).toInt();
+    result[2] = (uint32_t)getValue(dateStr, '/', 2).toInt();
+    result[3] = (uint32_t)getValue(timeStr, ':', 0).toInt();
+    result[4] = (uint32_t)getValue(timeStr, ':', 1).toInt();
+    result[5] = (uint32_t)getValue(getValue(timeStr, ':',2), '+', 0).toInt();
+
+    // get timezone
+    bool positive = false;
+    uint32_t tmp = 0;
+    if (timeStr.indexOf('+') > 0){
+        positive = true;
+        tmp = (uint32_t) getValue(timeStr, '+', 1).toInt();
+    }else{
+        tmp = (uint32_t) getValue(timeStr, '-', 1).toInt();
+    }
+
+    uint32_t h = tmp / 4;
+    uint32_t min = tmp % 4;
+
+    if(min == 0)
+        min = 0;
+    else if(min == 1)
+        min = 15;
+    else if(min == 2)
+        min = 30;
+    else
+        min = 45;
+
+    result[6] = h;
+
+    result[7] = min;
+    result[8] = (uint32_t) positive;
+    return result;
+}
+
+uint8_t executePostMsg(const char server[], const char uri[], const String& data)
+{
+    Serial1.flush();
+    Serial1.print("AT+HTTPINIT\r\n");
+
+    // create request message. SSL accept
+    String req =String("AT+HTTPPARA=\"URL\",\"https://");
+    req.concat(server);
+    req.concat(uri);
+    req.concat("\"\r\n");
+
+    Serial1.print(req);
+    ShowSerialData('N');
+    
+    Serial1.print("AT+HTTPPARA=\"CID\",1\r\n");
+    Serial1.print("AT+HTTPPARA=\"REDIR\",1\r\n");
+    Serial1.print("AT+HTTPPARA=\"CONTENT\",\"text/plain;charset=utf-8\"\r\n");
+
+    // auth
+    Serial1.print("AT+HTTPPARA=\"USERDATA\",\"Authorization: Basic ");
+    Serial1.print("");
+    Serial1.print("\"\r\n");
+    waitResponse(1000UL,"");
+    delay(500);
+    Serial1.print("AT+HTTPSSL=1\r\n");
+
+    // data
+    String sdata=String("AT+HTTPDATA=");
+    sdata.concat(String(data.length()));
+    sdata.concat(",5000\r\n");
+
+    Serial.print(sdata);
+    waitResponse(20000UL, "DOWNLOAD");
+
+    Serial.print(data);
+    Serial.print("AT+HTTPACTION=1\r\n");
+    Serial.print("AT+HTTPREAD\r\n");
+    Serial1.flush();
+
+    uint8_t response = getResponse();
+
+    Serial.print("AT+HTTPTERM\r\n");
+    Serial.print("AT+CIPSHUT\r\n");
+    delay(2000);
+    ShowSerialData('N');
+
+    return response;
+
+}
+
+bool getResponse(){
+
+    String response = String("");
+    bool exit = false;
+
+    unsigned long timeout = millis();
+    while ((millis() - timeout) < 10000UL && !exit) {
+        // Print available data
+        while (Serial1.available()) {
+            char c = Serial1.read();
+            Serial.print(c);
+            response += c;
+
+            if (c == '}')
+                exit = true;
+
+            timeout = millis();
+        }
+    }
+    Serial.println(response);
+
+    if (response.indexOf(F("\"success\": true")) < 0){
+        return 0;
+    }
+    return 1;
+}
+
+
 
