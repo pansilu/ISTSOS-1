@@ -36,7 +36,7 @@ This Is a Whether station Internal code. this is requested to buy the hardware i
     7.OneWire
     8.TinyGSM
 ```
-
+4. Copy Libraries to C:\Users\<Username>\Documents\Arduino\libraries Folder
 
 ## Running 
 
