@@ -26,10 +26,10 @@
 #define RAIN_GAUGE_INT 0
 #define RAIN_FACTOR 0.2       // rain factor for one tip bucket
 #define POWER_UP_GSM 9        // powerup pin
-#define TEMP_UP 33            // upeer temp for the fan
-#define TEMP_DOWN 30          // lower temperature or fan
+#define TEMP_UP 38            // upeer temp for the fan
+#define TEMP_DOWN 36          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
-#define SERVER_SETUP 1        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
+#define SERVER_SETUP 0        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
 #define TIME_RATE 2           // set as sending after every Time rate=15minute
 
 #define WIN_SPEED_PIN 2       // wind speed pin
@@ -147,7 +147,7 @@ void setup() {
   // read Datetime once
   RTCDateTime();
   // read sensor values onece
-  readSensorValues();
+  //readSensorValues();
   sendData();
 }
 
@@ -156,7 +156,7 @@ void loop() {
   // read Datetime once
   RTCDateTime();
   // read sensor values onece
-  readSensorValues(); 
+  //readSensorValues(); 
 
   
   if(l_hour==now.hour()){
@@ -169,6 +169,8 @@ void loop() {
     }  
   }
 
+//  createFileSD("log.txt");
+//  writeFileSD("log.txt");
   
 }
 
@@ -244,7 +246,7 @@ int sendGPRSDataAsGET(){
 }
 
 int sendAsGPRS(){
-  
+  soundIndicator(3);
   if(SERVER_SETUP==0){
     sendGPRSDataAsGET();
   }else{
@@ -295,31 +297,31 @@ void RTCDateTime()
     datetime__.concat(String(now.minute(), DEC));
     datetime__.concat(':');
     datetime__.concat(String(now.second(), DEC));
-
-    uint32_t* timepointer=istsos.ntpUpdate("metasntp11.admin.ch",+0000);
-    datetime___="";
-    datetime___.concat(timepointer[0]);
-    datetime___.concat("-");
-    if(timepointer[1]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[1]);
-    datetime___.concat("-");
-    if(timepointer[2]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[2]);
-    datetime___.concat("T");
-    if(timepointer[3]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[3]);
-    datetime___.concat(":");
-    if(timepointer[4]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[4]);
-    datetime___.concat(":");
-    if(timepointer[5]<10)
-      datetime___.concat("0");
-    datetime___.concat(timepointer[5]);
-    datetime___.concat("+0000");
+//
+//    uint32_t* timepointer=istsos.ntpUpdate("metasntp11.admin.ch",+0000);
+//    datetime___="";
+//    datetime___.concat(timepointer[0]);
+//    datetime___.concat("-");
+//    if(timepointer[1]<10)
+//      datetime___.concat("0");
+//    datetime___.concat(timepointer[1]);
+//    datetime___.concat("-");
+//    if(timepointer[2]<10)
+//      datetime___.concat("0");
+//    datetime___.concat(timepointer[2]);
+//    datetime___.concat("T");
+//    if(timepointer[3]<10)
+//      datetime___.concat("0");
+//    datetime___.concat(timepointer[3]);
+//    datetime___.concat(":");
+//    if(timepointer[4]<10)
+//      datetime___.concat("0");
+//    datetime___.concat(timepointer[4]);
+//    datetime___.concat(":");
+//    if(timepointer[5]<10)
+//      datetime___.concat("0");
+//    datetime___.concat(timepointer[5]);
+//    datetime___.concat("+0000");
 
     
     logfile=String(now.year(),DEC);
@@ -565,44 +567,44 @@ void initialize(){
     Wire.begin();
     
     // tone startup // 2 beeps
-    soundIndicator(2);
-    
-    // LCD 
-    lcd.begin(16, 2);
-    
+//    soundIndicator(2);
+//    
+//    // LCD 
+//    lcd.begin(16, 2);
+//    
     // Dullas temperature 
-    externalTemp.begin();
-    externalTemp.begin();
-    externalTemp.getAddress(insideThermometer, 0);
-    externalTemp.setResolution(insideThermometer, 12);
+//    externalTemp.begin();
+//    externalTemp.begin();
+//    externalTemp.getAddress(insideThermometer, 0);
+//    externalTemp.setResolution(insideThermometer, 12);
 
     // BME 280 calibration
-    if(!bme280.init()){
-      printError("BME is not Working");
-    }
-
-    // start light meter
-    lightMeter.begin();  
-    // delay 
+//    if(!bme280.init()){
+//      printError("BME is not Working");
+//    }
+//
+//    // start light meter
+//    lightMeter.begin();  
+//    // delay 
 
     // win speed // wind componant
-    pinMode(RAIN_GAUGE_PIN,INPUT);
-    digitalWrite(RAIN_GAUGE_PIN,HIGH);  // Turn on the internal Pull Up Resistor
-    attachInterrupt(RAIN_GAUGE_INT,rainGageClick,FALLING);
-
-    // turn on interrupts
-    interrupts();
-
-    // check and initialize fan
-    pinMode(FAN_PIN,OUTPUT);
-    digitalWrite(FAN_PIN,HIGH);
+//    pinMode(RAIN_GAUGE_PIN,INPUT);
+//    digitalWrite(RAIN_GAUGE_PIN,HIGH);  // Turn on the internal Pull Up Resistor
+//    attachInterrupt(RAIN_GAUGE_INT,rainGageClick,FALLING);
+//
+//    // turn on interrupts
+//    interrupts();
+//
+//    // check and initialize fan
+//    pinMode(FAN_PIN,OUTPUT);
+//    digitalWrite(FAN_PIN,HIGH);
 
     //   clock module initialization
     if (! rtc.begin()) {
       printError("RTC Not Connected ... !");
       while (1);
     }
-    
+    rtc.adjust(DateTime(__DATE__, __TIME__));
     if (! rtc.isrunning()) {
       printError("RTC Not Running \nSet Time ...!");
       rtc.adjust(DateTime(__DATE__, __TIME__));
@@ -618,7 +620,7 @@ void initialize(){
     if (!SD.begin(chipSelect)) 
     {
       printError("SD Error ... !");
-      setup();
+      //setup();
     }
     else
     {
@@ -630,7 +632,8 @@ void initialize(){
 
     printStr("Initialize GPRS");
     // setup GPRS
-    
+
+    pinMode(POWER_UP_GSM,OUTPUT);
     gsmPower(); 
     if(1){
        // POWER UP GSM
@@ -692,13 +695,14 @@ void funcFan(){
 
 // GSM power UP
 void gsmPower(){
+  
   int check=istsos.getStatus();
   if(check==0){
     digitalWrite(POWER_UP_GSM,HIGH);
     digitalWrite(FAN_PIN,LOW);// check fan
     delay(2000);
     digitalWrite(POWER_UP_GSM,LOW); 
-    digitalWrite(FAN_PIN,HIGH);
+    digitalWrite(FAN_PIN,HIGH );
     Serial.print("Power UP");
     delay(100); 
   }
@@ -902,7 +906,7 @@ void sendGPRSData(){
   Serial1.print("&dt=");
   Serial1.print(datetime__);
   Serial1.print("&GUID=");
-  Serial1.print("5bf82c59-7ec0-4f");
+  Serial1.print("8b29c33e-9df0-44");
   Serial1.print(" HTTP/1.1\r\nHost: www.slpiot.org\r\nConnection:keep-alive\r\n\r\n");
   ShowSerialData('N');
   
