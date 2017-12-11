@@ -49,7 +49,10 @@
                 "C:/Program Files (x86)/Windows Kits/8.1/Include/shared",
                 "C:/Program Files (x86)/Windows Kits/8.1/Include/winrt",
                 "${workspaceRoot}",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino"
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino",
+                "${workspaceRoot}/esos",
+                "C:\\Program Files (x86)\\Arduino\\libraries",
+                "${workspaceRoot}/esos/libs"
             ],
             "defines": [
                 "_DEBUG",

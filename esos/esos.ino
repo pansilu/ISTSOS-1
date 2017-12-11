@@ -33,9 +33,9 @@
 #define TIME_RATE 2           // set as sending after every Time rate=15minute
 
 #define WIN_SPEED_PIN 2       // wind speed pin
-#define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
-#define WIND_VOLTAGE_MIN 10  // minimum voltage comes from wind speed sensor
-#define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        
+#define WIND_FACTOR 32.2      // 1024 --> 32.2ms-1   
+#define WIND_VOLTAGE_MIN 10   // minimum voltage comes from wind speed sensor
+#define WIND_VOLTAGE_MAX 1024 // maximum voltage comes from wind speed sensor        
 // GPRS SETTINGS FOR ISTSOS
 
 #define APN "mobitel"
@@ -147,7 +147,7 @@ void setup() {
   // read Datetime once
   RTCDateTime();
   // read sensor values onece
-  //readSensorValues();
+  readSensorValues();
   sendData();
 }
 
@@ -156,7 +156,7 @@ void loop() {
   // read Datetime once
   RTCDateTime();
   // read sensor values onece
-  //readSensorValues(); 
+  readSensorValues(); 
 
   
   if(l_hour==now.hour()){
@@ -567,7 +567,7 @@ void initialize(){
     Wire.begin();
     
     // tone startup // 2 beeps
-//    soundIndicator(2);
+    soundIndicator(2);
 //    
 //    // LCD 
 //    lcd.begin(16, 2);
@@ -579,9 +579,9 @@ void initialize(){
 //    externalTemp.setResolution(insideThermometer, 12);
 
     // BME 280 calibration
-//    if(!bme280.init()){
-//      printError("BME is not Working");
-//    }
+   if(!bme280.init()){
+     printError("BME is not Working");
+   }
 //
 //    // start light meter
 //    lightMeter.begin();  
@@ -917,7 +917,6 @@ void sendGPRSData(){
   printStr("Data Sent");
 }
 
-//lcd functions
 // LCD functions
 void printLCD(double val,int i,int j){
   String s = String(val,2);  
