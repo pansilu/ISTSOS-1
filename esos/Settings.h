@@ -11,7 +11,6 @@
 #include <Seeed_BME280.h>
 #include <Wire.h>
 #include "Codes.h"
-#include "Functions/Logger.h"
 
 //LCD
 #define LCD_RS 3
@@ -54,3 +53,7 @@
 #define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
 
 #define RF_TIMEOUT 5000
+
+// Factors
+const int MIN_WIND_FACTOR=476;
+const int MAX_WIND_FACTOR=780;
