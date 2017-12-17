@@ -1,15 +1,5 @@
 //includes
-#include <DallasTemperature.h>
-#include <OneWire.h>
-#include <dht.h>
-#include <BH1750.h> 
-#include <RTClib.h>
-#include "SD.h"
-#include <istsos.h>
-#include <com/sim800.h>
-#include <LiquidCrystal.h>
-#include <Seeed_BME280.h>
-#include <Wire.h>
+#include "Settings.h"
 
 // definitins
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
@@ -30,7 +20,7 @@
 #define TEMP_DOWN 36          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
 #define SERVER_SETUP 0        // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 esos
-#define TIME_RATE 2           // set as sending after every Time rate=15minute
+#define TIME_RATE 10           // set as sending after every Time rate=15minute
 
 #define WIN_SPEED_PIN 2       // wind speed pin
 #define WIND_FACTOR 32.2      // 1024 --> 32.2ms-1   
@@ -43,6 +33,9 @@
 #define PASSWORD ""
 #define PROCEDURE "bb3a14a0988311e78b760800273cbaca"
 #define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
+
+// for SLPIOT
+#define PROCEDURE_CODE "5bf82c59-7ec0-4f"
 
 #define RF_TIMEOUT 5000
 
@@ -63,7 +56,8 @@
  * wiper to LCD VO pin (pin 3)
 */
 
-LiquidCrystal lcd(3, 8, 4, 5, 6, 7);
+const int rs = 3, en = 8, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 // Factors
 const int MIN_WIND_FACTOR=476;
@@ -246,6 +240,7 @@ int sendGPRSDataAsGET(){
 }
 
 int sendAsGPRS(){
+  delay(500);
   soundIndicator(3);
   if(SERVER_SETUP==0){
     sendGPRSDataAsGET();
@@ -568,36 +563,36 @@ void initialize(){
     
     // tone startup // 2 beeps
     soundIndicator(2);
-//    
-//    // LCD 
-//    lcd.begin(16, 2);
-//    
+    
+    // LCD 
+    lcd.begin(16, 2);
+    
     // Dullas temperature 
-//    externalTemp.begin();
-//    externalTemp.begin();
-//    externalTemp.getAddress(insideThermometer, 0);
-//    externalTemp.setResolution(insideThermometer, 12);
+    externalTemp.begin();
+    externalTemp.begin();
+    externalTemp.getAddress(insideThermometer, 0);
+    externalTemp.setResolution(insideThermometer, 12);
 
     // BME 280 calibration
    if(!bme280.init()){
      printError("BME is not Working");
    }
-//
-//    // start light meter
-//    lightMeter.begin();  
-//    // delay 
 
+    // start light meter
+    lightMeter.begin(); 
+    delay(1000); 
+    // delay 
     // win speed // wind componant
-//    pinMode(RAIN_GAUGE_PIN,INPUT);
-//    digitalWrite(RAIN_GAUGE_PIN,HIGH);  // Turn on the internal Pull Up Resistor
-//    attachInterrupt(RAIN_GAUGE_INT,rainGageClick,FALLING);
-//
-//    // turn on interrupts
-//    interrupts();
-//
-//    // check and initialize fan
-//    pinMode(FAN_PIN,OUTPUT);
-//    digitalWrite(FAN_PIN,HIGH);
+    pinMode(RAIN_GAUGE_PIN,INPUT);
+    digitalWrite(RAIN_GAUGE_PIN,HIGH);  // Turn on the internal Pull Up Resistor
+    attachInterrupt(RAIN_GAUGE_INT,rainGageClick,FALLING);
+
+    // turn on interrupts
+    interrupts();
+
+    // check and initialize fan
+    pinMode(FAN_PIN,OUTPUT);
+    digitalWrite(FAN_PIN,HIGH);
 
     //   clock module initialization
     if (! rtc.begin()) {
@@ -842,7 +837,7 @@ int setupGPRS(){
   check_gprs = ShowSerialData('N');
   if(check_gprs == -1)
     return -1;
-  delay(1000);
+  delay(4000);
   return 0;
 }
 
@@ -906,13 +901,15 @@ void sendGPRSData(){
   Serial1.print("&dt=");
   Serial1.print(datetime__);
   Serial1.print("&GUID=");
-  Serial1.print("8b29c33e-9df0-44");
+  Serial1.print(PROCEDURE_CODE);
   Serial1.print(" HTTP/1.1\r\nHost: www.slpiot.org\r\nConnection:keep-alive\r\n\r\n");
   ShowSerialData('N');
+  delay(3000);
   
   // Random Data
   Serial1.write(0x1A);
   ShowSerialData('N');
+  
   
   printStr("Data Sent");
 }

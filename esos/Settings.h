@@ -1,4 +1,17 @@
-// definitins
+// includes
+#include <DallasTemperature.h>
+#include <OneWire.h>
+#include <dht.h>
+#include <BH1750.h> 
+#include <RTClib.h>
+#include "SD.h"
+#include <istsos.h>
+#include <com/sim800.h>
+#include <LiquidCrystal.h>
+#include <Seeed_BME280.h>
+#include <Wire.h>
+#include "Codes.h"
+#include "Functions/Logger.h"
 
 //LCD
 #define LCD_RS 3
