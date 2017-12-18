@@ -49,7 +49,6 @@ String logfile="log.txt";
 String logger="logger.txt";
 
 // GSM power up pin
-int isGSM_POWERUP=0;
 String sp;
 
 // water level calc
@@ -122,15 +121,6 @@ void loop() {
         sendData();
     }  
   }
-
-  // make the RTC update
-  if((returnCount * TIME_RATE )>= RTC_UPDATE_INTERVAL * 60 *24){
-      returnCount=0;
-      updateRTC();
-  }
-  writeLogFile();
-  
-  
 }
 
 // send Data To server
@@ -270,31 +260,31 @@ void RTCDateTime()
     logfile.concat(".txt");
 }
 
-// update RTC time from ntp time server
-void updateRTC(){
-  uint32_t* timepointer=ntpUpdateTime();
+// // update RTC time from ntp time server
+// void updateRTC(){
+//   uint32_t* timepointer=ntpUpdateTime();
 
-  // init datetime componants
+//   // init datetime componants
 
- int yyyy =  timepointer[0];
- int MM   =  timepointer[1];
- int dd   =  timepointer[2];
- int hh   =  timepointer[3];
- int mm   =  timepointer[4];
- int ss   =  timepointer[5];
+//  int yyyy =  timepointer[0];
+//  int MM   =  timepointer[1];
+//  int dd   =  timepointer[2];
+//  int hh   =  timepointer[3];
+//  int mm   =  timepointer[4];
+//  int ss   =  timepointer[5];
  
- DateTime ds(yyyy,MM,dd,hh,mm,ss);
- ds =ds + TimeSpan(0, 5, 30, 00);
- rtc.adjust(ds);
+//  DateTime ds(yyyy,MM,dd,hh,mm,ss);
+//  ds =ds + TimeSpan(0, 5, 30, 00);
+//  rtc.adjust(ds);
 
- delay(3000);
- // Read RTC
- RTCDateTime();
+//  delay(3000);
+//  // Read RTC
+//  RTCDateTime();
 
- printValues("Gr Time : ",grinichDateTime);
- printValues("Lc Time : ",localDateTime);
+//  printValues("Gr Time : ",grinichDateTime);
+//  printValues("Lc Time : ",localDateTime);
  
-}
+// }
 
 void readSensorValues(){
   
@@ -381,7 +371,7 @@ void printValues(String name_index,String value){
     delay(1000);
 }
 
-void printError(char *f){
+void printError(String f){
   Serial.println(f); 
   lcd.clear();
   printLCDN(f,0,0);
@@ -584,7 +574,6 @@ void initialize(){
     printStr("Initialize GPRS");
     // setup GPRS
     
-    gsmPower(); 
     while(setupGPRS()==-1){
       printError("\nGPRS ERROR");  
       soundIndicator(3,0);
@@ -602,12 +591,9 @@ void initialize(){
     if (! rtc.isrunning()) {
       printError("RTC Not Running ...!");
       soundIndicator(4,1);
-      updateRTC();
       setup();
     }
     
-    // update rtc from NTP
-    updateRTC();
     
     delay(1000);
 }
@@ -645,21 +631,6 @@ void funcFan(){
     if(int_temperature<TEMP_DOWN){
         digitalWrite(FAN_PIN,HIGH);  
     }
-}
-
-// GSM power UP
-void gsmPower(){
-  int check=0;//istsos.getStatus();
-  if(check==0){
-    digitalWrite(POWER_UP_GSM,HIGH);
-    digitalWrite(FAN_PIN,LOW);// check fan
-    delay(2000);
-    digitalWrite(POWER_UP_GSM,LOW); 
-    digitalWrite(FAN_PIN,HIGH);
-    Serial.print("Power UP");
-    delay(100); 
-  }
-  
 }
 
 void writeFileSD(String fileName)
