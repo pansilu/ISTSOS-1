@@ -49,22 +49,12 @@
 
 // LCD
 
-/*
- * LCD RS pin to digital pin 41
- * LCD Enable pin to digital pin 39
- * LCD D4 pin to digital pin 37
- * LCD D5 pin to digital pin 35
- * LCD D6 pin to digital pin 33
- * LCD D7 pin to digital pin 31
- * LCD R/W pin to ground
- * LCD VSS pin to ground
- * LCD VCC pin to 5V
- * 10K resistor:
- * ends to +5V and ground
- * wiper to LCD VO pin (pin 3)
-*/
-
-LiquidCrystal lcd(3, 8, 4, 5, 6, 7);
+#define LCD_RS 3
+#define LCD_EN 8
+#define LCD_D4 4
+#define LCD_D5 5
+#define LCD_D6 6
+#define LCD_D7 7
 
 // Factors
 const int MIN_WIND_FACTOR=476;
@@ -112,6 +102,9 @@ dht internal_temperature_meter;
 
 // BME 280
 BME280 bme280;
+
+//LCD
+LiquidCrystal lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
 
 // global variables
 double ext_temperature=0; // external temperature 
