@@ -54,4 +54,30 @@ void printStr(String text){
     // printLCDN(name_index,0,0);
 }
 
+void printErrorCode(String text, int DefinitionCode){
+    printError(text);
+    soundIndicator(DefinitionCode/10,DefinitionCode%10);
+}
+
+// sound soundIndicator
+void soundIndicator(int count1,int count2){
+
+    //long turn
+    while(count1>0){
+        tone(BUZZER,1000);
+        delay(200);
+        noTone(BUZZER);
+        delay(10);
+        count1--;
+    }
+    //long turn
+    while(count2>0){
+        tone(BUZZER,1000);
+        delay(100);
+        noTone(BUZZER);
+        delay(10);
+        count2--;
+    }
+    
+  }
 

@@ -18,4 +18,9 @@ void printValues(String name_index,String value);
 void printError(String text);
 void printStr(String text);
 
+void printErrorCode(String text, int DefinitionCode);
+
+// sound indicate
+void soundIndicator(int count1,int count2);
+
 #endif

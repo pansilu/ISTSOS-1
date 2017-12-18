@@ -539,31 +539,6 @@ Serial.println("Writing to "+fileName+ "...");
 }
 // end of extention
 
-// tone genarator
-void soundIndicator(int count){ // 1KHz 100ms out 1
-  for(int i=0;i<count;i++){
-    tone(BUZZER,1000);
-    delay(100);
-    noTone(BUZZER);
-    delay(10);
-  }
-}
-
-void soundIndicator(int count1,int count2){ // 1KHz 100ms out 1
-  for(int i=0;i<count1;i++){
-    tone(BUZZER,500);
-    delay(100);
-    noTone(BUZZER);
-    delay(10);
-  }
-
-   for(int i=0;i<count2;i++){
-    tone(BUZZER,1000);
-    delay(100);
-    noTone(BUZZER);
-    delay(10);
-  }
-}
 
 // =================   GPRS SETUP FOR GET STATEMENT ==============
 
