@@ -378,11 +378,7 @@ void rainGageClick()
 }
 
 
-//write to log file
-void writeLogFile(){
-    createFileSD(logfile);
-    writeFileSD(logfile);  
-}
+
 
 // initialize componants
 void initialize(){

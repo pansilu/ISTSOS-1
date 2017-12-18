@@ -31,6 +31,7 @@ void createFileSD(String fileName)
 //Write the message on the Log
 void writeFileSD(String fileName,String message)
 {
+    createFileSD(fileName);
     file = SD.open(fileName, FILE_WRITE);
     if (file) 
     {
@@ -88,6 +89,7 @@ void printStr(String text){
 
 void printErrorCode(String text, int DefinitionCode){
     Serial.println(text);
+    writeFileSD("ErrorLog.txt",text);
     // lcd.clear();
     // printLCDN(name_index,0,0);
     soundIndicator(DefinitionCode/10,DefinitionCode%10);
