@@ -6,7 +6,7 @@
 #include "Settings.h"
 
 // saving log file
-File myFile;
+File file;
 int SDOK=0;
 const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
 

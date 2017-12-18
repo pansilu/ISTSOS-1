@@ -15,6 +15,20 @@ void initSD(){
     }
 }
 
+// file extention
+void createFileSD(String fileName)
+{
+  if (!SD.exists(fileName)) 
+  {
+    file = SD.open(fileName, FILE_WRITE);
+    file.close();
+ 
+    if (SD.exists(fileName)) 
+        printErrorCode(F("SD_FILE_CREATION_ERROR"),SD_FILE_CREATION_ERROR);
+  }
+}
+
+
 /*
     LCD Functions
 */
@@ -59,7 +73,9 @@ void printStr(String text){
 }
 
 void printErrorCode(String text, int DefinitionCode){
-    printError(text);
+    Serial.println(text);
+    // lcd.clear();
+    // printLCDN(name_index,0,0);
     soundIndicator(DefinitionCode/10,DefinitionCode%10);
 }
 

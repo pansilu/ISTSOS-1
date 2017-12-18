@@ -441,29 +441,7 @@ void initialize(){
     delay(1000);
 }
 
-// file extention
-void createFileSD(String fileName)
-{
-  if (SD.exists(fileName)) 
-  {
-    Serial.println(fileName+" exists.");
-  }
-  else 
-  {
-    Serial.println("Creating "+fileName+"...");
-    myFile = SD.open(fileName, FILE_WRITE);
-    myFile.close();
- 
-    if (SD.exists(fileName)) 
-    {
-      Serial.println(fileName+" create success!");
-    }
-    else 
-    {
-      Serial.println(fileName+" create failed!");  
-    }
-  }
-}
+
 
 // fan on in the range of temperature high
 void funcFan(){
