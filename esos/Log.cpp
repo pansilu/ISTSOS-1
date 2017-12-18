@@ -28,6 +28,20 @@ void createFileSD(String fileName)
   }
 }
 
+//Write the message on the Log
+void writeFileSD(String fileName,String message)
+{
+    file = SD.open(fileName, FILE_WRITE);
+    if (file) 
+    {
+        file.println(message);
+        file.close();
+    } 
+    else 
+    {
+        Serial.println("SD_FILE_OPEN_ERROR" + fileName);
+    }
+}
 
 /*
     LCD Functions

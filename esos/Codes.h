@@ -5,7 +5,7 @@
 #define SD_INIT_DONE 0
 #define SD_INIT_ERROR 12
 #define SD_FILE_CREATION_ERROR 22 
-
+#define SD_FILE_OPEN_ERROR 23
 
 // RTC
 #define RTC_INIT_DONE 0

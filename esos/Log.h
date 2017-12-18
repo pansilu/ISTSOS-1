@@ -15,6 +15,8 @@ const int chipSelect = 53;  // chip select pin for the SD module.it should be co
 
 // SD initialization
 void initSD();
+void createFileSD(String fileName);
+void writeFileSD(String fileName,String message);
 
 // LCD begin
 void initLCD();

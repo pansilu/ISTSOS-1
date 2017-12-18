@@ -454,58 +454,7 @@ void funcFan(){
     }
 }
 
-void writeFileSD(String fileName)
-{
 
-
-  myFile = SD.open(fileName, FILE_WRITE);
-  if (myFile) 
-  {
-Serial.println("Writing to "+fileName+ "...");
-    myFile.println("");
-    myFile.print(grinichDateTime);
-    myFile.println(":{");
-    myFile.print("HUMIDITY");
-    myFile.print(ext_humidity);
-    myFile.print("| ");
-    myFile.print("EXT_TEMP");
-    myFile.print(ext_temperature);
-    myFile.print("| ");
-    myFile.print("INT_TEMP");
-    myFile.print(int_temperature);
-    myFile.print("| ");
-    myFile.print("LUX");
-    myFile.print(lux_value);
-    myFile.print("| ");
-    myFile.print("SM");
-    myFile.print(soilemoisture_value);
-    myFile.print("| ");
-    myFile.print("PRESSURE");
-    myFile.print(pressure_value);
-    myFile.print("| ");
-    myFile.print("WIN_SPEED");
-    myFile.print(wind_speed);
-    myFile.print("| ");
-    myFile.print("WIN_DIR");
-    myFile.print(wind_direction);
-    myFile.print("| ");
-    myFile.print("RAIN_GAUGE");
-    myFile.print(rain_gauge);
-    myFile.print("| ");
-    myFile.print("WATER_LEVEL");
-    myFile.print(water_level);
-    myFile.print("| ");
-    myFile.print("BATT");
-    myFile.println(battery_value);
-    myFile.println("}");
-    myFile.close();
-    Serial.println("File Saved.");
-  } 
-  else 
-  {
-    Serial.println("error opening "+fileName);
-  }
-}
 // end of extention
 
 
