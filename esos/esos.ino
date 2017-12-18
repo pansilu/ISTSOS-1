@@ -80,7 +80,6 @@ void setup() {
   while (!Serial){}     // wait for Serial Monitor On
   Serial1.begin(9600);  // serial  for GPRS 
   while (!Serial1){}    // wait for GPRS Monitor
-
   
   initialize();
 
@@ -426,7 +425,8 @@ void initialize(){
     // LCD 
     initLCD();
 
-    // RTC 
+    // RTC Initialize
+    initRTC();
     
     while(setupGPRS()==-1){
       printError("\nGPRS ERROR");  
@@ -434,20 +434,8 @@ void initialize(){
     };
 
     printStr("Initialize RTC");
+
     
-    //   clock module initialization
-    if (! rtc.begin()) {
-      printError("RTC Not Connected ... !");
-      soundIndicator(4,0);
-      setup();
-    }
-    
-    
-    if (! rtc.isrunning()) {
-      printError("RTC Not Running ...!");
-      soundIndicator(4,1);
-      setup();
-    }
     
     
     delay(1000);
