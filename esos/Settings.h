@@ -15,7 +15,6 @@
 #define RAIN_GAUGE_PIN 2
 #define RAIN_GAUGE_INT 0
 #define RAIN_FACTOR 0.2       // rain factor for one tip bucket
-#define SIM_POWER 9        // powerup pin
 #define TEMP_UP 40            // upeer temp for the fan
 #define TEMP_DOWN 34          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
@@ -32,8 +31,6 @@
 #define APN "mobitel"
 #define USERNAME ""
 #define PASSWORD ""
-#define PROCEDURE "bb3a14a0988311e78b760800273cbaca"
-#define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
 
 #define RF_TIMEOUT 5000
 
