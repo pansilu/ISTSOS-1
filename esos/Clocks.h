@@ -7,6 +7,7 @@
 #include "Settings.h"
 
 RTC_DS1307 rtc; 
+String localDateTime;
 
 void initRTC();
 String getLocalTime();

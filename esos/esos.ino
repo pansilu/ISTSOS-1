@@ -26,7 +26,7 @@ BH1750 lightMeter;
 
 // Clock module     
 DateTime now;   // now time 
-String grinichDateTime,localDateTime;;
+String grinichDateTime;;
 byte l_hour=0,l_minute=0; // to taken time differece of TIME_RATE defined time rate
 int returnCount =0;
 
@@ -163,19 +163,7 @@ void RTCDateTime()
     grinichDateTime.concat(String(now.second(), DEC));
     grinichDateTime.concat("+0000");
 
-   // current datetime
-    now = rtc.now();
-    localDateTime=String(now.year(),DEC);
-    localDateTime.concat('-');
-    localDateTime.concat(String(now.month(), DEC));
-    localDateTime.concat('-');
-    localDateTime.concat(String(now.day(), DEC));
-    localDateTime.concat('-');
-    localDateTime.concat(String(now.hour(), DEC));
-    localDateTime.concat(':');
-    localDateTime.concat(String(now.minute(), DEC));
-    localDateTime.concat(':');
-    localDateTime.concat(String(now.second(), DEC));
+
 
 
 }
@@ -634,7 +622,7 @@ void sendGPRSData(){
   Serial1.print("&BV=");
   Serial1.print(battery_value); 
   Serial1.print("&dt=");
-  Serial1.print(localDateTime);
+  //Serial1.print(localDateTime);
   Serial1.print("&GUID=");
   Serial1.print("5bf82c59-7ec0-4f");
   Serial1.print(" HTTP/1.1\r\nHost: www.slpiot.org\r\nConnection:keep-alive\r\n\r\n");
