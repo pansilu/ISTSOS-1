@@ -52,6 +52,26 @@ void initLCD(){
     lcd.begin(LCD_COLS, LCD_ROWS);
 }
 
+void printLCDDouble(double val,int i,int j){ 
+    lcd.setCursor(i,j);
+    lcd.print(String(val,2));
+}
+  
+void printLCDCharArray(char *f,int i,int j){
+    lcd.setCursor(i,j);
+    lcd.print(f);
+}
+  
+void printLCDString(String f,int i,int j){
+    lcd.setCursor(i,j);
+    lcd.print(f);
+}
+  
+void printLCD(char *f){
+    lcd.clear();
+    lcd.print(f);
+}
+
 /*
     Print Functions 
 */
@@ -90,8 +110,8 @@ void printStr(String text){
 void printErrorCode(String text, int DefinitionCode){
     Serial.println(text);
     writeFileSD("ErrorLog.txt",text);
-    // lcd.clear();
-    // printLCDN(name_index,0,0);
+    lcd.clear();
+    printLCDN(name_index,0,0);
     soundIndicator(DefinitionCode/10,DefinitionCode%10);
 }
 

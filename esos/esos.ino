@@ -677,24 +677,3 @@ void sendGPRSData(){
   
 }
 
-// Log on LCD 
-void printLCD(double val,int i,int j){
-  String s = String(val,2);  
-  lcd.setCursor(i,j);
-  lcd.print(s);
-}
-
-void printLCDN(char *f,int i,int j){
-    lcd.setCursor(i,j);
-    lcd.print(f);
-}
-
-void printLCDN(String f,int i,int j){
-    lcd.setCursor(i,j);
-    lcd.print(f);
-}
-
-void printLCD(char *f){
-    lcd.clear();
-    lcd.print(f);
-}

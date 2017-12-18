@@ -20,6 +20,10 @@ void writeFileSD(String fileName,String message);
 
 // LCD begin
 void initLCD();
+void printLCDDouble(double val,int i,int j);
+void printLCDCharArray(char *f,int i,int j);  
+void printLCDString(String f,int i,int j);
+void printLCD(char *f);
 
 // printers
 void printValues(String name_index,double value);
