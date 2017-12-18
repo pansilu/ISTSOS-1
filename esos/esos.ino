@@ -142,53 +142,7 @@ void sendData(){
   returnCount ++;
 }
 
-//send data as GPRS
-int sendGPRSDataASPOST(){
-    printStr("Sending Data");
-     String data =PROCEDURE;
-    data.concat(";");
-    data.concat(grinichDateTime);
-    data.concat(",");
-    data.concat(battery_value);
-    data.concat(",");
-    data.concat(lux_value/1000);
-    data.concat(",");
-    data.concat(rain_gauge);
-    rain_count=0;   // reset rain counter
-    data.concat(",");
-    data.concat(wind_direction);
-    data.concat(",");
-    data.concat(wind_speed);
-    data.concat(",");
-    data.concat(water_level);
-    data.concat(",");
-    data.concat(soilemoisture_value);
-    data.concat(",");
-    data.concat(altitude_value);
-    data.concat(",");
-    data.concat(pressure_value/1000);
-    data.concat(",");
-    data.concat(ext_temperature);
-    data.concat(",");
-    data.concat(ext_humidity);
 
-    Serial.println(data);
-    int response = executePostMsg(server, uri, data);
-  
-    if (response != REQUEST_SUCCESS)
-    {
-      Serial.println(F("\nSend Failed"));
-      Serial.println(response);
-      printStr("Send Failed");
-      return -1;
-    }
-    else
-    {
-      Serial.println(F("\nSend Success"));
-      printStr("Send Success");
-      return 0;
-    }
-}
 
 int sendGPRSDataAsGET(){
   sendGPRSData();
