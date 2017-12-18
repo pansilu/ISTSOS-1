@@ -12,4 +12,7 @@
 #define RTC_NOT_CONNECTED 13
 #define RTC_FAILED 14
 
+// BME
+#define BME_NOT_INIT 31
+
 #endif

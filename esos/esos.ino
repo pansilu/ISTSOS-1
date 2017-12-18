@@ -63,8 +63,8 @@ double water_level=0;       // water level
 double rain_gauge=0;
 volatile unsigned long rain_count=0;
 volatile unsigned long rain_last=0; 
-
 double battery_value=0;     // battry value
+int loopCount=0;
  
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -74,31 +74,14 @@ void setup() {
   
   initialize();
 
-  // ====  initialy send data
-  // read Datetime once
-  RTCDateTime();
-  // read sensor values onece
-  readSensorValues();
-  sendData();
 }
 
 void loop() {
 
-  // read Datetime once
-  RTCDateTime();
   // read sensor values onece
   readSensorValues(); 
 
   
-  if(l_hour==now.hour()){
-    if((now.minute()-l_minute)==TIME_RATE){
-        sendData();
-    }
-  }else{
-    if(((60+now.minute())-l_minute)==TIME_RATE){
-        sendData();
-    }  
-  }
 }
 
 // send Data To server
@@ -113,7 +96,6 @@ void sendData(){
     }
     printError("GPRS IS NOT CONNECTED TO SERVER");
   }
-  RTCDateTime();
   l_hour=now.hour();
   l_minute=now.minute();
   returnCount ++;
@@ -132,41 +114,6 @@ int sendAsGPRS(){
   }
 }
 
-// read current time value
-void RTCDateTime()
-{
-    // Time genaration for ISTSOS
-    now = rtc.now(); 
-    now =now - TimeSpan(0, 5, 30, 00);
-    
-    grinichDateTime=String(now.year(),DEC);
-    grinichDateTime.concat('-');
-    if(now.month()<10)
-      grinichDateTime.concat("0");
-    grinichDateTime.concat(String(now.month(), DEC));
-    grinichDateTime.concat('-');
-    if(now.day()<10)
-      grinichDateTime.concat("0");
-    grinichDateTime.concat(String(now.day(), DEC));
-    grinichDateTime.concat('T');
-    if(now.hour()<10)
-      grinichDateTime.concat("0");
-    grinichDateTime.concat(String(now.hour(), DEC));
-    grinichDateTime.concat(':');
-    int miniute=now.minute()<2?59:now.minute();
-     if(miniute<10)
-      grinichDateTime.concat("0");
-    grinichDateTime.concat(String(miniute, DEC));
-    grinichDateTime.concat(':');
-     if(now.second()<10)
-      grinichDateTime.concat("0");
-    grinichDateTime.concat(String(now.second(), DEC));
-    grinichDateTime.concat("+0000");
-
-
-
-
-}
 
 // // update RTC time from ntp time server
 // void updateRTC(){
@@ -197,51 +144,51 @@ void RTCDateTime()
 void readSensorValues(){
   
     // read External temperature
-    ext_temperature = readExternalTemperature();
+    ext_temperature += readExternalTemperature();
     printValues(F("EX_T"),ext_temperature);
 
     // read Internal temperature
-    int_temperature=readInternalTemperature();
+    int_temperature += readInternalTemperature();
     printValues(F("IN_T"),int_temperature);
 
     // read Internal humidiy
-    int_humidity=readInternalHumidity();
+    int_humidity += readInternalHumidity();
     printValues(F("IN_H"),int_humidity);
 
     // read external humidity
-    ext_humidity = readExternalHumidity();
+    ext_humidity += readExternalHumidity();
     printValues(F("EX_H"),ext_humidity);
 
     // soile mosture value
-    soilemoisture_value=readSoileMoisture();
+    soilemoisture_value += readSoileMoisture();
     printValues(F("SM"),soilemoisture_value);
 
     // pressure value
-    pressure_value=readPressure();
+    pressure_value += readPressure();
     printValues(F("P"),pressure_value);
 
     // altitude value
-    altitude_value = readAltitude();
+    altitude_value += readAltitude();
     printValues(F("AL"),altitude_value);
 
     // lux value
-    lux_value= readItensity();
+    lux_value += readItensity();
     printValues(F("IN"),lux_value);
 
     // wind direction
-    wind_direction=readWinDirection();
+    wind_direction = readWinDirection();
     printValues(F("WD"),wind_direction);
 
     // wind speed
-    wind_speed=readWindSpeed();
+    wind_speed += readWindSpeed();
     printValues(F("WS"),wind_speed);
     
     // rain guarge
-    rain_gauge=readRainGuarge();
+    rain_gauge += readRainGuarge();
     printValues(F("RG"),rain_gauge);
 
     // get battery voltage
-    battery_value=readBatteryVoltage();
+    battery_value = readBatteryVoltage();
     printValues(F("BT"),battery_value);
     
     // current time and date
@@ -251,6 +198,8 @@ void readSensorValues(){
     funcFan();
     // station is up
     soundIndicator(0,1);
+
+    loopCount++;
 }
 
 
@@ -356,8 +305,8 @@ void initialize(){
     // one wire intialization
     Wire.begin();
     
-    // LCD 
-    lcd.begin(16, 2);
+    // RTC Initialize
+    initRTC();
     
     // Dullas temperature 
     externalTemp.begin();
@@ -366,10 +315,8 @@ void initialize(){
     externalTemp.setResolution(insideThermometer, 12);
 
     // BME 280 calibration
-    if(!bme280.init()){
-      printError("BME is not Working");
-      soundIndicator(1,0);
-    }
+    if(!bme280.init())
+      printErrorCode("BME_NOT_INIT",BME_NOT_INIT);
 
     // start light meter
     lightMeter.begin();  
@@ -392,10 +339,8 @@ void initialize(){
     // LCD 
     initLCD();
 
-    // RTC Initialize
-    initRTC();
-    
     // GPRS
+
 
     printStr(F("Initialization Completed"));    
     delay(2000);
