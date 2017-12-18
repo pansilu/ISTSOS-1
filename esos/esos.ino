@@ -279,7 +279,7 @@ void readSensorValues(){
     // Fan operator
     funcFan();
     // station is up
-    soundIndicator(1);
+    soundIndicator(0,1);
 
 }
 
@@ -420,11 +420,13 @@ void initialize(){
     pinMode(FAN_PIN,OUTPUT);
     digitalWrite(FAN_PIN,HIGH);
 
+    // SD init
+    initSD();
     
     // LCD 
+    initLCD();
 
-    printStr("Initialize GPRS");
-    // setup GPRS
+    // RTC 
     
     while(setupGPRS()==-1){
       printError("\nGPRS ERROR");  
@@ -432,6 +434,7 @@ void initialize(){
     };
 
     printStr("Initialize RTC");
+    
     //   clock module initialization
     if (! rtc.begin()) {
       printError("RTC Not Connected ... !");

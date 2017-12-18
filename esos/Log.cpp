@@ -1,20 +1,30 @@
 #include "log.h"
 
+/*
+    SD card Functions
+*/
+
 void initSD(){
 
     if(SDOK==0){
         if (SD.begin(chipSelect)) 
-            printErrorCode("SD_INIT_DONE",SD_INIT_DONE);
+            printErrorCode(F("SD_INIT_DONE"),SD_INIT_DONE);
         else
-            printErrorCode("SD_INIT_ERROR",SD_INIT_ERROR);
+            printErrorCode(F("SD_INIT_ERROR"),SD_INIT_ERROR);
         SDOK=1;
     }
 }
 
+/*
+    LCD Functions
+*/
+
+void initLCD(){
+    lcd.begin(LCD_COLS, LCD_ROWS);
+}
 
 /*
-    Print Values 
-
+    Print Functions 
 */
 
 void printValues(String name_index,double value){
