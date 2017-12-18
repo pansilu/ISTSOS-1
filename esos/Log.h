@@ -10,4 +10,12 @@ const int chipSelect = 53;  // chip select pin for the SD module.it should be co
 
 // SD initialization
 void initSD();
+
+
+// printers
+void printValues(String name_index,double value);
+void printValues(String name_index,String value);
+void printError(String text);
+void printStr(String text);
+
 #endif
