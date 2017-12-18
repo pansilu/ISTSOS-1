@@ -10,7 +10,12 @@
 
 */
 
-#include "Settings.h"
+#ifndef Logger_h
+#define Logger_h
+
+#include <LiquidCrystal.h>
+#include <Stream.h>
+#include "../Settings.h"
 
 #define LCD_DOUBLE_DECIMAL_PLACES 2
 #define LCD_COLS 16
@@ -21,16 +26,19 @@ const int SDOK=0;
 const int chipSelect = 53;
 
 class Logger{
-  
+
 private:
-    Logger();
-    void LcdPrintDouble(double val,int i,int j);
-    void LcdPrintCharArray(char *f,int i,int j);
-    void LcdPrintString(String f,int i,int j);
-    void soundIndicator(int higher_code,int lower_code);
-    void createFileSD(String fileName);
+        Stream* com_port;
+        void LcdPrintDouble(double val,int i,int j);
+        void LcdPrintCharArray(char *f,int i,int j);
+        void LcdPrintString(String f,int i,int j);
+        void soundIndicator(int higher_code,int lower_code);
+        void createFileSD(String fileName);
 
 public:
-    void Indicate(int soundCode);
-    
+        void Indicate(int soundCode);
+        void begin(Stream &com);
+        void begin();
 };
+
+#endif

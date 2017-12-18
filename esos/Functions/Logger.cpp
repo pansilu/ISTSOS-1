@@ -6,15 +6,18 @@
  basic LCD functions 
 */
 
-// constructor
-
 LiquidCrystal lcd(LCD_RS, LCD_Enable, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
-Logger::Logger(){
+void Logger::begin(Stream &com){
+    this->com_port = &com;
     // LCD initialization
     lcd.begin(LCD_COLS, LCD_ROWS);
-
 }
+
+void Logger::begin(){
+    
+}
+
 
 void Logger::LcdPrintDouble(double val,int i,int j){
     String s = String(val,LCD_DOUBLE_DECIMAL_PLACES);  
