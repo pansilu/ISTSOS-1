@@ -31,10 +31,6 @@ String grinichDateTime,localDateTime;;
 byte l_hour=0,l_minute=0; // to taken time differece of TIME_RATE defined time rate
 int returnCount =0;
 
-// saving log file
-File myFile;
-int SDOK=0;
-const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
 
 // SIM800
 Sim800 istsos = Sim800(Serial1, APN, USERNAME, PASSWORD);
@@ -85,7 +81,6 @@ void setup() {
   Serial1.begin(9600);  // serial  for GPRS 
   while (!Serial1){}    // wait for GPRS Monitor
 
-  printStr("Station SL");
   
   initialize();
 
@@ -271,6 +266,7 @@ void readSensorValues(){
     rain_gauge=readRainGuarge();
     printValues("Rain Gauge:",rain_gauge);
 
+
     // get battery voltage
     battery_value=readBatteryVoltage();
     printValues("Battry Value:",battery_value);
@@ -427,9 +423,6 @@ void initialize(){
     // one wire intialization
     Wire.begin();
     
-    // tone startup // 2 beeps
-    soundIndicator(2);
-    
     // LCD 
     lcd.begin(16, 2);
     
@@ -447,9 +440,8 @@ void initialize(){
 
     // start light meter
     lightMeter.begin();  
-    // delay 
 
-    // win speed // wind componant
+    // Rain guarge
     pinMode(RAIN_GAUGE_PIN,INPUT);
     digitalWrite(RAIN_GAUGE_PIN,HIGH);  // Turn on the internal Pull Up Resistor
     attachInterrupt(RAIN_GAUGE_INT,rainGageClick,FALLING);
@@ -461,19 +453,7 @@ void initialize(){
     pinMode(FAN_PIN,OUTPUT);
     digitalWrite(FAN_PIN,HIGH);
 
-    if(SDOK==0){
-    if (!SD.begin(chipSelect)) 
-    {
-      printError("SD Error ... !");
-      soundIndicator(2,0);
-      setup();
-    }
-    else
-    {
-      SDOK=1;
-      Serial.println("SD Initializes.");
-    }  
-    }
+    
     // LCD 
 
     printStr("Initialize GPRS");
