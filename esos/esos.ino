@@ -1,60 +1,17 @@
 //includes
+#include "Settings.h"
 #include <DallasTemperature.h>
 #include <OneWire.h>
 #include <dht.h>
 #include <BH1750.h> 
 #include <RTClib.h>
 #include "SD.h"
-#include <istsos.h>
-#include <com/sim800.h>
 #include <LiquidCrystal.h>
 #include <Seeed_BME280.h>
 #include <Wire.h>
+#include "log.h"
 
-// definitins
-#define EXTERNAL_TEMP_PIN 11  // External temperature pin
-#define DHT11_IN_PIN 13       // internal temperature
-#define BUZZER 12             // buzzer pin
-#define SM_PIN 8              //  for SM sensor
-#define BMP085_ADDRESS 0x77   // bmp sensor Address  
-#define BATT 0                // get battry meter value
-#define WIN_DIRECTION_PIN 1   // wind directionPin
-#define WIND_DIRECTION_VOLTAGE_MIN 1.96  // minimum voltage comes from wind speed sensor
-#define WIND_DIRECTION_VOLTAGE_MAX 3.13  // maximum voltage comes from wind speed sensor
-// rain gauge
-#define RAIN_GAUGE_PIN 2
-#define RAIN_GAUGE_INT 0
-#define RAIN_FACTOR 0.2       // rain factor for one tip bucket
-#define POWER_UP_GSM 9        // powerup pin
-#define TEMP_UP 40            // upeer temp for the fan
-#define TEMP_DOWN 34          // lower temperature or fan
-#define FAN_PIN 10            // fan pin
-#define SERVER_SETUP 0         // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 for esos ServerSetup=2 for Both 
-#define TIME_RATE 5           // set as sending after every Time (minutes)
-#define RTC_UPDATE_INTERVAL 1 // the inteval et ween 2 RTC update from ntp (days)
 
-#define WIN_SPEED_PIN 2       // wind speed pin
-#define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
-#define WIND_VOLTAGE_MIN 10  // minimum voltage comes from wind speed sensor
-#define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        
-// GPRS SETTINGS FOR ISTSOS
-
-#define APN "mobitel"
-#define USERNAME ""
-#define PASSWORD ""
-#define PROCEDURE "bb3a14a0988311e78b760800273cbaca"
-#define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
-
-#define RF_TIMEOUT 5000
-
-// LCD
-
-#define LCD_RS 3
-#define LCD_EN 8
-#define LCD_D4 4
-#define LCD_D5 5
-#define LCD_D6 6
-#define LCD_D7 7
 
 // Factors
 const int MIN_WIND_FACTOR=476;
@@ -1007,8 +964,7 @@ void sendGPRSData(){
   
 }
 
-//lcd functions
-// LCD functions
+// Log on LCD 
 void printLCD(double val,int i,int j){
   String s = String(val,2);  
   lcd.setCursor(i,j);
@@ -1029,152 +985,3 @@ void printLCD(char *f){
     lcd.clear();
     lcd.print(f);
 }
-
-
-uint32_t* ntpUpdateTime(){
-  
- 
-    Serial1.print("AT+CCLK?\r\n");
-    delay(200);
-
-    String response = "";
-
-    bool flag = false;
-    if (Serial1.available()>0){
-        while (Serial1.available()>0){
-            char c = Serial1.read();
-            if (c == '"'){
-                flag = true;
-            }else if(flag){
-                if (c == '"')
-                    flag = false;
-                else
-                    response += c;
-            }
-        }
-    }
-
-
-    uint32_t* result = new uint32_t[8];
-
-    Serial.println(response);
-
-    String dateStr = getValue(response, ',', 0);
-    String timeStr = getValue(response, ',', 1);
-
-    // get date and time
-    result[0] = (uint32_t)(2000 + getValue(dateStr, '/', 0).toInt());
-    result[1] = (uint32_t)getValue(dateStr, '/', 1).toInt();
-    result[2] = (uint32_t)getValue(dateStr, '/', 2).toInt();
-    result[3] = (uint32_t)getValue(timeStr, ':', 0).toInt();
-    result[4] = (uint32_t)getValue(timeStr, ':', 1).toInt();
-    result[5] = (uint32_t)getValue(getValue(timeStr, ':',2), '+', 0).toInt();
-
-    // get timezone
-    bool positive = false;
-    uint32_t tmp = 0;
-    if (timeStr.indexOf('+') > 0){
-        positive = true;
-        tmp = (uint32_t) getValue(timeStr, '+', 1).toInt();
-    }else{
-        tmp = (uint32_t) getValue(timeStr, '-', 1).toInt();
-    }
-
-    uint32_t h = tmp / 4;
-    uint32_t min = tmp % 4;
-
-    if(min == 0)
-        min = 0;
-    else if(min == 1)
-        min = 15;
-    else if(min == 2)
-        min = 30;
-    else
-        min = 45;
-
-    result[6] = h;
-
-    result[7] = min;
-    result[8] = (uint32_t) positive;
-    return result;
-}
-
-uint8_t executePostMsg(const char server[], const char uri[], const String& data)
-{
-    Serial1.flush();
-    Serial1.print("AT+HTTPINIT\r\n");
-
-    // create request message. SSL accept
-    String req =String("AT+HTTPPARA=\"URL\",\"https://");
-    req.concat(server);
-    req.concat(uri);
-    req.concat("\"\r\n");
-
-    Serial1.print(req);
-    ShowSerialData('N');
-    
-    Serial1.print("AT+HTTPPARA=\"CID\",1\r\n");
-    Serial1.print("AT+HTTPPARA=\"REDIR\",1\r\n");
-    Serial1.print("AT+HTTPPARA=\"CONTENT\",\"text/plain;charset=utf-8\"\r\n");
-
-    // auth
-    Serial1.print("AT+HTTPPARA=\"USERDATA\",\"Authorization: Basic ");
-    Serial1.print("");
-    Serial1.print("\"\r\n");
-    waitResponse(1000UL,"");
-    delay(500);
-    Serial1.print("AT+HTTPSSL=1\r\n");
-
-    // data
-    String sdata=String("AT+HTTPDATA=");
-    sdata.concat(String(data.length()));
-    sdata.concat(",5000\r\n");
-
-    Serial.print(sdata);
-    waitResponse(20000UL, "DOWNLOAD");
-
-    Serial.print(data);
-    Serial.print("AT+HTTPACTION=1\r\n");
-    Serial.print("AT+HTTPREAD\r\n");
-    Serial1.flush();
-
-    uint8_t response = getResponse();
-
-    Serial.print("AT+HTTPTERM\r\n");
-    Serial.print("AT+CIPSHUT\r\n");
-    delay(2000);
-    ShowSerialData('N');
-
-    return response;
-
-}
-
-bool getResponse(){
-
-    String response = String("");
-    bool exit = false;
-
-    unsigned long timeout = millis();
-    while ((millis() - timeout) < 10000UL && !exit) {
-        // Print available data
-        while (Serial1.available()) {
-            char c = Serial1.read();
-            Serial.print(c);
-            response += c;
-
-            if (c == '}')
-                exit = true;
-
-            timeout = millis();
-        }
-    }
-    Serial.println(response);
-
-    if (response.indexOf(F("\"success\": true")) < 0){
-        return 0;
-    }
-    return 1;
-}
-
-
-
