@@ -142,8 +142,6 @@ void sendData(){
   returnCount ++;
 }
 
-
-
 int sendGPRSDataAsGET(){
   sendGPRSData();
   return ShowSerialData('K');
@@ -154,12 +152,6 @@ int sendAsGPRS(){
   
   if(SERVER_SETUP==0){
     sendGPRSDataAsGET();
-  }else if(SERVER_SETUP==1){
-    sendGPRSDataASPOST();
-  }else{
-    sendGPRSDataAsGET();
-    delay(1000);
-    sendGPRSDataASPOST();  
   }
 }
 
