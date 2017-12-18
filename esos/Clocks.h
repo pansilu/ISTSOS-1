@@ -9,6 +9,6 @@
 RTC_DS1307 rtc; 
 
 void initRTC();
-
+String getLocalTime();
 
 #endif

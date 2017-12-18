@@ -77,12 +77,12 @@ void printLCD(char *f){
 */
 
 void printValues(String name_index,double value){
-    Serial.print(name_index);
+    Serial.print(name_index + ":");
     Serial.println(value);
-    // lcd.clear();
-    // printLCDN(name_index,0,0);
-    // printLCD(value,0,1);
-    // delay(1000);
+    lcd.clear();
+    printLCDString(name_index,0,0);
+    printLCDDouble(value,0,1);
+    delay(1000);
 }
 
 void printValues(String name_index,String value){
@@ -103,8 +103,8 @@ void printError(String text){
 
 void printStr(String text){
     Serial.print(text);
-    // lcd.clear();
-    // printLCDN(name_index,0,0);
+    lcd.clear();
+    printLCDString(text,0,0);
 }
 
 void printErrorCode(String text, int DefinitionCode){

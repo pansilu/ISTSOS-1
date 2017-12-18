@@ -210,63 +210,59 @@ void readSensorValues(){
   
     // read External temperature
     ext_temperature = readExternalTemperature();
-    printValues("Ext Temperature:",ext_temperature);
+    printValues(F("EX_T"),ext_temperature);
 
     // read Internal temperature
     int_temperature=readInternalTemperature();
-    printValues("Int Temperature:",int_temperature);
+    printValues(F("IN_T"),int_temperature);
 
     // read Internal humidiy
     int_humidity=readInternalHumidity();
-    printValues("Int Humidity:",int_humidity);
+    printValues(F("IN_H"),int_humidity);
 
     // read external humidity
     ext_humidity = readExternalHumidity();
-    printValues("Ext Humidity:",ext_humidity);
+    printValues(F("EX_H"),ext_humidity);
 
     // soile mosture value
     soilemoisture_value=readSoileMoisture();
-    printValues("Soil Moisture:",soilemoisture_value);
+    printValues(F("SM"),soilemoisture_value);
 
     // pressure value
     pressure_value=readPressure();
-    printValues("Pressure:",pressure_value);
+    printValues(F("P"),pressure_value);
 
     // altitude value
     altitude_value = readAltitude();
-    printValues("Altitude:",altitude_value);
+    printValues(F("AL"),altitude_value);
 
     // lux value
     lux_value= readItensity();
-    printValues("Intensity:",lux_value);
+    printValues(F("IN"),lux_value);
 
     // wind direction
     wind_direction=readWinDirection();
-    printValues("Win Direction:",wind_direction);
+    printValues(F("WD"),wind_direction);
 
     // wind speed
     wind_speed=readWindSpeed();
-    printValues("Win Speed:",wind_speed);
+    printValues(F("WS"),wind_speed);
     
     // rain guarge
     rain_gauge=readRainGuarge();
-    printValues("Rain Gauge:",rain_gauge);
-
+    printValues(F("RG"),rain_gauge);
 
     // get battery voltage
     battery_value=readBatteryVoltage();
-    printValues("Battry Value:",battery_value);
-    
+    printValues(F("BT"),battery_value);
     
     // current time and date
-    printValues("Gr Time : ",grinichDateTime);
-    printValues("Lc Time : ",localDateTime);
+    printValues(F("LCT"),getLocalTime());
 
     // Fan operator
     funcFan();
     // station is up
     soundIndicator(0,1);
-
 }
 
 
@@ -411,17 +407,10 @@ void initialize(){
     // RTC Initialize
     initRTC();
     
-    while(setupGPRS()==-1){
-      printError("\nGPRS ERROR");  
-      soundIndicator(3,0);
-    };
+    // GPRS
 
-    printStr("Initialize RTC");
-
-    
-    
-    
-    delay(1000);
+    printStr(F("Initialization Completed"));    
+    delay(2000);
 }
 
 

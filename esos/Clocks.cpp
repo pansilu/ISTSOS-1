@@ -9,3 +9,9 @@ void initRTC(){
     else
         printErrorCode(F("RTC_INIT_DONE"),RTC_INIT_DONE); 
 }
+
+// get the local time
+
+String getLocalTime(){
+    
+}
