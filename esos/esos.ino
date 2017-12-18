@@ -6,11 +6,11 @@
 #include <BH1750.h> 
 #include <RTClib.h>
 #include <SD.h>
-#include <LiquidCrystal.h>
 #include <Seeed_BME280.h>
 #include <sim800.h>
 #include <Wire.h>
 #include "log.h"
+#include "Clocks.h"
 
 // Factors
 const int MIN_WIND_FACTOR=476;
@@ -24,20 +24,14 @@ DeviceAddress insideThermometer;
 // light meter
 BH1750 lightMeter;
 
-// Clock module
-RTC_DS1307 rtc;      
+// Clock module     
 DateTime now;   // now time 
 String grinichDateTime,localDateTime;;
 byte l_hour=0,l_minute=0; // to taken time differece of TIME_RATE defined time rate
 int returnCount =0;
 
-
 // SIM800
 Sim800 istsos = Sim800(Serial1, APN, USERNAME, PASSWORD);
-
-// log file datetime 
-String logfile="log.txt";
-String logger="logger.txt";
 
 // GSM power up pin
 String sp;
@@ -50,9 +44,6 @@ dht internal_temperature_meter;
 
 // BME 280
 BME280 bme280;
-
-//LCD
-LiquidCrystal lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
 
 // global variables
 double ext_temperature=0; // external temperature 
@@ -121,7 +112,6 @@ void sendData(){
           break;
     }
     printError("GPRS IS NOT CONNECTED TO SERVER");
-    writeLogFile();     // write data to log
   }
   RTCDateTime();
   l_hour=now.hour();
@@ -187,10 +177,7 @@ void RTCDateTime()
     localDateTime.concat(':');
     localDateTime.concat(String(now.second(), DEC));
 
-    logfile=String(now.year(),DEC);
-    logfile.concat('-');
-    logfile.concat(String(now.month(),DEC));
-    logfile.concat(".txt");
+
 }
 
 // // update RTC time from ntp time server

@@ -6,6 +6,8 @@
 #include "Log.h"
 #include "Settings.h"
 
+RTC_DS1307 rtc; 
+
 void initRTC();
 
 

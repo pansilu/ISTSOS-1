@@ -111,7 +111,7 @@ void printErrorCode(String text, int DefinitionCode){
     Serial.println(text);
     writeFileSD("ErrorLog.txt",text);
     lcd.clear();
-    printLCDN(name_index,0,0);
+    printLCDString(text,0,0);
     soundIndicator(DefinitionCode/10,DefinitionCode%10);
 }
 
