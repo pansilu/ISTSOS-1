@@ -4,11 +4,10 @@
 #define TINY_GSM_MODEM_SIM800
 //#define TINY_GSM_MODEM_SIM900
 
-#define SIM_POWER 11
+#define SIM_POWER 9
 #define SIM_PIN_STATUS 40
 
-#define TIMEOUT 20000UL
-#define RESPOSE_TIMEOUT 30000UL
+#define TIMEOUT 30000UL
 
 // error code
 #define REQUEST_SUCCESS 0
@@ -21,7 +20,7 @@
 #define DEBUG_COM 0
 #define DEBUG_COM_ANS 1
 
-#define USE_SSL false
+#define USE_SSL 1
 
 
 #define OK "OK"
@@ -34,7 +33,7 @@
 #include "utils.h"
 #include "comunication.h"
 
-class Drok : public ICom
+class Sim800 : public ICom
 {
 
 private:
@@ -63,12 +62,7 @@ private:
         Put the shield in sleep mode.
     */
     void sleepMode();
-    /**
-        Get shield status
-
-        @return bool status
-    */
-    bool getStatus();
+    
 
     /**
         To
@@ -103,10 +97,7 @@ private:
         Connect to the APN
     */
     bool connectToNetwork();
-    /**
-        Check if connected to the network
-    */
-    uint8_t getRegStatus();
+    
 
     /**
         Wait for a response
@@ -167,7 +158,7 @@ public:
         @param basic Basic authentication string
         @param pin pin to unlock the SIM ("1234)
     */
-    Drok(Stream &serial, const char* apn, const char* user, const char* pass, const char* basic="", const char* pin="");
+    Sim800(Stream &serial, const char* apn, const char* user, const char* pass, const char* basic="", const char* pin="");
 
     /**
         Initialize SIM enviroment.
@@ -212,5 +203,16 @@ public:
         Disconnect from GPRS network.
     */
     void disconnect();
+	/**
+        Check if connected to the network
+    */
+    uint8_t getRegStatus();
+	/**
+        Get shield status
+
+        @return bool status
+    */
+    bool getStatus();
+	
 };
 #endif

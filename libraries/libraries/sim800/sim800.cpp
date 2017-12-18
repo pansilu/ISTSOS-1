@@ -107,7 +107,7 @@ void Sim800::serialFlush(){
 uint8_t Sim800::connectGprs()
 {
 
-    this->wakeUpShield();
+    //this->wakeUpShield();
 
     if (!this->waitForNetwork(TIMEOUT))
     {

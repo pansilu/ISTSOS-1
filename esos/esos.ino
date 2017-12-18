@@ -84,8 +84,6 @@ void setup() {
   while (!Serial){}     // wait for Serial Monitor On
   Serial1.begin(9600);  // serial  for GPRS 
   while (!Serial1){}    // wait for GPRS Monitor
-  Serial3.begin(1200);  // serial  for water level sensor 
-  while (!Serial3){}    // wait for Water Level commuication
 
   printStr("Station SL");
   
@@ -273,10 +271,6 @@ void readSensorValues(){
     rain_gauge=readRainGuarge();
     printValues("Rain Gauge:",rain_gauge);
 
-    // water level
-    water_level=readWaterLevel();
-    printValues("Water Level:",water_level);
-
     // get battery voltage
     battery_value=readBatteryVoltage();
     printValues("Battry Value:",battery_value);
@@ -409,36 +403,6 @@ double readWindSpeed(){
 // read rain guarge
 double readRainGuarge(){
   return rain_count * RAIN_FACTOR;
-}
-
-// read water level
-double readWaterLevel(){
-  Serial3.print('1');
-  Serial3.print('\r');
-  char y,count=0;
-  long l= millis();
-  while(1){
-      if(Serial3.available()){
-        y= Serial3.read();
-        if(y=='A'){
-          water_level= temp.toDouble();
-          Serial3.print('0');
-          Serial3.flush();
-          count=0;
-          temp="";
-          return water_level;
-        }
-        else{
-          temp=temp+y;
-        }
-        
-      }
-      count++;
-        if((millis()-l)>RF_TIMEOUT)
-        {
-          return 0;
-        }
-    }
 }
 
 void rainGageClick()
