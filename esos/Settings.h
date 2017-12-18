@@ -15,7 +15,7 @@
 #define RAIN_GAUGE_PIN 2
 #define RAIN_GAUGE_INT 0
 #define RAIN_FACTOR 0.2       // rain factor for one tip bucket
-#define POWER_UP_GSM 9        // powerup pin
+#define SIM_POWER 9        // powerup pin
 #define TEMP_UP 40            // upeer temp for the fan
 #define TEMP_DOWN 34          // lower temperature or fan
 #define FAN_PIN 10            // fan pin

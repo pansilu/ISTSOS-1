@@ -4,7 +4,7 @@
 #define TINY_GSM_MODEM_SIM800
 //#define TINY_GSM_MODEM_SIM900
 
-#define SIM_POWER 34
+
 #define SIM_PIN_STATUS 40
 
 #define TIMEOUT 30000UL

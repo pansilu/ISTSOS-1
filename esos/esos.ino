@@ -1,13 +1,14 @@
 //includes
 #include "Settings.h"
-#include <DallasTemperature.h>
-#include <OneWire.h>
-#include <dht.h>
-#include <BH1750.h> 
-#include <RTClib.h>
-#include "SD.h"
+#include "libs/DallasTemperature.h"
+#include "libs/OneWire.h"
+#include "libs/dht.h"
+#include "libs/BH1750.h" 
+#include "libs/RTClib.h"
+#include "libs/SD.h"
 #include <LiquidCrystal.h>
-#include <Seeed_BME280.h>
+#include "libs/Seeed_BME280.h"
+#include "libs/com/sim800.h"
 #include <Wire.h>
 #include "log.h"
 
@@ -648,7 +649,7 @@ void funcFan(){
 
 // GSM power UP
 void gsmPower(){
-  int check=istsos.getStatus();
+  int check=0;//istsos.getStatus();
   if(check==0){
     digitalWrite(POWER_UP_GSM,HIGH);
     digitalWrite(FAN_PIN,LOW);// check fan
