@@ -2,6 +2,7 @@
 #define LOG_H
 
 #include <SD.h>
+#include "Codes.h"
 
 // saving log file
 File myFile;
