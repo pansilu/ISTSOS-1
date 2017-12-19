@@ -202,6 +202,23 @@ void readSensorValues(){
     loopCount++;
 }
 
+//clear variables setup to sensor Data
+void clearSensorVariables(){
+  ext_temperature=0;
+  int_temperature=0;
+  ext_humidity=0;
+  int_humidity=0;
+  soilemoisture_value=0;
+  pressure_value=0;
+  altitude_value=0;
+  lux_value=0;
+  wind_direction=0;
+  wind_speed=0;
+  sensor_voltage=0;
+  water_level=0;
+  rain_gauge=0;
+  rain_count=0;
+}
 
 // read external temperature from dullas
 double readExternalTemperature(){
@@ -554,8 +571,7 @@ void sendGPRSData(){
   Serial1.print("&WD=");
   Serial1.print(wind_direction);
   Serial1.print("&RG=");
-  Serial1.print(rain_gauge);
-  rain_count=0;             // set rain count value in to zero
+  Serial1.print(rain_gauge);         
   Serial1.print("&P=");
   Serial1.print(pressure_value);
   Serial1.print("&SM=");
