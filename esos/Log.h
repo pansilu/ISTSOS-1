@@ -6,13 +6,13 @@
 #include "Settings.h"
 #include <LiquidCrystal.h>
 
-// saving log file
-File file;
-int SDOK=0;
-const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
-
 #define LCD_COLS 16
 #define LCD_ROWS 2
+
+// saving log file
+extern File file;
+extern int SDOK=0;
+extern const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
 
 // SD functions
 void initSD();
@@ -20,7 +20,7 @@ void createFileSD(String fileName);
 void writeFileSD(String fileName,String message);
 
 // LCD functions
-LiquidCrystal lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
+extern LiquidCrystal lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
 
 void initLCD();
 void printLCDDouble(double val,int i,int j);

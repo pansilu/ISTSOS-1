@@ -1,0 +1,251 @@
+
+// end of extention
+
+
+// =================   GPRS SETUP FOR GET STATEMENT ==============
+
+int setupGPRS(){
+  int check_gprs;  // check each module is OK;
+  Serial.println("Check The GPRS module : ");
+  
+  Serial1.print("AT\r"); 
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    soundIndicator(3,1);
+    return -1;
+  
+  }
+    
+  // check pin reset happened : unlocked
+  Serial1.print("AT+CPIN?\r");
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    soundIndicator(3,2);
+    return -1;
+  
+  }
+    
+  // check sim registered
+  Serial1.print("AT+CREG?\r"); 
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    soundIndicator(3,3);
+    return -1;
+  
+  }
+    
+  //check GPRS attached :
+  
+  Serial1.print("AT+CGATT?\r"); 
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    soundIndicator(3,4);
+    return -1;
+  
+  }  
+  // Reset the IP session if any
+  Serial1.print("AT+CIPSHUT\r");
+  delay(2000);
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    soundIndicator(3,5);
+    return -1;
+  
+  }
+    
+ //Check if the IP stack is initialized
+  Serial1.print("AT+CIPSTATUS\r");
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    soundIndicator(3,6);
+    return -1;
+  
+  }
+    
+ // To keep things simple, I’m setting up a single connection mode
+  Serial1.print("AT+CIPMUX=0\r"); 
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    soundIndicator(3,7);
+    return -1;
+  
+  }
+    
+  // Start the task, based on the SIM card you are using, you need to know the APN, username and password for your service provider
+  Serial1.print("AT+CSTT= \"mobitel\", \"\", \"\"\r"); 
+  delay(1000);
+  if(check_gprs == -1){
+    soundIndicator(3,8);
+    return -1;
+  
+  }
+    
+  // Now bring up the wireless. Please note, the response to this might take some time
+  Serial1.print("AT+CIICR\r");
+  delay(2000);
+  check_gprs = ShowSerialData('K');
+  if(check_gprs == -1){
+    soundIndicator(3,9);
+    return -1;
+  
+  }
+    
+  //Get the local IP address. Some people say that this step is not required, but if I do not issue this, it was not working for my case. So I made this mandatory, no harm.
+  Serial1.print(" AT+CIFSR\r");  
+  delay(2000);
+  check_gprs = ShowSerialData('N');
+  if(check_gprs == -1){
+    soundIndicator(3,10);
+    return -1;
+  
+  }
+  delay(1000);
+  return 0;
+}
+
+// visualize Serial Data
+int ShowSerialData(char c){  
+ delay(1000);
+ char retval;
+ sp="";
+ while(Serial1.available()!=0) {
+  retval=Serial1.read(); 
+  sp += retval;
+  Serial.write(retval);
+  if(retval == c)
+    return 0;  
+ }
+ if(c== 'N')
+   return 0;
+ else
+  return -1;
+}
+
+uint8_t waitResponse(uint32_t timeout, const String expected)
+{
+
+    unsigned long start = millis();
+
+    String response = String("");
+    bool status = false;
+    bool check = false;
+
+    if (expected != "")
+        check = true;
+
+    do
+    {
+        while(Serial1.available() > 0)
+        {
+            char c = Serial1.read();
+            response += c;
+
+            if(check && response.endsWith(expected))
+            {
+                status = true;
+                goto finish;
+            }
+            if(response.endsWith("OK"))
+            {
+                status = true;
+                goto finish;
+            }
+            else if(response.endsWith("ERROR"))
+            {
+                goto finish;
+            }
+        }
+    }while( millis() - start < timeout);
+
+  finish:
+
+    Serial1.flush();
+
+    return status;
+}
+
+
+
+// get data sender
+void sendGPRSData(){
+  printStr("Send SLPIOT");
+  // Start the connection, TCP, domain name, port 
+  Serial1.println("AT+CIPSTART=\"TCP\",\"slpiot.org\",80");
+  delay(1000);
+  ShowSerialData('N');
+
+  // Random Data
+  Serial1.print("AT+CIPSEND\r\n"); 
+  ShowSerialData('N');
+
+ //send the request
+  Serial1.print("GET /insert_data.php?");
+  Serial1.print("H=");
+  Serial1.print(ext_humidity);
+  Serial1.print("&TE=");
+  Serial1.print(ext_temperature);// ext_temperature
+  Serial1.print("&L=");
+  Serial1.print(lux_value);
+  Serial1.print("&TI=");
+  Serial1.print(int_temperature-2);
+  Serial1.print("&WS=");
+  Serial1.print(wind_speed);
+  Serial1.print("&WD=");
+  Serial1.print(wind_direction);
+  Serial1.print("&RG=");
+  Serial1.print(rain_gauge);         
+  Serial1.print("&P=");
+  Serial1.print(pressure_value);
+  Serial1.print("&SM=");
+  Serial1.print(soilemoisture_value);
+  Serial1.print("&WL=");
+  Serial1.print(water_level);
+  Serial1.print("&AT=");
+  Serial1.print(altitude_value);
+  Serial1.print("&BV=");
+  Serial1.print(battery_value); 
+  Serial1.print("&dt=");
+  //Serial1.print(localDateTime);
+  Serial1.print("&GUID=");
+  Serial1.print("5bf82c59-7ec0-4f");
+  Serial1.print(" HTTP/1.1\r\nHost: www.slpiot.org\r\nConnection:keep-alive\r\n\r\n");
+  ShowSerialData('N');
+  
+  // Random Data
+  Serial1.write(0x1A);
+  ShowSerialData('N');
+
+  delay(1000);
+  Serial1.print("AT+CIPSHUT\r\n"); 
+  delay(2000);
+  ShowSerialData('N');
+  
+  printStr("Data Sent");
+  
+}
+
+// update RTC time from ntp time server
+void updateRTC(){
+  uint32_t* timepointer=ntpUpdateTime();
+
+  // init datetime componants
+
+ int yyyy =  timepointer[0];
+ int MM   =  timepointer[1];
+ int dd   =  timepointer[2];
+ int hh   =  timepointer[3];
+ int mm   =  timepointer[4];
+ int ss   =  timepointer[5];
+ 
+ DateTime ds(yyyy,MM,dd,hh,mm,ss);
+ ds =ds + TimeSpan(0, 5, 30, 00);
+ rtc.adjust(ds);
+
+ delay(3000);
+ // Read RTC
+ RTCDateTime();
+
+ printValues("Gr Time : ",grinichDateTime);
+ printValues("Lc Time : ",localDateTime);
+ 
+}
