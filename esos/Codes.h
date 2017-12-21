@@ -21,4 +21,7 @@
 #define SERVICE_OK 1
 #define SERVICE_ERROR 11
 
+#define DATA_SEND_SUCCESSFULLY 2
+#define DATA_SEND_ERROR 21
+
 #endif

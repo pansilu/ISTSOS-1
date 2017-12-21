@@ -8,7 +8,9 @@ void unitRun(){
         Serial.print(getLocalTime());
     }
 
-    
+    if(SERVICE_TEST){
+        ServiceBegin();
+    }
     
     while(1);
 }

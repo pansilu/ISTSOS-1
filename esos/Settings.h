@@ -32,6 +32,10 @@
 #define USERNAME ""
 #define PASSWORD ""
 
+//Local Server
+#define SERVER "slpiot.org"
+#define PROCEDURE "5bf82c59-7ec0-4f"
+
 #define RF_TIMEOUT 5000
 
 // LCD

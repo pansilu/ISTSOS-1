@@ -7,8 +7,23 @@
 #include "Clocks.h"
 
 // SIM800
-extern Sim800 server = Sim800(Serial1, APN, USERNAME, PASSWORD);
+extern Sim800 server ;
 
 void ServiceBegin();
+uint8_t executeRequest(double* externalHum,
+    double *externalTemp,
+    double *internalTemp,
+    double *light_intensity,
+    double *windSpeed,
+    double *windDirection,
+    double *rainFall,
+    double *pressure,
+    double *soilMoisture,
+    double *waterlevel,
+    double *altitude,
+    double *battry,
+    String& TimeStamp,
+    String& Guid,
+    String& uri);
 
 #endif
