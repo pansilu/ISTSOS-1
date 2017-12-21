@@ -33,6 +33,7 @@ void printValues(String name_index,double value);
 void printValues(String name_index,String value);
 void printError(String text);
 void printStrOnDebug(String text);
+void logData(String& text);
 void printStr(String text);
 void printStr(String text,String logTime,int DefinitionCode );
 void printErrorCode(String text,String logTime,int DefinitionCode );

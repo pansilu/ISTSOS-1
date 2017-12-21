@@ -1,9 +1,10 @@
 #include "Service.h"
 
-Sim800 server = Sim800(Serial1, APN, USERNAME, PASSWORD);
+const String server_url=String(SERVER);
+Sim800 simServer = Sim800(Serial1, APN, USERNAME, PASSWORD);
 
 void ServiceBegin(){
-    uint8_t temp= server.begin();
+    uint8_t temp= simServer.begin();
     if(temp)
         printStr("SERVICE_OK",getLocalTime(),SERVICE_OK);
     else
@@ -23,10 +24,9 @@ uint8_t executeRequest(double *externalHum,
                     double *altitude,
                     double *battry,
                     String &TimeStamp,
-                    String &Guid,
-                    String &uri)
+                    String &Guid)
 {
-            String req = uri;
+            String req = String(F("http://slpiot.org/insert_data.php?"));
             req.concat("H="); req.concat(*externalHum);
             req.concat("&TE=" ); req.concat(* externalTemp);
             req.concat("&L=" ); req.concat(*light_intensity);
@@ -41,13 +41,12 @@ uint8_t executeRequest(double *externalHum,
             req.concat("&dt=" ); req += TimeStamp;
             req.concat("&GUID=" ); req += Guid;
 
-            printStrOnDebug(F("REQ : "));
-            printStrOnDebug(F(req));
+            logData(req);
 
     char charBuf[req.length()];
     req.toCharArray(charBuf,req.length());
 
-   uint8_t temp = server.executeGet(SERVER,charBuf);
+   uint8_t temp = simServer.executeGet(SERVER,charBuf);
    if(temp)
     printStr("DATA_SEND_SUCCESSFULLY",getLocalTime(),DATA_SEND_SUCCESSFULLY);
    else

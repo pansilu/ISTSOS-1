@@ -118,6 +118,11 @@ void printStr(String text){
     printLCDString(text,0,0);
 }
 
+void logData(String &text){
+    Serial.println(text);
+    writeFileSD("DTLOG.txt",text);
+}
+
 void printStr(String text,String logTime,int DefinitionCode ){
     Serial.println(text);
     logTime.concat(" | ");

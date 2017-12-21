@@ -23,7 +23,6 @@ uint8_t executeRequest(double* externalHum,
     double *altitude,
     double *battry,
     String& TimeStamp,
-    String& Guid,
-    String& uri);
+    String& Guid);
 
 #endif
