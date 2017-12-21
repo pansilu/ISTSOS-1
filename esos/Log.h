@@ -11,8 +11,8 @@
 
 // saving log file
 extern File file;
-extern int SDOK=0;
-extern const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
+extern int SDOK;
+extern const int chipSelect;  // chip select pin for the SD module.it should be connected to 53 of module
 
 // SD functions
 void initSD();
@@ -20,7 +20,7 @@ void createFileSD(String fileName);
 void writeFileSD(String fileName,String message);
 
 // LCD functions
-extern LiquidCrystal lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
+extern LiquidCrystal lcd;
 
 void initLCD();
 void printLCDDouble(double val,int i,int j);
@@ -33,7 +33,8 @@ void printValues(String name_index,double value);
 void printValues(String name_index,String value);
 void printError(String text);
 void printStr(String text);
-
+void printStr(String text,String logTime,int DefinitionCode );
+void printErrorCode(String text,String logTime,int DefinitionCode );
 void printErrorCode(String text, int DefinitionCode);
 
 // sound indicate

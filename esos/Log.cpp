@@ -1,5 +1,12 @@
 #include "log.h"
 
+LiquidCrystal lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
+// saving log file
+File file;
+int SDOK=0;
+const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
+
+
 /*
     SD card Functions
 */
@@ -8,7 +15,7 @@ void initSD(){
 
     if(SDOK==0){
         if (SD.begin(chipSelect)) 
-            printErrorCode(F("SD_INIT_DONE"),SD_INIT_DONE);
+            printErrorCode(F("SD_INIT_DONE"),SD_INIT_DONE); 
         else
             printErrorCode(F("SD_INIT_ERROR"),SD_INIT_ERROR);
         SDOK=1;
@@ -24,7 +31,7 @@ void createFileSD(String fileName)
     file.close();
  
     if (SD.exists(fileName)) 
-        printErrorCode(F("SD_FILE_CREATION_ERROR"),SD_FILE_CREATION_ERROR);
+        printErrorCode(F("SD_FILE_CREATION_ERROR : "),SD_FILE_CREATION_ERROR);
   }
 }
 
@@ -107,9 +114,29 @@ void printStr(String text){
     printLCDString(text,0,0);
 }
 
+void printStr(String text,String logTime,int DefinitionCode ){
+    Serial.println(text);
+    logTime.concat(" | ");
+    logTime.concat(text);
+    writeFileSD("SYSLOG.txt",logTime);
+    lcd.clear();
+    printLCDString(text,0,0);
+    soundIndicator(DefinitionCode/10,DefinitionCode%10);
+}
+
 void printErrorCode(String text, int DefinitionCode){
     Serial.println(text);
-    writeFileSD("ErrorLog.txt",text);
+    writeFileSD("ERRLog.txt",text);
+    lcd.clear();
+    printLCDString(text,0,0);
+    soundIndicator(DefinitionCode/10,DefinitionCode%10);
+}
+
+void printErrorCode(String text,String logTime,int DefinitionCode ){
+    Serial.println(text);
+    logTime.concat(" | ");
+    logTime.concat(text);
+    writeFileSD("ERRLog.txt",logTime);
     lcd.clear();
     printLCDString(text,0,0);
     soundIndicator(DefinitionCode/10,DefinitionCode%10);

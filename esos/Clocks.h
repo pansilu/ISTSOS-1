@@ -6,10 +6,11 @@
 #include "Log.h"
 #include "Settings.h"
 
-RTC_DS1307 rtc; 
-String localDateTime;
+extern RTC_DS1307 rtc; 
+extern String localDateTime;
 
 void initRTC();
 String getLocalTime();
+void setTimeFromPC();
 
 #endif

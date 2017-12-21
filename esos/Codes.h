@@ -15,4 +15,6 @@
 // BME
 #define BME_NOT_INIT 31
 
+#define INIT_DONE 1
+
 #endif

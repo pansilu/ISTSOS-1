@@ -1,5 +1,8 @@
 #include "Clocks.h"
 
+RTC_DS1307 rtc; 
+String localDateTime;
+
 // begin RTC 
 void initRTC(){
     if(!rtc.begin())
@@ -7,7 +10,12 @@ void initRTC(){
     else if(!rtc.isrunning())
         printErrorCode(F("RTC_FAILED"),RTC_FAILED);
     else
-        printErrorCode(F("RTC_INIT_DONE"),RTC_INIT_DONE); 
+        printErrorCode(F("RTC_INIT_DONE "),RTC_INIT_DONE); 
+}
+
+// void set Time from PC
+void setTimeFromPC(){
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
 // get the local time

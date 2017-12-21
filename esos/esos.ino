@@ -11,6 +11,7 @@
 #include <Wire.h>
 #include "log.h"
 #include "Clocks.h"
+#include "unit.h"
 
 // Factors
 const int MIN_WIND_FACTOR=476;
@@ -28,7 +29,7 @@ BH1750 lightMeter;
 DateTime now;   // now time
 
 // SIM800
-Sim800 istsos = Sim800(Serial1, APN, USERNAME, PASSWORD);
+Sim800 server = Sim800(Serial1, APN, USERNAME, PASSWORD);
 
 // dht 11 internal temperature
 dht internal_temperature_meter;
@@ -68,6 +69,9 @@ void setup() {
 }
 
 void loop() {
+  //Run Unit tests
+  unitRun();
+  
   // read sensor values onece
   readSensorValues(); 
 
@@ -288,7 +292,7 @@ void initialize(){
     // GPRS
 
     clearSensorVariables();   // initialize all sensor variables 
-    printStr(F("Initialization Completed"));    
+    printStr(F("INIT_DONE"),getLocalTime(),INIT_DONE);    
     delay(2000);
 }
 
