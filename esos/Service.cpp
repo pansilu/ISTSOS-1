@@ -41,6 +41,9 @@ uint8_t executeRequest(double *externalHum,
             req.concat("&dt=" ); req += TimeStamp;
             req.concat("&GUID=" ); req += Guid;
 
+            printStrOnDebug(F("REQ : "));
+            printStrOnDebug(F(req));
+
     char charBuf[req.length()];
     req.toCharArray(charBuf,req.length());
 

@@ -108,6 +108,10 @@ void printError(String text){
 //   delay(1000);
 }
 
+void printStrOnDebug(String text){
+    Serial.print(text);
+}
+
 void printStr(String text){
     Serial.print(text);
     lcd.clear();
