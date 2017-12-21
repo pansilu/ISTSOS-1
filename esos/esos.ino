@@ -7,11 +7,11 @@
 #include <RTClib.h>
 #include <SD.h>
 #include <Seeed_BME280.h>
-#include <sim800.h>
 #include <Wire.h>
 #include "log.h"
 #include "Clocks.h"
 #include "unit.h"
+#include "Service.h"
 
 // Factors
 const int MIN_WIND_FACTOR=476;
@@ -27,9 +27,6 @@ BH1750 lightMeter;
 
 // Clock module     
 DateTime now;   // now time
-
-// SIM800
-Sim800 server = Sim800(Serial1, APN, USERNAME, PASSWORD);
 
 // dht 11 internal temperature
 dht internal_temperature_meter;

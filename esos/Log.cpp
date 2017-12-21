@@ -47,7 +47,7 @@ void writeFileSD(String fileName,String message)
     } 
     else 
     {
-        Serial.println("SD_FILE_OPEN_ERROR" + fileName);
+        Serial.println("SD_FILE_OPEN_ERROR :" + fileName);
     }
 }
 

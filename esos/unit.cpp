@@ -7,6 +7,8 @@ void unitRun(){
         setTimeFromPC();
         Serial.print(getLocalTime());
     }
+
+    if()
     
     while(1);
 }

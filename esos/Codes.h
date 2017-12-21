@@ -17,4 +17,8 @@
 
 #define INIT_DONE 1
 
+// Service
+#define SERVICE_OK 1
+#define SERVICE_ERROR 11
+
 #endif

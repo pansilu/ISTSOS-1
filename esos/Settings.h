@@ -28,7 +28,7 @@
 #define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        
 // GPRS SETTINGS FOR ISTSOS
 
-#define APN "mobitel"
+#define APN "dialog"
 #define USERNAME ""
 #define PASSWORD ""
 
