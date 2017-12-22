@@ -48,5 +48,6 @@ DateTime getCurruntRTCDate(){
 }
 
 unsigned long getUnixTime(){
-    return rtc.unixtime();
+    DateTime now = rtc.now();
+    return now.unixtime();
 }

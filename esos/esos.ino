@@ -18,7 +18,7 @@ const int MIN_WIND_FACTOR=476;
 const int MAX_WIND_FACTOR=780;
 
 // Procedure 
-String GUID_CODE = String("8b29c33e-9df0-44");
+String GUID_CODE = String("5bf82c59-7ec0-4f");
 
 // Dullas Temperature Mesurement
 OneWire oneWire(EXTERNAL_TEMP_PIN);
@@ -80,7 +80,12 @@ void setup() {
 
 void loop() {
   // read sensor values onece
-  readSensorValues(); 
+  readSensorValues();
+  Serial.print(getUnixTime() - lastSendTime);
+  if((getUnixTime() - lastSendTime) > TIME_RATE * 60){
+    getAvarageSensorValues();
+    sendData();
+  }  
 }
 
 void sendData(){
@@ -103,7 +108,7 @@ void sendData(){
             curruntDatetimeStr,
             GUID_CODE);
   clearSensorVariables();
-  lastSendTime = getCurruntRTCDate();
+  lastSendTime = getUnixTime();
 
 }
 
