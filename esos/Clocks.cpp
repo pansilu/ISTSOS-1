@@ -1,13 +1,13 @@
 #include "Clocks.h"
 
-RTC_DS1307 rtc; 
+RTC_DS3231 rtc;  
 String localDateTime;
 
 // begin RTC 
 void initRTC(){
     if(!rtc.begin())
         printErrorCode(F("RTC_NOT_CONNECTED"),RTC_NOT_CONNECTED);
-    else if(!rtc.isrunning())
+    else if(rtc.lostPower())
         printErrorCode(F("RTC_FAILED"),RTC_FAILED);
     else
         printErrorCode(F("RTC_INIT_DONE "),RTC_INIT_DONE); 

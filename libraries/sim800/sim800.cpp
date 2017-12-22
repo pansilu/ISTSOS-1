@@ -16,16 +16,21 @@ uint8_t Sim800::begin()
     pinMode(SIM_PIN_STATUS, INPUT);
     pinMode(SIM_POWER, OUTPUT);
 
-    //this->unlockSim();
+    if (!this->restart()){
+        return false;
+    }
+	
+	if(this->pin != "")
+    {
+        return this->unlockSim();
+    }
 
     return true;
 }
 
 bool Sim800::restart()
 {
-    /*if(!autoBaud())
-        return false;
-*/
+    Serial.println(getStatus());
     if(!this->sendCmd(F("AT+CFUN=0\r\n"), 10000UL))
     {
         Serial.println(F("AT+CFUN=0 fail"));
@@ -39,11 +44,7 @@ bool Sim800::restart()
 
     delay(3000);
 
-    // Factory reset
-    if(!this->sendCmd(F("AT&FZE0\r\n")))
-        return false;
 
-    return this->unlockSim();
 }
 
 bool Sim800::unlockSim()
@@ -107,7 +108,7 @@ void Sim800::serialFlush(){
 uint8_t Sim800::connectGprs()
 {
 
-    //this->wakeUpShield();
+    this->wakeUpShield();
 
     if (!this->waitForNetwork(TIMEOUT))
     {
@@ -124,7 +125,7 @@ uint8_t Sim800::connectGprs()
     return 0;
 }
 
-bool Sim800::waitForNetwork(unsigned long timeout = 30000UL)
+bool Sim800::waitForNetwork(unsigned long timeout)
 {
     for (unsigned long start = millis(); millis() - start < timeout;)
     {
@@ -245,7 +246,8 @@ uint8_t Sim800::waitResponse(uint32_t timeout, const String expected)
         {
             char c = this->serialAT->read();
             response += c;
-
+			if(DEBUG_COM_ANS)
+				Serial.print(c);
             if(check && response.endsWith(expected))
             {
                 status = true;
@@ -270,6 +272,52 @@ uint8_t Sim800::waitResponse(uint32_t timeout, const String expected)
     return status;
 }
 
+uint8_t Sim800::executeGet(const char server[], const char uri[]){
+
+	/*this->serialAT->flush();
+    int tmp = this->connectGprs();
+    if( tmp != 0){
+        return tmp;
+    }
+	
+	this->writeCmd(F("AT+CIPSTART=\"TCP\","), String(server), String(",80"), F("\"\r\n"));
+	this->waitResponse();
+	this->sendCmd(F("AT+CIPSEND\r\n"));
+	
+	this->sendCmd(F("GET "));
+	this->sendCmd(uri);
+	this->sendCmd(F(" HTTP/1.1\r\nHost: "));
+	this->sendCmd(server);
+	this->sendCmd(F("\r\nConnection: close\r\n\r\n"));
+
+    if (DEBUG_COM)
+        Serial.println(F("wait for response..."));
+
+    bool response = this->getResponse();
+    return response;*/
+	
+	this->serialAT->flush();
+    int tmp = this->connectGprs();
+
+    if( tmp != 0){
+        return tmp;
+    }
+
+    this->sendCmd(F("AT+HTTPINIT\r\n"));
+    this->sendCmd(F("AT+HTTPPARA=\"CID\",1\r\n"));
+	this->writeCmd(F("AT+HTTPPARA=\"URL\",\""), String(uri),String("\"\r\n"));
+	this->sendCmd(F("AT+HTTPACTION=0\r\n"));
+	this->waitResponse(5000UL, "OK");
+	this->sendCmd(F("AT+HTTPREAD\r\n"));
+	uint8_t response = this->waitResponse(5000UL, "OK");
+	this->sendCmd(F("AT+HTTPTERM\r\n"));
+	this->waitResponse(5000UL, "OK");
+    this->disconnect();
+
+    return response;
+	
+}
+
 uint8_t Sim800::executePost(const char server[], const char uri[], const String& data)
 {
     this->serialAT->flush();
@@ -280,7 +328,7 @@ uint8_t Sim800::executePost(const char server[], const char uri[], const String&
     }
 
     this->sendCmd(F("AT+HTTPINIT\r\n"));
-
+	
     if(USE_SSL)
         this->writeCmd(F("AT+HTTPPARA=\"URL\",\"https://"), String(server), String(uri), F("\"\r\n"));
     else
@@ -438,7 +486,7 @@ bool Sim800::getResponse(){
             if(DEBUG_COM_ANS)
                 Serial.print(c);
             response += c;
-
+			
             if (c == '}')
                 exit = true;
 

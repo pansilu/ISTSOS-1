@@ -17,8 +17,8 @@
 #define GPRS_FAILURE 4
 #define SERVER_FAILURE 5
 
-#define DEBUG_COM 0
-#define DEBUG_COM_ANS 1
+#define DEBUG_COM 1
+#define DEBUG_COM_ANS 0
 
 #define USE_SSL 1
 
@@ -179,7 +179,7 @@ public:
 
         @return uint8_t return code
     */
-    //uint8_t executeGet(const char server[], const char uri[]);
+    uint8_t executeGet(const char server[], const char uri[]);
     /**
         Execute POST requests.
 
@@ -190,7 +190,7 @@ public:
         @return uint8_t return code
     */
     uint8_t executePost(const char server[], const char uri[], const String& data);
-
+	
     /**
         Update the internal RTC and return the current date.
 

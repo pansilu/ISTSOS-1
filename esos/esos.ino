@@ -81,7 +81,6 @@ void setup() {
 void loop() {
   // read sensor values onece
   readSensorValues();
-  Serial.print(getUnixTime() - lastSendTime);
   if((getUnixTime() - lastSendTime) > TIME_RATE * 60){
     getAvarageSensorValues();
     sendData();
