@@ -10,12 +10,15 @@
 #include <Wire.h>
 #include "log.h"
 #include "Clocks.h"
-#include "unit.h"
 #include "Service.h"
+//#include "unit.h"
 
 // Factors
 const int MIN_WIND_FACTOR=476;
 const int MAX_WIND_FACTOR=780;
+
+// Procedure 
+const String GUID_CODE = "8b29c33e-9df0-44";
 
 // Dullas Temperature Mesurement
 OneWire oneWire(EXTERNAL_TEMP_PIN);
@@ -26,7 +29,8 @@ DeviceAddress insideThermometer;
 BH1750 lightMeter;
 
 // Clock module     
-DateTime now;   // now time
+DateTime lastSendTime;   // last send Time
+String curruntDatetimeStr;
 
 // dht 11 internal temperature
 dht internal_temperature_meter;
@@ -63,15 +67,62 @@ void setup() {
   
   initialize();
 
+  //Run Unit tests
+  #ifdef UNIT_CPP
+    unitRun();
+  #endif
+
+  // initial sending data,
+  curruntDatetime = getCurruntRTCDate();
+  readSensorValues();
+  getAvarageSensorValues();
 }
 
 void loop() {
-  //Run Unit tests
-  unitRun();
+  
   
   // read sensor values onece
   readSensorValues(); 
+}
 
+void sendData(){
+
+  // read Date 
+  curruntDatetimeStr = getLocalTime();
+
+  uint8_t temp= executeRequest(&ext_humidity,
+          &ext_temperature,
+            &int_temperature,
+            &lux_value,
+            &wind_speed,
+            &wind_direction,
+            &rain_gauge,
+            &pressure,
+            &soilemoisture_value,
+            &water_level,
+            &altitude_value,
+            &battery_value,
+            curruntDatetimeStr,
+            GUID_CODE
+            );
+  clearSensorVariables();
+
+
+}
+
+void getAvarageSensorValues(){
+  ext_temperature /= loopCount;
+  int_temperature /= loopCount;
+  int_humidity /= loopCount;
+  ext_humidity /= loopCount;
+  soilemoisture_value /= loopCount;
+  pressure /= loopCount;
+  pressure *= 1000;
+  altitude_value /= loopCount;
+  lux_value /= loopCount;
+  wind_speed /= loopCount;
+  rain_gauge /= loopCount;
+  battery_value /= loopCount;
 }
 
 void readSensorValues(){
@@ -151,6 +202,8 @@ void clearSensorVariables(){
   water_level=0;
   rain_gauge=0;
   rain_count=0;
+
+  loopCount=0;
 }
 
 // read external temperature from dullas
@@ -195,7 +248,7 @@ double readAltitude(){
 
 // read pressure value
 double readPressure(){
-  return bme280.getPressure(); // kpa
+  return bme280.getPressure()*0.001; // kpa
 }
 
 // read lux value
@@ -287,6 +340,7 @@ void initialize(){
     initLCD();
 
     // GPRS
+    ServiceBegin();
 
     clearSensorVariables();   // initialize all sensor variables 
     printStr(F("INIT_DONE"),getLocalTime(),INIT_DONE);    
