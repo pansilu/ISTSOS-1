@@ -73,7 +73,6 @@ void setup() {
   #endif
 
   // initial sending data,
-  curruntDatetime = getCurruntRTCDate();
   readSensorValues();
   getAvarageSensorValues();
 }
@@ -106,7 +105,7 @@ void sendData(){
             GUID_CODE
             );
   clearSensorVariables();
-
+  lastSendTime = getCurruntRTCDate();
 
 }
 
