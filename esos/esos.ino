@@ -29,7 +29,7 @@ DeviceAddress insideThermometer;
 BH1750 lightMeter;
 
 // Clock module     
-DateTime lastSendTime;   // last send Time
+unsigned long lastSendTime;   // last send Time
 String curruntDatetimeStr;
 
 // dht 11 internal temperature

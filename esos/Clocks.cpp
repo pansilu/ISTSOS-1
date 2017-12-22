@@ -46,3 +46,7 @@ String getLocalTime(){
 DateTime getCurruntRTCDate(){
     return rtc.now();
 }
+
+unsigned long getUnixTime(){
+    return rtc.unixtime();
+}

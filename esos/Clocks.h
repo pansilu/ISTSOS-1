@@ -13,5 +13,6 @@ void initRTC();
 String getLocalTime();
 void setTimeFromPC();
 DateTime getCurruntRTCDate();
+unsigned long getUnixTime();
 
 #endif
