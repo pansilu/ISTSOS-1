@@ -18,7 +18,7 @@ const int MIN_WIND_FACTOR=476;
 const int MAX_WIND_FACTOR=780;
 
 // Procedure 
-const String GUID_CODE = "8b29c33e-9df0-44";
+String GUID_CODE = String("8b29c33e-9df0-44");
 
 // Dullas Temperature Mesurement
 OneWire oneWire(EXTERNAL_TEMP_PIN);
@@ -75,11 +75,10 @@ void setup() {
   // initial sending data,
   readSensorValues();
   getAvarageSensorValues();
+  sendData();
 }
 
 void loop() {
-  
-  
   // read sensor values onece
   readSensorValues(); 
 }
@@ -96,14 +95,13 @@ void sendData(){
             &wind_speed,
             &wind_direction,
             &rain_gauge,
-            &pressure,
+            &pressure_value,
             &soilemoisture_value,
             &water_level,
             &altitude_value,
             &battery_value,
             curruntDatetimeStr,
-            GUID_CODE
-            );
+            GUID_CODE);
   clearSensorVariables();
   lastSendTime = getCurruntRTCDate();
 
@@ -115,8 +113,8 @@ void getAvarageSensorValues(){
   int_humidity /= loopCount;
   ext_humidity /= loopCount;
   soilemoisture_value /= loopCount;
-  pressure /= loopCount;
-  pressure *= 1000;
+  pressure_value /= loopCount;
+  pressure_value *= 1000;
   altitude_value /= loopCount;
   lux_value /= loopCount;
   wind_speed /= loopCount;
