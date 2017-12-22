@@ -10,7 +10,7 @@ void unitRun(){
 
     if(SERVICE_TEST){
         ServiceBegin();
-        double testVar = 0.0;
+        double testVar = 0.1;
         String s= getLocalTime();
         String p= String("8b29c33e-9df0-44");
 

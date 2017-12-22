@@ -27,19 +27,21 @@ uint8_t executeRequest(double *externalHum,
                     String &Guid)
 {
             String req = String(F("http://slpiot.org/insert_data.php?"));
-            req.concat("H="); req.concat(*externalHum);
+            req.concat("&GUID=" ); req += Guid;
+            req.concat("&dt=" ); req += TimeStamp;
+            req.concat("&H="); req.concat(*externalHum);
             req.concat("&TE=" ); req.concat(* externalTemp);
             req.concat("&L=" ); req.concat(*light_intensity);
             req.concat("&TI=" ); req.concat(*internalTemp);
             req.concat("&WS=" ); req.concat(*windSpeed);
-            req.concat("&WS=" ); req.concat(*windDirection);
+            req.concat("&WD=" ); req.concat(*windDirection);
             req.concat("&RG=" ); req.concat(*rainFall);
+            req.concat("&P=" ); req.concat(*pressure);
             req.concat("&SM=" ); req.concat(*soilMoisture);
             req.concat("&WL=" ); req.concat(*waterlevel);
             req.concat("&AT=" ); req.concat(*altitude);
             req.concat("&BV=" ); req.concat(*battry);
-            req.concat("&dt=" ); req += TimeStamp;
-            req.concat("&GUID=" ); req += Guid;
+            
 
             logData(req);
 
