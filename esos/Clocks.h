@@ -12,5 +12,6 @@ extern String localDateTime;
 void initRTC();
 String getLocalTime();
 void setTimeFromPC();
+DateTime getCurruntRTCDate();
 
 #endif

@@ -42,3 +42,7 @@ String getLocalTime(){
 
    return localDateTime;
 }
+
+DateTime getCurruntRTCDate(){
+    return rtc.now();
+}
