@@ -1,16 +1,19 @@
 #include "Clocks.h"
 
-RTC_DS3231 rtc;  
+RTC_DS1307 rtc;  
 String localDateTime;
 
 // begin RTC 
 void initRTC(){
     if(!rtc.begin())
-        printErrorCode(F("RTC_NOT_CONNECTED"),RTC_NOT_CONNECTED);
-    else if(rtc.lostPower())
-        printErrorCode(F("RTC_FAILED"),RTC_FAILED);
+    printError(F("RTC_NOT_CONNECTED"));
+    else if(! rtc.isrunning()){
+        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+        printError(F("RTC_FAILED"));
+    }
+    
     else
-        printErrorCode(F("RTC_INIT_DONE "),RTC_INIT_DONE); 
+    printStr(F("RTC_INIT_DONE ")); 
 }
 
 // void set Time from PC

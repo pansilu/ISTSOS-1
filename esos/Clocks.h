@@ -8,8 +8,8 @@
 #include "Log.h"
 #include "Settings.h"
 
-extern RTC_DS3231 rtc;
- 
+extern RTC_DS1307 rtc;
+
 extern String localDateTime;
 
 void initRTC();

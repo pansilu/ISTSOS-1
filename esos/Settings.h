@@ -45,4 +45,19 @@
 #define LCD_D6 6
 #define LCD_D7 7
 
+
+// Sensor Enabling
+#define EXT_TEMP_ENABLE 1
+#define INT_TEMP_ENABLE 1
+#define EXT_HUM_ENABLE 1
+#define INT_HUM_ENABLE 1
+#define SM_ENABLE 1
+#define PRESSURE_ENABLE 1
+#define ALTITUDE_ENABLE 1
+#define LUX_ENABLE 1
+#define WS_ENABLE 1
+#define WD_ENABLE 1
+#define RG_ENABLE 1
+#define BT_ENABLE 1
+
 #endif

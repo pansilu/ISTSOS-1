@@ -20,6 +20,7 @@ const int MAX_WIND_FACTOR=780;
 // Procedure 
 String GUID_CODE = String("5bf82c59-7ec0-4f");
 
+
 // Dullas Temperature Mesurement
 OneWire oneWire(EXTERNAL_TEMP_PIN);
 DallasTemperature externalTemp(&oneWire);
@@ -88,7 +89,7 @@ void loop() {
 }
 
 void sendData(){
-
+  printStr("Sending Data");
   // read Date 
   curruntDatetimeStr = getLocalTime();
 
@@ -129,52 +130,76 @@ void getAvarageSensorValues(){
 void readSensorValues(){
   
     // read External temperature
-    ext_temperature += readExternalTemperature();
-    printValues(F("EX_T"),ext_temperature);
+    if(EXT_TEMP_ENABLE){
+      ext_temperature += readExternalTemperature();
+      printValues(F("EX_T"),ext_temperature);
+    }
 
     // read Internal temperature
-    int_temperature += readInternalTemperature();
-    printValues(F("IN_T"),int_temperature);
+    if(INT_TEMP_ENABLE){
+      int_temperature += readInternalTemperature();
+      printValues(F("IN_T"),int_temperature);
+    }
 
     // read Internal humidiy
-    int_humidity += readInternalHumidity();
-    printValues(F("IN_H"),int_humidity);
+    if(INT_HUM_ENABLE){
+      int_humidity += readInternalHumidity();
+      printValues(F("IN_H"),int_humidity);
+    }
 
     // read external humidity
-    ext_humidity += readExternalHumidity();
-    printValues(F("EX_H"),ext_humidity);
+    if(EXT_HUM_ENABLE){
+      ext_humidity += readExternalHumidity();
+      printValues(F("EX_H"),ext_humidity);
+    }
 
     // soile mosture value
-    soilemoisture_value += readSoileMoisture();
-    printValues(F("SM"),soilemoisture_value);
+    if(SM_ENABLE){
+      soilemoisture_value += readSoileMoisture();
+      printValues(F("SM"),soilemoisture_value);
+    }
 
     // pressure value
-    pressure_value += readPressure();
-    printValues(F("P"),pressure_value);
+    if(PRESSURE_ENABLE){
+      pressure_value += readPressure();
+      printValues(F("P"),pressure_value);
+    }
 
     // altitude value
-    altitude_value += readAltitude();
-    printValues(F("AL"),altitude_value);
+    if(ALTITUDE_ENABLE){
+      altitude_value += readAltitude();
+      printValues(F("AL"),altitude_value);
+    }
 
     // lux value
-    lux_value += readItensity();
-    printValues(F("IN"),lux_value);
+    if(LUX_ENABLE){
+      lux_value += readItensity();
+      printValues(F("IN"),lux_value);
+    }
 
     // wind direction
-    wind_direction = readWinDirection();
-    printValues(F("WD"),wind_direction);
+    if(WD_ENABLE){
+      wind_direction = readWinDirection();
+      printValues(F("WD"),wind_direction);
+    }
 
     // wind speed
-    wind_speed += readWindSpeed();
-    printValues(F("WS"),wind_speed);
+    if(WS_ENABLE){
+      wind_speed += readWindSpeed();
+      printValues(F("WS"),wind_speed);
+    }
     
     // rain guarge
-    rain_gauge += readRainGuarge();
-    printValues(F("RG"),rain_gauge);
+    if(RG_ENABLE){
+      rain_gauge += readRainGuarge();
+      printValues(F("RG"),rain_gauge);
+    }
 
     // get battery voltage
-    battery_value = readBatteryVoltage();
-    printValues(F("BT"),battery_value);
+    if(BT_ENABLE){
+      battery_value = readBatteryVoltage();
+      printValues(F("BT"),battery_value);
+    }
     
     // current time and date
     printValues(F("LCT"),getLocalTime());
@@ -310,22 +335,30 @@ void initialize(){
     initRTC();
     
     // Dullas temperature 
-    externalTemp.begin();
-    externalTemp.begin();
-    externalTemp.getAddress(insideThermometer, 0);
-    externalTemp.setResolution(insideThermometer, 12);
+    if(EXT_TEMP_ENABLE){
+      externalTemp.begin();
+      externalTemp.begin();
+      externalTemp.getAddress(insideThermometer, 0);
+      externalTemp.setResolution(insideThermometer, 12);
+    }
 
     // BME 280 calibration
-    if(!bme280.init())
+    if(EXT_HUM_ENABLE || PRESSURE_ENABLE || ALTITUDE_ENABLE){
+      if(!bme280.init())
       printErrorCode("BME_NOT_INIT",BME_NOT_INIT);
+    }
 
     // start light meter
-    lightMeter.begin();  
+    if(LUX_ENABLE){
+      lightMeter.begin(); 
+    } 
 
     // Rain guarge
-    pinMode(RAIN_GAUGE_PIN,INPUT);
-    digitalWrite(RAIN_GAUGE_PIN,HIGH);  // Turn on the internal Pull Up Resistor
-    attachInterrupt(RAIN_GAUGE_INT,rainGageClick,FALLING);
+    if(RG_ENABLE){
+      pinMode(RAIN_GAUGE_PIN,INPUT);
+      digitalWrite(RAIN_GAUGE_PIN,HIGH);  // Turn on the internal Pull Up Resistor
+      attachInterrupt(RAIN_GAUGE_INT,rainGageClick,FALLING);
+    }
 
     // turn on interrupts
     interrupts();
