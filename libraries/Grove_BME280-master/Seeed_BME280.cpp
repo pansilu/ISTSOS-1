@@ -106,28 +106,35 @@ float BME280::calcAltitude(float pressure)
   C = C /0.0000225577;
   return C;
 }
-
+unsigned long time_y;
 uint8_t BME280::BME280Read8(uint8_t reg)
 {
+  time_y = millis();	
   Wire.beginTransmission(BME280_ADDRESS);
   Wire.write(reg);
   Wire.endTransmission();
 
   Wire.requestFrom(BME280_ADDRESS, 1);
-  while(!Wire.available());
+  while(!Wire.available()){
+	  if((millis() - time_y)>3000UL)
+		  return 0;
+  }
   return Wire.read();
 }
 
 uint16_t BME280::BME280Read16(uint8_t reg)
 {
   uint8_t msb, lsb;
-
+  time_y = millis();	
   Wire.beginTransmission(BME280_ADDRESS);
   Wire.write(reg);
   Wire.endTransmission();
 
   Wire.requestFrom(BME280_ADDRESS, 2);
-  while(Wire.available()<2);
+  while(Wire.available()<2){
+	  if((millis() - time_y)>3000UL)
+		  return 0;
+  }
   msb = Wire.read();
   lsb = Wire.read();
 
@@ -153,13 +160,16 @@ int16_t BME280::BME280ReadS16LE(uint8_t reg)
 uint32_t BME280::BME280Read24(uint8_t reg)
 {
   uint32_t data;
-
+  time_y = millis();
   Wire.beginTransmission(BME280_ADDRESS);
   Wire.write(reg);
   Wire.endTransmission();
 
   Wire.requestFrom(BME280_ADDRESS, 3);
-  while(Wire.available()<3);
+  while(Wire.available()<3){
+	  if((millis() - time_y)>3000UL)
+		  return 0;
+  }
   data = Wire.read();
   data <<= 8;
   data |= Wire.read();

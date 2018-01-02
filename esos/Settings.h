@@ -5,10 +5,10 @@
 #define EXTERNAL_TEMP_PIN 11  // External temperature pin
 #define DHT11_IN_PIN 13       // internal temperature
 #define BUZZER 12             // buzzer pin
-#define SM_PIN 8              //  for SM sensor
+#define SM_PIN A8              //  for SM sensor
 #define BMP085_ADDRESS 0x77   // bmp sensor Address  
-#define BATT 0                // get battry meter value
-#define WIN_DIRECTION_PIN 1   // wind directionPin
+#define BATT A0                // get battry meter value
+#define WIN_DIRECTION_PIN A1   // wind directionPin
 #define WIND_DIRECTION_VOLTAGE_MIN 1.96  // minimum voltage comes from wind speed sensor
 #define WIND_DIRECTION_VOLTAGE_MAX 3.13  // maximum voltage comes from wind speed sensor
 // rain gauge
@@ -22,7 +22,7 @@
 #define TIME_RATE 5           // set as sending after every Time (minutes)
 #define RTC_UPDATE_INTERVAL 1 // the inteval et ween 2 RTC update from ntp (days)
 
-#define WIN_SPEED_PIN 2       // wind speed pin
+#define WIN_SPEED_PIN A2       // wind speed pin
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
 #define WIND_VOLTAGE_MIN 10  // minimum voltage comes from wind speed sensor
 #define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        

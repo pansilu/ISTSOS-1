@@ -337,7 +337,6 @@ void initialize(){
     // Dullas temperature 
     if(EXT_TEMP_ENABLE){
       externalTemp.begin();
-      externalTemp.begin();
       externalTemp.getAddress(insideThermometer, 0);
       externalTemp.setResolution(insideThermometer, 12);
     }
@@ -345,7 +344,9 @@ void initialize(){
     // BME 280 calibration
     if(EXT_HUM_ENABLE || PRESSURE_ENABLE || ALTITUDE_ENABLE){
       if(!bme280.init())
-      printErrorCode("BME_NOT_INIT",BME_NOT_INIT);
+        printErrorCode("BME_NOT_INIT",BME_NOT_INIT);
+      else
+        printStr(F("BMP OK"),getLocalTime(),INIT_DONE);
     }
 
     // start light meter
