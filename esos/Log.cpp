@@ -102,23 +102,23 @@ void printValues(String name_index,String value){
     delay(1000);
 }
 
-void printValues(String name_index,String timeStamp,double value){
+void printValues(String name_index,String tx,double value){
     Serial.print(name_index + ":");
     Serial.println(value);
     lcd.clear();
     printLCDString(name_index,0,0);
     printLCDDouble(value,7,0);
-    printLCDString(timeStamp,0,1);
+    printLCDString(tx.substring(2),0,1);
     delay(1000);
 }
 
-void printValues(String name_index,String timeStamp,String value){
+void printValues(String name_index,String tx,String value){
     Serial.print(name_index);
     Serial.println(value);
     lcd.clear();
     printLCDString(name_index,0,0);
     printLCDString(value,7,0);
-    printLCDString(timeStamp,0,1);
+    printLCDString(tx.substring(2),0,1);
     delay(1000);
 }
 

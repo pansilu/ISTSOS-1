@@ -133,77 +133,74 @@ void readSensorValues(){
     // read External temperature
     if(EXT_TEMP_ENABLE){
       ext_temperature += readExternalTemperature();
-      printValues(F("EX_T"),ext_temperature/loopCount);
+      printValues(F("EX_T"),getLocalTime(),ext_temperature/loopCount);
     }
 
     // read Internal temperature
     if(INT_TEMP_ENABLE){
       int_temperature += readInternalTemperature();
-      printValues(F("IN_T"),int_temperature/loopCount);
+      printValues(F("IN_T"),getLocalTime(),int_temperature/loopCount);
     }
 
     // read Internal humidiy
     if(INT_HUM_ENABLE){
       int_humidity += readInternalHumidity();
-      printValues(F("IN_H"),int_humidity/loopCount);
+      printValues(F("IN_H"),getLocalTime(),int_humidity/loopCount);
     }
 
     // read external humidity
     if(EXT_HUM_ENABLE){
       ext_humidity += readExternalHumidity();
-      printValues(F("EX_H"),ext_humidity/loopCount);
+      printValues(F("EX_H"),getLocalTime(),ext_humidity/loopCount);
     }
 
     // soile mosture value
     if(SM_ENABLE){
       soilemoisture_value += readSoileMoisture();
-      printValues(F("SM"),soilemoisture_value/loopCount);
+      printValues(F("SM"),getLocalTime(),soilemoisture_value/loopCount);
     }
 
     // pressure value
     if(PRESSURE_ENABLE){
       pressure_value += readPressure();
-      printValues(F("P"),pressure_value/loopCount);
+      printValues(F("P"),getLocalTime(),pressure_value/loopCount);
     }
 
     // altitude value
     if(ALTITUDE_ENABLE){
       altitude_value += readAltitude();
-      printValues(F("AL"),altitude_value/loopCount);
+      printValues(F("AL"),getLocalTime(),altitude_value/loopCount);
     }
 
     // lux value
     if(LUX_ENABLE){
       lux_value += readItensity();
-      printValues(F("IN"),lux_value/loopCount);
+      printValues(F("IN"),getLocalTime(),lux_value/loopCount);
     }
 
     // wind direction
     if(WD_ENABLE){
       wind_direction = readWinDirection();
-      printValues(F("WD"),wind_direction);
+      printValues(F("WD"),getLocalTime(),wind_direction);
     }
 
     // wind speed
     if(WS_ENABLE){
       wind_speed += readWindSpeed();
-      printValues(F("WS"),wind_speed/loopCount);
+      printValues(F("WS"),getLocalTime(),wind_speed/loopCount);
     }
     
     // rain guarge
     if(RG_ENABLE){
       rain_gauge += readRainGuarge();
-      printValues(F("RG"),rain_gauge/loopCount);
+      printValues(F("RG"),getLocalTime(),(rain_gauge/loopCount));
     }
 
     // get battery voltage
     if(BT_ENABLE){
       battery_value = readBatteryVoltage();
-      printValues(F("BT"),battery_value);
+      printValues(F("BT"),getLocalTime(),battery_value);
     }
-    
-    // current time and date
-    printValues(F("LCT "),getLocalTime());
 
     // Fan operator
     funcFan();

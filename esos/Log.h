@@ -31,6 +31,8 @@ void printLCD(char *f);
 // printers
 void printValues(String name_index,double value);
 void printValues(String name_index,String value);
+void printValues(String name_index,String tx,double value);
+void printValues(String name_index,String tx,String value);
 void printError(String text);
 void printStrOnDebug(String text);
 void logData(String& text);
