@@ -203,7 +203,7 @@ void readSensorValues(){
     }
     
     // current time and date
-    printValues(F("LCT"),getLocalTime());
+    printValues(F("LCT "),getLocalTime());
 
     // Fan operator
     funcFan();
@@ -235,8 +235,12 @@ void clearSensorVariables(){
 
 // read external temperature from dullas
 double readExternalTemperature(){
-  return bme280.getTemperature();
   externalTemp.requestTemperatures();
+  if(externalTemp.getTempCByIndex(0) <-120)
+  {
+    printErrorCode("DS18B20_ERROR",getLocalTime(),DS18B20_ERROR);
+    return 0;  
+  }
   return externalTemp.getTempCByIndex(0);
 }
 
@@ -364,20 +368,22 @@ void rainGageClick()
 void initialize(){
     // one wire intialization
     Wire.begin();
+    // LCD 
+    initLCD();
     
     // RTC Initialize
     initRTC();
-    
+    delay(300);
     // SD init
     initSD();
-    
+    delay(300);
     // Dullas temperature 
     if(EXT_TEMP_ENABLE){
       externalTemp.begin();
       externalTemp.getAddress(insideThermometer, 0);
       externalTemp.setResolution(insideThermometer, 12);
     }
-
+    
     // BME 280 calibration
     if(EXT_HUM_ENABLE || PRESSURE_ENABLE || ALTITUDE_ENABLE){
       if(!bme280.init()){
@@ -407,9 +413,6 @@ void initialize(){
     // check and initialize fan
     pinMode(FAN_PIN,OUTPUT);
     digitalWrite(FAN_PIN,HIGH);
-    
-    // LCD 
-    initLCD();
 
     // GPRS
     ServiceBegin();

@@ -2,7 +2,7 @@
 #define SETTINGS_H
 
 // definitins
-#define EXTERNAL_TEMP_PIN 11  // External temperature pin
+#define EXTERNAL_TEMP_PIN 8  // External temperature pin
 #define DHT11_IN_PIN 13       // internal temperature
 #define BUZZER 12             // buzzer pin
 #define SM_PIN A8              //  for SM sensor
@@ -37,13 +37,7 @@
 #define RF_TIMEOUT 5000
 
 // LCD
-
-#define LCD_RS 3
-#define LCD_EN 8
-#define LCD_D4 4
-#define LCD_D5 5
-#define LCD_D6 6
-#define LCD_D7 7
+#define LCD_ADDRESS 0x27
 
 
 // Sensor Enabling

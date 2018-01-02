@@ -4,7 +4,7 @@
 #include <SD.h>
 #include "Codes.h"
 #include "Settings.h"
-#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 
 #define LCD_COLS 16
 #define LCD_ROWS 2
@@ -20,7 +20,7 @@ void createFileSD(String fileName);
 void writeFileSD(String fileName,String message);
 
 // LCD functions
-extern LiquidCrystal lcd;
+extern LiquidCrystal_I2C lcd;
 
 void initLCD();
 void printLCDDouble(double val,int i,int j);

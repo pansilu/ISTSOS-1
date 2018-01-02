@@ -1,6 +1,6 @@
 #include "log.h"
 
-LiquidCrystal lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
+LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLS, LCD_ROWS);
 // saving log file
 File filef;
 int SDOK=0;
@@ -56,7 +56,8 @@ void writeFileSD(String fileName,String message)
 */
 
 void initLCD(){
-    lcd.begin(LCD_COLS, LCD_ROWS);
+    lcd.begin();
+    lcd.backlight();
 }
 
 void printLCDDouble(double val,int i,int j){ 
@@ -98,6 +99,26 @@ void printValues(String name_index,String value){
     lcd.clear();
     printLCDString(name_index,0,0);
     printLCDString(value,0,1);
+    delay(1000);
+}
+
+void printValues(String name_index,String timeStamp,double value){
+    Serial.print(name_index + ":");
+    Serial.println(value);
+    lcd.clear();
+    printLCDString(name_index,0,0);
+    printLCDDouble(value,7,0);
+    printLCDString(timeStamp,0,1);
+    delay(1000);
+}
+
+void printValues(String name_index,String timeStamp,String value){
+    Serial.print(name_index);
+    Serial.println(value);
+    lcd.clear();
+    printLCDString(name_index,0,0);
+    printLCDString(value,7,0);
+    printLCDString(timeStamp,0,1);
     delay(1000);
 }
 

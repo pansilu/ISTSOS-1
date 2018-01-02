@@ -8,8 +8,9 @@ void initRTC(){
     if(!rtc.begin())
     printError(F("RTC_NOT_CONNECTED"));
     else if(rtc.lostPower()){
-        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-        printError(F("RTC_FAILED"));
+        printError(F("RTC_ADJESTING..."));
+        setTimeFromPC();
+        printError(F("RTC_SUCCESSFULL"));
     }
     
     else

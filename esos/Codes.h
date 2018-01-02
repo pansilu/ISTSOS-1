@@ -28,4 +28,8 @@
 // Light 
 #define LIGHT_I2C_ERROR 15
 
+// DS18B20
+
+#define DS18B20_ERROR 16
+
 #endif
