@@ -49,7 +49,7 @@ uint8_t executeRequest(double *externalHum,
     req.toCharArray(charBuf,req.length());
 
    uint8_t temp = simServer.executeGet(SERVER,charBuf);
-   if(temp)
+   if(!temp)
     printStr("DATA_SEND_SUCCESSFULLY",getLocalTime(),DATA_SEND_SUCCESSFULLY);
    else
     printErrorCode("DATA_SEND_ERROR",getLocalTime(),DATA_SEND_ERROR);

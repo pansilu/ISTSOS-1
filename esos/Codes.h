@@ -25,4 +25,7 @@
 #define DATA_SEND_SUCCESSFULLY 2
 #define DATA_SEND_ERROR 21
 
+// Light 
+#define LIGHT_I2C_ERROR 15
+
 #endif

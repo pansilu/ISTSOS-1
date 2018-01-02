@@ -235,6 +235,7 @@ void clearSensorVariables(){
 
 // read external temperature from dullas
 double readExternalTemperature(){
+  return bme280.getTemperature();
   externalTemp.requestTemperatures();
   return externalTemp.getTempCByIndex(0);
 }
@@ -253,12 +254,12 @@ double readInternalHumidity(){
 
 double readExternalHumidity(){
   if(!isBME280Working()){
-    printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+    printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
     return 0;
   }
 
   if(bme280.getHumidity() == 0 ){
-    printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+    printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
     return 0;
   }
   return bme280.getHumidity();
@@ -280,12 +281,12 @@ double readSoileMoisture(){
 // read Altitude
 double readAltitude(){
     if(!isBME280Working()){
-      printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
       return 0;
     }
     
     if(bme280.getPressure() > 118000 ){
-      printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);\
+      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);\
       return 0;
     }
     return bme280.calcAltitude(bme280.getPressure());
@@ -294,12 +295,12 @@ double readAltitude(){
 // read pressure value
 double readPressure(){
   if(!isBME280Working()){
-      printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
       return 0;
     }
     
     if(bme280.getPressure() > 118000 ){
-      printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
       return 0;
     }
   return bme280.getPressure()*0.001; // kpa
@@ -307,6 +308,11 @@ double readPressure(){
 
 // read lux value
 double readItensity(){
+    if(lightMeter.readLightLevel()>54000){
+      
+      printErrorCode("LIGHT_I2C_ERROR",getLocalTime(),LIGHT_I2C_ERROR);
+      return 0;
+    }
     return lightMeter.readLightLevel();
 }
 
@@ -375,7 +381,7 @@ void initialize(){
     // BME 280 calibration
     if(EXT_HUM_ENABLE || PRESSURE_ENABLE || ALTITUDE_ENABLE){
       if(!bme280.init()){
-        printErrorCode("BME_NOT_INIT",BME_NOT_INIT);
+        printErrorCode("BME_NOT_INIT",getLocalTime(),BME_NOT_INIT);
         is_bme280_working=0;
       }
       else
