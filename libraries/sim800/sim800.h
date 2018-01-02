@@ -17,7 +17,7 @@
 #define GPRS_FAILURE 4
 #define SERVER_FAILURE 5
 
-#define DEBUG_COM 1
+#define DEBUG_COM 0
 #define DEBUG_COM_ANS 0
 
 #define USE_SSL 1
