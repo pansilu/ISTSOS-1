@@ -14,6 +14,7 @@
 
 // BME
 #define BME_NOT_INIT 31
+#define BME_I2C_ERROR 32
 
 #define INIT_DONE 1
 

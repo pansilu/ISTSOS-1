@@ -2,7 +2,7 @@
 
 LiquidCrystal lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
 // saving log file
-File file;
+File filef;
 int SDOK=0;
 const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
 
@@ -27,8 +27,8 @@ void createFileSD(String fileName)
 {
   if (!SD.exists(fileName)) 
   {
-    file = SD.open(fileName, FILE_WRITE);
-    file.close();
+    filef = SD.open(fileName, FILE_WRITE);
+    filef.close();
  
     if (SD.exists(fileName)) 
         printErrorCode(F("SD_FILE_CREATION_ERROR : "),SD_FILE_CREATION_ERROR);
@@ -39,11 +39,11 @@ void createFileSD(String fileName)
 void writeFileSD(String fileName,String message)
 {
     createFileSD(fileName);
-    file = SD.open(fileName, FILE_WRITE);
-    if (file) 
+    filef = SD.open(fileName, FILE_WRITE);
+    if (filef) 
     {
-        file.println(message);
-        file.close();
+        filef.println(message);
+        filef.close();
     } 
     else 
     {
@@ -112,7 +112,7 @@ void printStrOnDebug(String text){
 }
 
 void printStr(String text){
-    Serial.print(text);
+    Serial.println(text);
     lcd.clear();
     printLCDString(text,0,0);
 }

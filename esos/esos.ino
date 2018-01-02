@@ -38,6 +38,7 @@ dht internal_temperature_meter;
 
 // BME 280
 BME280 bme280;
+uint8_t is_bme280_working=0;
 
 // global variables
 double ext_temperature=0; // external temperature 
@@ -128,53 +129,53 @@ void getAvarageSensorValues(){
 }
 
 void readSensorValues(){
-  
+    loopCount++;
     // read External temperature
     if(EXT_TEMP_ENABLE){
       ext_temperature += readExternalTemperature();
-      printValues(F("EX_T"),ext_temperature);
+      printValues(F("EX_T"),ext_temperature/loopCount);
     }
 
     // read Internal temperature
     if(INT_TEMP_ENABLE){
       int_temperature += readInternalTemperature();
-      printValues(F("IN_T"),int_temperature);
+      printValues(F("IN_T"),int_temperature/loopCount);
     }
 
     // read Internal humidiy
     if(INT_HUM_ENABLE){
       int_humidity += readInternalHumidity();
-      printValues(F("IN_H"),int_humidity);
+      printValues(F("IN_H"),int_humidity/loopCount);
     }
 
     // read external humidity
     if(EXT_HUM_ENABLE){
       ext_humidity += readExternalHumidity();
-      printValues(F("EX_H"),ext_humidity);
+      printValues(F("EX_H"),ext_humidity/loopCount);
     }
 
     // soile mosture value
     if(SM_ENABLE){
       soilemoisture_value += readSoileMoisture();
-      printValues(F("SM"),soilemoisture_value);
+      printValues(F("SM"),soilemoisture_value/loopCount);
     }
 
     // pressure value
     if(PRESSURE_ENABLE){
       pressure_value += readPressure();
-      printValues(F("P"),pressure_value);
+      printValues(F("P"),pressure_value/loopCount);
     }
 
     // altitude value
     if(ALTITUDE_ENABLE){
       altitude_value += readAltitude();
-      printValues(F("AL"),altitude_value);
+      printValues(F("AL"),altitude_value/loopCount);
     }
 
     // lux value
     if(LUX_ENABLE){
       lux_value += readItensity();
-      printValues(F("IN"),lux_value);
+      printValues(F("IN"),lux_value/loopCount);
     }
 
     // wind direction
@@ -186,13 +187,13 @@ void readSensorValues(){
     // wind speed
     if(WS_ENABLE){
       wind_speed += readWindSpeed();
-      printValues(F("WS"),wind_speed);
+      printValues(F("WS"),wind_speed/loopCount);
     }
     
     // rain guarge
     if(RG_ENABLE){
       rain_gauge += readRainGuarge();
-      printValues(F("RG"),rain_gauge);
+      printValues(F("RG"),rain_gauge/loopCount);
     }
 
     // get battery voltage
@@ -209,7 +210,7 @@ void readSensorValues(){
     // station is up
     soundIndicator(0,1);
 
-    loopCount++;
+    
 }
 
 //clear variables setup to sensor Data
@@ -251,6 +252,15 @@ double readInternalHumidity(){
 }
 
 double readExternalHumidity(){
+  if(!isBME280Working()){
+    printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+    return 0;
+  }
+
+  if(bme280.getHumidity() == 0 ){
+    printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+    return 0;
+  }
   return bme280.getHumidity();
 }
 
@@ -269,11 +279,29 @@ double readSoileMoisture(){
 
 // read Altitude
 double readAltitude(){
+    if(!isBME280Working()){
+      printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+      return 0;
+    }
+    
+    if(bme280.getPressure() > 118000 ){
+      printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);\
+      return 0;
+    }
     return bme280.calcAltitude(bme280.getPressure());
 }
 
 // read pressure value
 double readPressure(){
+  if(!isBME280Working()){
+      printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+      return 0;
+    }
+    
+    if(bme280.getPressure() > 118000 ){
+      printErrorCode("BME_I2C_ERROR",BME_I2C_ERROR);
+      return 0;
+    }
   return bme280.getPressure()*0.001; // kpa
 }
 
@@ -334,6 +362,9 @@ void initialize(){
     // RTC Initialize
     initRTC();
     
+    // SD init
+    initSD();
+    
     // Dullas temperature 
     if(EXT_TEMP_ENABLE){
       externalTemp.begin();
@@ -343,10 +374,13 @@ void initialize(){
 
     // BME 280 calibration
     if(EXT_HUM_ENABLE || PRESSURE_ENABLE || ALTITUDE_ENABLE){
-      if(!bme280.init())
+      if(!bme280.init()){
         printErrorCode("BME_NOT_INIT",BME_NOT_INIT);
+        is_bme280_working=0;
+      }
       else
         printStr(F("BMP OK"),getLocalTime(),INIT_DONE);
+        is_bme280_working=1;
     }
 
     // start light meter
@@ -367,9 +401,6 @@ void initialize(){
     // check and initialize fan
     pinMode(FAN_PIN,OUTPUT);
     digitalWrite(FAN_PIN,HIGH);
-
-    // SD init
-    initSD();
     
     // LCD 
     initLCD();
@@ -393,5 +424,10 @@ void funcFan(){
     if(int_temperature<TEMP_DOWN){
         digitalWrite(FAN_PIN,HIGH);  
     }
+}
+
+// check the bme 280 initialized at the first place.
+uint8_t isBME280Working(){
+  return is_bme280_working==1;
 }
 
