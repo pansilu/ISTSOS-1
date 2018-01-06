@@ -18,7 +18,7 @@ extern const int chipSelect;  // chip select pin for the SD module.it should be 
 void initSD();
 void createFileSD(String fileName);
 void writeFileSD(String fileName,String message);
-
+void writeErrorLogData(String &text);
 // LCD functions
 extern LiquidCrystal_I2C lcd;
 

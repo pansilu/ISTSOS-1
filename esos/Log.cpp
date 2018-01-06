@@ -143,6 +143,10 @@ void logData(String &text){
     writeFileSD("DTLOG.txt",text);
 }
 
+void writeErrorLogData(String &text){
+  writeFileSD(F("SE.txt"),text);
+}
+
 void printStr(String text,String logTime,int DefinitionCode ){
     Serial.println(text);
     logTime.concat(" | ");

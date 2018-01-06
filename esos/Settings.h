@@ -40,6 +40,7 @@
 
 #define GET_REQUEST 10
 #define POST_REQUEST 20
+#define JSON_POST_REQUEST 30
 
 #define ENABLE_ISTSOS 1
 #define ENABLE_SLPIOT 1

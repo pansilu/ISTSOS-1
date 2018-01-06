@@ -91,9 +91,7 @@ void loop() {
 void sendData(){
   printStr("Sending Data");
   uint8_t temp;
-  
-  
-  
+  Serial.println(getLocalTime());
   if(ENABLE_ISTSOS){
     curruntDatetimeStr = getGrinichTime();
     String sr =  String(PROCEDURE);
@@ -112,9 +110,9 @@ void sendData(){
             POST_REQUEST,
             curruntDatetimeStr,
             sr);
-  }
-  delay(5000);
-  if(ENABLE_SLPIOT){
+    }  
+  delay(2000);
+   if(ENABLE_SLPIOT){
     curruntDatetimeStr = getLocalTime();
     temp= executeRequest(&ext_humidity,
           &ext_temperature,
@@ -128,11 +126,11 @@ void sendData(){
             &water_level,
             &altitude_value,
             &battery_value,
-            GET_REQUEST,
+            JSON_POST_REQUEST,
             curruntDatetimeStr,
             GUID_CODE);
-  }
-  
+   }
+
   clearSensorVariables();
   lastSendTime = getUnixTime();
 
@@ -261,7 +259,16 @@ double readExternalTemperature(){
   if(externalTemp.getTempCByIndex(0) <-120)
   {
     printErrorCode("DS18B20_ERROR",getLocalTime(),DS18B20_ERROR);
-    return 0;  
+    if(!isBME280Working()){
+      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
+      return 0;
+    }
+
+    if(bme280.getHumidity() == 0 ){
+      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
+      return 0;
+    }
+    return bme280.getTemperature(); 
   }
   return externalTemp.getTempCByIndex(0);
 }
