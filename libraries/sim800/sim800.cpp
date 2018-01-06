@@ -272,30 +272,48 @@ uint8_t Sim800::waitResponse(uint32_t timeout, const String expected)
     return status;
 }
 
-uint8_t Sim800::executeGet(const char server[], const char uri[]){
+uint8_t Sim800::executePostPure(const char server[], const char uri[], const String& data){
 
-	/*this->serialAT->flush();
+	this->serialAT->flush();
     int tmp = this->connectGprs();
+
     if( tmp != 0){
         return tmp;
     }
-	
-	this->writeCmd(F("AT+CIPSTART=\"TCP\","), String(server), String(",80"), F("\"\r\n"));
-	this->waitResponse();
-	this->sendCmd(F("AT+CIPSEND\r\n"));
-	
-	this->sendCmd(F("GET "));
-	this->sendCmd(uri);
-	this->sendCmd(F(" HTTP/1.1\r\nHost: "));
-	this->sendCmd(server);
-	this->sendCmd(F("\r\nConnection: close\r\n\r\n"));
 
-    if (DEBUG_COM)
-        Serial.println(F("wait for response..."));
-
-    bool response = this->getResponse();
-    return response;*/
+    this->sendCmd(F("AT+HTTPINIT\r\n"));
 	
+    this->writeCmd(F("AT+HTTPPARA=\"URL\",\"http://"), String(server), String(uri), F("\"\r\n"));
+    this->serialAT->flush();
+    this->waitResponse();
+    this->sendCmd(F("AT+HTTPPARA=\"CID\",1\r\n"));
+    this->sendCmd(F("AT+HTTPPARA=\"CONTENT\",\"application/json;charset=utf-8\"\r\n"));
+	this->sendCmd(F("AT+HTTPSSL=0\r\n"));
+    this->writeCmd(F("AT+HTTPDATA="), String(data.length()), F(",5000\r\n"));
+    this->serialAT->flush();
+    this->waitResponse(20000UL, "DOWNLOAD");
+
+    this->sendCmd(data, 20000UL);
+
+    if(!this->sendCmd(F("AT+HTTPACTION=1\r\n")))
+        return 1;
+
+    delay(10000);
+
+    this->serialAT->print(F("AT+HTTPREAD\r\n"));
+    this->serialAT->flush();
+
+    uint8_t response = this->getResponse();
+
+    this->sendCmd(F("AT+HTTPTERM\r\n"));
+    this->disconnect();
+
+    return response;
+	
+}
+
+uint8_t Sim800::executeGet(const char server[], const char uri[]){
+
 	this->serialAT->flush();
     int tmp = this->connectGprs();
 
@@ -307,11 +325,11 @@ uint8_t Sim800::executeGet(const char server[], const char uri[]){
     this->sendCmd(F("AT+HTTPPARA=\"CID\",1\r\n"));
 	this->writeCmd(F("AT+HTTPPARA=\"URL\",\""), String(uri),String("\"\r\n"));
 	this->sendCmd(F("AT+HTTPACTION=0\r\n"));
-	this->waitResponse(5000UL, "OK");
+	this->waitResponse(10000UL, "OK");
 	this->sendCmd(F("AT+HTTPREAD\r\n"));
-	uint8_t response = this->waitResponse(5000UL, "OK");
+	uint8_t response = this->waitResponse(10000UL, "OK");
 	this->sendCmd(F("AT+HTTPTERM\r\n"));
-	this->waitResponse(5000UL, "OK");
+	this->waitResponse(10000UL, "OK");
     this->disconnect();
 
     return response;
@@ -363,7 +381,6 @@ uint8_t Sim800::executePost(const char server[], const char uri[], const String&
     uint8_t response = this->getResponse();
 
     this->sendCmd(F("AT+HTTPTERM\r\n"));
-
     this->disconnect();
 
     return response;

@@ -169,7 +169,7 @@ public:
     uint8_t begin();
 
 
-
+	uint8_t Sim800::executePostPure(const char server[], const char uri[], const String& data);
     // call this methods inside loop()
     /**
         Execute GET requests.
