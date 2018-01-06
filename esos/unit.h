@@ -11,6 +11,7 @@
 #define RTC_SET_LOCAL_TIME 1
 
 #define SERVICE_TEST 1
+#define SERVICE_TEST_IST 1
 
 void unitRun();
 

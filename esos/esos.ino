@@ -18,7 +18,7 @@ const int MIN_WIND_FACTOR=476;
 const int MAX_WIND_FACTOR=780;
 
 // Procedure 
-String GUID_CODE = String("5bf82c59-7ec0-4f");
+String GUID_CODE = String("07ec7356-9b13-48");
 
 
 // Dullas Temperature Mesurement
@@ -67,13 +67,12 @@ void setup() {
   Serial1.begin(9600);  // serial  for GPRS 
   while (!Serial1){}    // wait for GPRS Monitor
   
-  initialize();
-
   //Run Unit tests
   #ifdef UNIT_CPP
     unitRun();
   #endif
 
+  initialize();
   // initial sending data,
   readSensorValues();
   getAvarageSensorValues();
@@ -91,10 +90,14 @@ void loop() {
 
 void sendData(){
   printStr("Sending Data");
-  // read Date 
-  curruntDatetimeStr = getLocalTime();
-
-  uint8_t temp= executeRequest(&ext_humidity,
+  uint8_t temp;
+  
+  
+  
+  if(ENABLE_ISTSOS){
+    curruntDatetimeStr = getGrinichTime();
+    String sr =  String(PROCEDURE);
+    temp= executeRequest(&ext_humidity,
           &ext_temperature,
             &int_temperature,
             &lux_value,
@@ -106,8 +109,30 @@ void sendData(){
             &water_level,
             &altitude_value,
             &battery_value,
+            POST_REQUEST,
+            curruntDatetimeStr,
+            sr);
+  }
+  delay(5000);
+  if(ENABLE_SLPIOT){
+    curruntDatetimeStr = getLocalTime();
+    temp= executeRequest(&ext_humidity,
+          &ext_temperature,
+            &int_temperature,
+            &lux_value,
+            &wind_speed,
+            &wind_direction,
+            &rain_gauge,
+            &pressure_value,
+            &soilemoisture_value,
+            &water_level,
+            &altitude_value,
+            &battery_value,
+            GET_REQUEST,
             curruntDatetimeStr,
             GUID_CODE);
+  }
+  
   clearSensorVariables();
   lastSendTime = getUnixTime();
 

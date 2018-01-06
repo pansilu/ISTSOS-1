@@ -14,6 +14,7 @@ extern String localDateTime;
 
 void initRTC();
 String getLocalTime();
+String getGrinichTime();
 void setTimeFromPC();
 DateTime getCurruntRTCDate();
 unsigned long getUnixTime();

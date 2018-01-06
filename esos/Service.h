@@ -22,7 +22,10 @@ uint8_t executeRequest(double* externalHum,
     double *waterlevel,
     double *altitude,
     double *battry,
+    int type,
     String& TimeStamp,
     String& Guid);
+
+
 
 #endif

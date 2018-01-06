@@ -28,11 +28,21 @@
 #define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        
 // GPRS SETTINGS FOR ISTSOS
 
-#define APN "dialog"
+#define APN "mobitel"
 #define USERNAME ""
 #define PASSWORD ""
 
 #define SERVER "slpiot.org"
+
+// istsos proceure
+#define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
+#define PROCEDURE "bb3a14a0988311e78b760800273cbaca"
+
+#define GET_REQUEST 10
+#define POST_REQUEST 20
+
+#define ENABLE_ISTSOS 1
+#define ENABLE_SLPIOT 1
 
 #define RF_TIMEOUT 5000
 
