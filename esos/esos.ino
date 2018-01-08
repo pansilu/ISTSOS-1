@@ -31,6 +31,7 @@ BH1750 lightMeter;
 
 // Clock module     
 unsigned long lastSendTime;   // last send Time
+unsigned long lastRTCUpdatedTime;
 String curruntDatetimeStr;
 
 // dht 11 internal temperature
@@ -73,6 +74,18 @@ void setup() {
   #endif
 
   initialize();
+  // ntp update
+  if(RTC_UPDATE_BY_NTP){
+    DateTime tsp = getCurruntRTCDate();
+    //if(tsp.year()<2018){
+    tsp = ntpUpdate();
+    printStr(F("RTC_ADJESTING_NTP..."));
+    if(tsp.year()>2017){
+      setTimeExternal(tsp);
+      printStr("RTC_UPDATED_NTP",getLocalTime(),0);
+    }
+    //}
+  }
   // initial sending data,
   readSensorValues();
   getAvarageSensorValues();
@@ -86,6 +99,16 @@ void loop() {
     getAvarageSensorValues();
     sendData();
   }  
+
+  if(RTC_UPDATE_BY_NTP){
+    if((getUnixTime() - lastRTCUpdatedTime) > RTC_UPDATE_TIME_RATE){
+      DateTime tsp = ntpUpdate();
+      if(tsp.year()>2017){
+        setTimeExternal(tsp);
+        printStr("RTC_UPDATED_NTP",getLocalTime(),0);
+      }
+    }
+  }
 }
 
 void sendData(){

@@ -20,7 +20,9 @@
 #define FAN_PIN 10            // fan pin
 #define SERVER_SETUP 0         // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 for esos ServerSetup=2 for Both 
 #define TIME_RATE 5           // set as sending after every Time (minutes)
+#define RTC_UPDATE_TIME_RATE 604800
 #define RTC_UPDATE_INTERVAL 1 // the inteval et ween 2 RTC update from ntp (days)
+#define RTC_UPDATE_BY_NTP 1
 
 #define WIN_SPEED_PIN A2       // wind speed pin
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   

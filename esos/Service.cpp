@@ -132,8 +132,19 @@ uint8_t executePostRequest(char server[],char url[],String &data){
 
 
 DateTime ntpUpdate(){
-  uint32_t* result = com.ntpUpdate("metasntp11.admin.ch", 0);
+  uint32_t* result = simServer.ntpUpdate("metasntp11.admin.ch", 0);
+  uint8_t tmp =5;
+  while(tmp>0 && result[0]<2018){
+    result = simServer.ntpUpdate("metasntp11.admin.ch", 0);
+    delay(100);
+  }
+  if(tmp==0){
+    DateTime dt = DateTime(2017,01,01, 00, 00, 00);
+    return dt;
+  }
+  
   DateTime dt = DateTime((uint16_t) result[0], (uint8_t) result[1], (uint8_t) result[2], (uint8_t) result[3], (uint8_t) result[4], (uint8_t) result[5]);
+  dt = dt + TimeSpan(0,5,30,0);
   return dt;
 }
 

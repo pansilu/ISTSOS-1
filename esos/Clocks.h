@@ -16,7 +16,7 @@ void initRTC();
 String getLocalTime();
 String getGrinichTime();
 void setTimeFromPC();
-void setTimeExternal(DateTime st);
+void setTimeExternal(DateTime dt);
 DateTime getCurruntRTCDate();
 unsigned long getUnixTime();
 

@@ -8,6 +8,7 @@ void initRTC(){
     printError(F("RTC_NOT_CONNECTED"));
     else if(rtc.lostPower()){
         printError(F("RTC_ADJESTING..."));
+        
         for(int i=0;i<5;i++)
           setTimeFromPC();
         printError(F("RTC_SUCCESSFULL"));
@@ -22,7 +23,7 @@ void setTimeFromPC(){
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
-void setTimeExternal(DateTime st){
+void setTimeExternal(DateTime dt){
     rtc.adjust(dt);
 }
 

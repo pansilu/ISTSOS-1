@@ -40,9 +40,10 @@ void unitRun(){
     }
     
     if(NTP_TEST){
-        DateTime now = ntpUpdate()
+        DateTime now = ntpUpdate();
         char str_time[30];
         sprintf(str_time, "%04d-%02d-%02d %02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());     
+        Serial.println(String(str_time));
     }
     while(1);
 }
