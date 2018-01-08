@@ -22,6 +22,10 @@ void setTimeFromPC(){
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
+void setTimeExternal(DateTime st){
+    rtc.adjust(dt);
+}
+
 // get the local time
 
 String getLocalTime(){

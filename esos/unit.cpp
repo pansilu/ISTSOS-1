@@ -39,6 +39,11 @@ void unitRun(){
         Serial.println(executeRequest(&testVar,&testVar,&testVar,&testVar,&testVar,&testVar,&testVar,&testVar,&testVar,&testVar,&testVar,&testVar,JSON_POST_REQUEST,s,p));
     }
     
+    if(NTP_TEST){
+        DateTime now = ntpUpdate()
+        char str_time[30];
+        sprintf(str_time, "%04d-%02d-%02d %02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());     
+    }
     while(1);
 }
 

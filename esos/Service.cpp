@@ -131,7 +131,9 @@ uint8_t executePostRequest(char server[],char url[],String &data){
 }
 
 
-DateTime ntpUpdate(const char server[], int GMT){
-  
+DateTime ntpUpdate(){
+  uint32_t* result = com.ntpUpdate("metasntp11.admin.ch", 0);
+  DateTime dt = DateTime((uint16_t) result[0], (uint8_t) result[1], (uint8_t) result[2], (uint8_t) result[3], (uint8_t) result[4], (uint8_t) result[5]);
+  return dt;
 }
 

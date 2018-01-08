@@ -28,6 +28,6 @@ uint8_t executeRequest(double* externalHum,
 
 uint8_t executePostRequest(char server[],char url[],String &data);
 
-DateTime ntpUpdate(const char server[], int GMT);
+DateTime ntpUpdate();
 
 #endif
