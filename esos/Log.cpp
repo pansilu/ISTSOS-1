@@ -183,7 +183,7 @@ void soundIndicator(int count1,int count2){
         tone(BUZZER,1000);
         delay(200);
         noTone(BUZZER);
-        delay(10);
+        delay(100);
         count1--;
     }
     //long turn
@@ -191,9 +191,9 @@ void soundIndicator(int count1,int count2){
         tone(BUZZER,1000);
         delay(100);
         noTone(BUZZER);
-        delay(10);
+        delay(100);
         count2--;
     }
-    
+    delay(1000);
   }
 

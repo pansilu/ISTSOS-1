@@ -1,7 +1,6 @@
 #include "Clocks.h"
 
 RTC_DS3231 rtc;  
-String localDateTime;
 
 // begin RTC 
 void initRTC(){
@@ -27,49 +26,20 @@ void setTimeFromPC(){
 
 String getLocalTime(){
    DateTime now = rtc.now();
-   
-   localDateTime=String(now.year(),DEC);
-   localDateTime.concat('-');
-   if(now.month()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.month(), DEC));
-   localDateTime.concat('-');
-   if(now.day()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.day(), DEC));
-   localDateTime.concat('-');
-   if(now.hour()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.hour(), DEC));
-   localDateTime.concat(':');
-   if(now.minute()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.minute(), DEC));
-   localDateTime.concat(':');
-   if(now.second()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.second(), DEC));
 
-   return localDateTime;
+   char str_time[30];
+   sprintf(str_time, "%04d-%02d-%02d %02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+
+   return String(str_time);
 }
 
 String getGrinichTime(){
    DateTime now = rtc.now();
    now =now - TimeSpan(0, 5, 30, 00);
-   
-   localDateTime=String(now.year(),DEC);
-   localDateTime.concat('-');
-   if(now.month()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.month(), DEC));
-   localDateTime.concat('-');
-   if(now.day()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.day(), DEC));
-   localDateTime.concat('T');
-   if(now.hour()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.hour(), DEC));
-   localDateTime.concat(':');
-   if(now.minute()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.minute(), DEC));
-   localDateTime.concat(':');
-   if(now.second()<10)localDateTime.concat("0");
-   localDateTime.concat(String(now.second(), DEC));
-   localDateTime.concat("+0000");
-   return localDateTime;
+
+   char str_time[30];
+   sprintf(str_time, "%04d-%02d-%02dT%02d:%02d:%02d+0000", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+   return String(str_time);
 }
 
 DateTime getCurruntRTCDate(){
