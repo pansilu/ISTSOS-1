@@ -74,17 +74,19 @@ void setup() {
   #endif
 
   initialize();
-  // ntp update
+  
   if(RTC_UPDATE_BY_NTP){
+    lastRTCUpdatedTime = getUnixTime();
+    // ntp update
     DateTime tsp = getCurruntRTCDate();
-    //if(tsp.year()<2018){
+    if(tsp.year()<2018){
     tsp = ntpUpdate();
     printStr(F("RTC_ADJESTING_NTP..."));
     if(tsp.year()>2017){
       setTimeExternal(tsp);
       printStr("RTC_UPDATED_NTP",getLocalTime(),0);
     }
-    //}
+    }
   }
   // initial sending data,
   readSensorValues();
@@ -107,14 +109,59 @@ void loop() {
         setTimeExternal(tsp);
         printStr("RTC_UPDATED_NTP",getLocalTime(),0);
       }
+      lastRTCUpdatedTime = getUnixTime();
     }
   }
 }
 
 void sendData(){
-  printStr("Sending Data");
-  uint8_t temp;
+  printStr("Sending ISTSOS");
+  uint8_t count = ERROR_REPEATE_COUNT;
   Serial.println(getLocalTime());
+
+  while(count>0){
+    if(sendISTSOS()==0)
+      break;
+    count--;
+  }
+  delay(2000);
+  printStr("Sending SLPIOT");
+  count = ERROR_REPEATE_COUNT;
+  while(count>0){
+    if(sendSLPIOT()==1)
+      break;
+    count--;
+  }
+   
+  clearSensorVariables();
+  lastSendTime = getUnixTime();
+}
+
+uint8_t sendSLPIOT(){
+  uint8_t temp=2;
+  if(ENABLE_SLPIOT){
+    curruntDatetimeStr = getLocalTime();
+    temp= executeRequest(&ext_humidity,
+          &ext_temperature,
+            &int_temperature,
+            &lux_value,
+            &wind_speed,
+            &wind_direction,
+            &rain_gauge,
+            &pressure_value,
+            &soilemoisture_value,
+            &water_level,
+            &altitude_value,
+            &battery_value,
+            JSON_POST_REQUEST,
+            curruntDatetimeStr,
+            GUID_CODE);
+   }
+   return temp;
+}
+
+uint8_t sendISTSOS(){
+  uint8_t temp=2;
   if(ENABLE_ISTSOS){
     curruntDatetimeStr = getGrinichTime();
     String sr =  String(PROCEDURE);
@@ -133,30 +180,8 @@ void sendData(){
             POST_REQUEST,
             curruntDatetimeStr,
             sr);
-    }  
-  delay(2000);
-   if(ENABLE_SLPIOT){
-    curruntDatetimeStr = getLocalTime();
-    temp= executeRequest(&ext_humidity,
-          &ext_temperature,
-            &int_temperature,
-            &lux_value,
-            &wind_speed,
-            &wind_direction,
-            &rain_gauge,
-            &pressure_value,
-            &soilemoisture_value,
-            &water_level,
-            &altitude_value,
-            &battery_value,
-            JSON_POST_REQUEST,
-            curruntDatetimeStr,
-            GUID_CODE);
-   }
-
-  clearSensorVariables();
-  lastSendTime = getUnixTime();
-
+    } 
+    return temp;
 }
 
 void getAvarageSensorValues(){
