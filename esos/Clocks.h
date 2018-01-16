@@ -14,6 +14,7 @@ extern String localDateTime;
 
 void initRTC();
 String getLocalTime();
+String getLocalTimeHHMM();
 String getGrinichTime();
 void setTimeFromPC();
 void setTimeExternal(DateTime dt);

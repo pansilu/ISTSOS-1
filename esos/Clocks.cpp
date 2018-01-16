@@ -6,14 +6,6 @@ RTC_DS3231 rtc;
 void initRTC(){
     if(!rtc.begin())
     printError(F("RTC_NOT_CONNECTED"));
-    else if(rtc.lostPower()){
-        printError(F("RTC_ADJESTING..."));
-        
-        for(int i=0;i<5;i++)
-          setTimeFromPC();
-        printError(F("RTC_SUCCESSFULL"));
-    }
-    
     else
     printStr(F("RTC_INIT_DONE ")); 
 }
@@ -34,6 +26,15 @@ String getLocalTime(){
 
    char str_time[30];
    sprintf(str_time, "%04d-%02d-%02d %02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+
+   return String(str_time);
+}
+
+String getLocalTimeHHMM(){
+   DateTime now = rtc.now();
+
+   char str_time[30];
+   sprintf(str_time, "%04d-%02d-%02d %02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute());
 
    return String(str_time);
 }

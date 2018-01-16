@@ -18,7 +18,7 @@ const int MIN_WIND_FACTOR=476;
 const int MAX_WIND_FACTOR=780;
 
 // Procedure 
-String GUID_CODE = String("07ec7356-9b13-48");
+String GUID_CODE = String(GUID_SLPIOT);
 
 
 // Dullas Temperature Mesurement
@@ -65,7 +65,7 @@ int loopCount=0;
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
   while (!Serial){}     // wait for Serial Monitor On
-  Serial1.begin(9600);  // serial  for GPRS 
+  Serial2.begin(9600);  // serial  for GPRS 
   while (!Serial1){}    // wait for GPRS Monitor
   
   //Run Unit tests
@@ -74,20 +74,7 @@ void setup() {
   #endif
 
   initialize();
-  
-  if(RTC_UPDATE_BY_NTP){
-    lastRTCUpdatedTime = getUnixTime();
-    // ntp update
-    DateTime tsp = getCurruntRTCDate();
-    if(tsp.year()<2018){
-    tsp = ntpUpdate();
-    printStr(F("RTC_ADJESTING_NTP..."));
-    if(tsp.year()>2017){
-      setTimeExternal(tsp);
-      printStr("RTC_UPDATED_NTP",getLocalTime(),0);
-    }
-    }
-  }
+
   // initial sending data,
   readSensorValues();
   getAvarageSensorValues();
@@ -118,17 +105,18 @@ void sendData(){
   printStr("Sending ISTSOS");
   uint8_t count = ERROR_REPEATE_COUNT;
   Serial.println(getLocalTime());
-
+  String t = getGrinichTime();
   while(count>0){
-    if(sendISTSOS()==0)
+    if(sendISTSOS(t)==0)
       break;
     count--;
   }
   delay(2000);
   printStr("Sending SLPIOT");
   count = ERROR_REPEATE_COUNT;
+  t=getLocalTime();
   while(count>0){
-    if(sendSLPIOT()==1)
+    if(sendSLPIOT(t)==1)
       break;
     count--;
   }
@@ -137,10 +125,9 @@ void sendData(){
   lastSendTime = getUnixTime();
 }
 
-uint8_t sendSLPIOT(){
+uint8_t sendSLPIOT(String &curruntDatetimeStr){
   uint8_t temp=2;
   if(ENABLE_SLPIOT){
-    curruntDatetimeStr = getLocalTime();
     temp= executeRequest(&ext_humidity,
           &ext_temperature,
             &int_temperature,
@@ -160,10 +147,9 @@ uint8_t sendSLPIOT(){
    return temp;
 }
 
-uint8_t sendISTSOS(){
+uint8_t sendISTSOS(String &curruntDatetimeStr){
   uint8_t temp=2;
   if(ENABLE_ISTSOS){
-    curruntDatetimeStr = getGrinichTime();
     String sr =  String(PROCEDURE);
     temp= executeRequest(&ext_humidity,
           &ext_temperature,
@@ -204,73 +190,73 @@ void readSensorValues(){
     // read External temperature
     if(EXT_TEMP_ENABLE){
       ext_temperature += readExternalTemperature();
-      printValues(F("EX_T"),getLocalTime(),ext_temperature/loopCount);
+      printValues(F("EX_T"),getLocalTimeHHMM(),ext_temperature/loopCount);
     }
 
     // read Internal temperature
     if(INT_TEMP_ENABLE){
       int_temperature += readInternalTemperature();
-      printValues(F("IN_T"),getLocalTime(),int_temperature/loopCount);
+      printValues(F("IN_T"),getLocalTimeHHMM(),int_temperature/loopCount);
     }
 
     // read Internal humidiy
     if(INT_HUM_ENABLE){
       int_humidity += readInternalHumidity();
-      printValues(F("IN_H"),getLocalTime(),int_humidity/loopCount);
+      printValues(F("IN_H"),getLocalTimeHHMM(),int_humidity/loopCount);
     }
 
     // read external humidity
     if(EXT_HUM_ENABLE){
       ext_humidity += readExternalHumidity();
-      printValues(F("EX_H"),getLocalTime(),ext_humidity/loopCount);
+      printValues(F("EX_H"),getLocalTimeHHMM(),ext_humidity/loopCount);
     }
 
     // soile mosture value
     if(SM_ENABLE){
       soilemoisture_value += readSoileMoisture();
-      printValues(F("SM"),getLocalTime(),soilemoisture_value/loopCount);
+      printValues(F("SM"),getLocalTimeHHMM(),soilemoisture_value/loopCount);
     }
 
     // pressure value
     if(PRESSURE_ENABLE){
       pressure_value += readPressure();
-      printValues(F("P"),getLocalTime(),pressure_value/loopCount);
+      printValues(F("P"),getLocalTimeHHMM(),pressure_value/loopCount);
     }
 
     // altitude value
     if(ALTITUDE_ENABLE){
       altitude_value += readAltitude();
-      printValues(F("AL"),getLocalTime(),altitude_value/loopCount);
+      printValues(F("AL"),getLocalTimeHHMM(),altitude_value/loopCount);
     }
 
     // lux value
     if(LUX_ENABLE){
       lux_value += readItensity();
-      printValues(F("IN"),getLocalTime(),lux_value/loopCount);
+      printValues(F("IN"),getLocalTimeHHMM(),lux_value/loopCount);
     }
 
     // wind direction
     if(WD_ENABLE){
       wind_direction = readWinDirection();
-      printValues(F("WD"),getLocalTime(),wind_direction);
+      printValues(F("WD"),getLocalTimeHHMM(),wind_direction);
     }
 
     // wind speed
     if(WS_ENABLE){
       wind_speed += readWindSpeed();
-      printValues(F("WS"),getLocalTime(),wind_speed/loopCount);
+      printValues(F("WS"),getLocalTimeHHMM(),wind_speed/loopCount);
     }
     
     // rain guarge
     if(RG_ENABLE){
       rain_gauge += readRainGuarge();
-      printValues(F("RG"),getLocalTime(),(rain_gauge/loopCount));
+      printValues(F("RG"),getLocalTimeHHMM(),(rain_gauge/loopCount));
     }
 
     // get battery voltage
     if(BT_ENABLE){
       battery_value = readBatteryVoltage();
-      printValues(F("BT"),getLocalTime(),battery_value);
+      printValues(F("BT"),getLocalTimeHHMM(),battery_value);
     }
 
     // Fan operator
@@ -399,7 +385,7 @@ double readItensity(){
 
 // read battry values
 double readBatteryVoltage(){
-    return ((analogRead(BATT)*15/1023));
+    return ((analogRead(BATT)*16.6f/1023));
 }
 
 // read wind direction
@@ -454,6 +440,18 @@ void initialize(){
     // SD init
     initSD();
     delay(300);
+
+    // GPRS
+    ServiceBegin();
+
+    if(rtc.lostPower()){
+        printError(F("RTC_ADJESTING..."));
+        setTimeExternal(ntpUpdate());
+        printError(F("RTC_SUCCESSFULL"));
+        delay(1000);
+    }
+    
+    
     // Dullas temperature 
     if(EXT_TEMP_ENABLE){
       externalTemp.begin();
@@ -468,7 +466,7 @@ void initialize(){
         is_bme280_working=0;
       }
       else
-        printStr(F("BMP OK"),getLocalTime(),INIT_DONE);
+        printStr(F("BME OK"),getLocalTime(),INIT_DONE);
         is_bme280_working=1;
     }
 
@@ -491,9 +489,6 @@ void initialize(){
     pinMode(FAN_PIN,OUTPUT);
     digitalWrite(FAN_PIN,HIGH);
 
-    // GPRS
-    ServiceBegin();
-
     clearSensorVariables();   // initialize all sensor variables 
     printStr(F("INIT_DONE"),getLocalTime(),INIT_DONE);    
     delay(2000);
@@ -503,11 +498,13 @@ void initialize(){
 
 // fan on in the range of temperature high
 void funcFan(){
-    if(int_temperature>TEMP_UP){
+    Serial.print("TP");
+    Serial.println(int_temperature/loopCount);
+    if((int_temperature/loopCount)>TEMP_UP){
           digitalWrite(FAN_PIN,LOW);
     }
 
-    if(int_temperature<TEMP_DOWN){
+    if((int_temperature/loopCount)<TEMP_DOWN){
         digitalWrite(FAN_PIN,HIGH);  
     }
 }

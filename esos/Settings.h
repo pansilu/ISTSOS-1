@@ -3,29 +3,28 @@
 
 // definitins
 #define EXTERNAL_TEMP_PIN 8  // External temperature pin
-#define DHT11_IN_PIN 13       // internal temperature
+#define DHT11_IN_PIN 4       // internal temperature
 #define BUZZER 12             // buzzer pin
 #define SM_PIN A8              //  for SM sensor
 #define BMP085_ADDRESS 0x77   // bmp sensor Address  
 #define BATT A0                // get battry meter value
-#define WIN_DIRECTION_PIN A1   // wind directionPin
-#define WIND_DIRECTION_VOLTAGE_MIN 1.96  // minimum voltage comes from wind speed sensor
-#define WIND_DIRECTION_VOLTAGE_MAX 3.13  // maximum voltage comes from wind speed sensor
+#define WIN_DIRECTION_PIN A2   // wind directionPin
+#define WIND_DIRECTION_VOLTAGE_MIN 1.04  // minimum voltage comes from wind speed sensor
+#define WIND_DIRECTION_VOLTAGE_MAX 5.02  // maximum voltage comes from wind speed sensor
 // rain gauge
 #define RAIN_GAUGE_PIN 2
 #define RAIN_GAUGE_INT 0
 #define RAIN_FACTOR 0.2       // rain factor for one tip bucket
-#define TEMP_UP 40            // upeer temp for the fan
+#define TEMP_UP 37            // upeer temp for the fan
 #define TEMP_DOWN 34          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
-#define SERVER_SETUP 0         // if SERVER_SETUP==0 SLPIOT.org else SERVER_SETUP=1 for esos ServerSetup=2 for Both 
 #define TIME_RATE 5           // set as sending after every Time (minutes)
 #define RTC_UPDATE_TIME_RATE 604800UL
 #define RTC_UPDATE_INTERVAL 1 // the inteval et ween 2 RTC update from ntp (days)
 #define RTC_UPDATE_BY_NTP 1
 #define ERROR_REPEATE_COUNT 3
 
-#define WIN_SPEED_PIN A2       // wind speed pin
+#define WIN_SPEED_PIN A1       // wind speed pin
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
 #define WIND_VOLTAGE_MIN 10  // minimum voltage comes from wind speed sensor
 #define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        
@@ -36,10 +35,11 @@
 #define PASSWORD ""
 
 #define SERVER "slpiot.org"
+#define GUID_SLPIOT "e813b67c-3c7a-40"
 
 // istsos proceure
 #define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
-#define PROCEDURE "bb3a14a0988311e78b760800273cbaca"
+#define PROCEDURE "a0303bb4f9e311e7953f0800273cbaca"
 
 #define GET_REQUEST 10
 #define POST_REQUEST 20
@@ -67,5 +67,6 @@
 #define WD_ENABLE 1
 #define RG_ENABLE 1
 #define BT_ENABLE 1
+extern int LostPower;
 
 #endif

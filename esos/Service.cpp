@@ -1,7 +1,7 @@
 #include "Service.h"
 
 const String server_url=String(SERVER);
-Sim800 simServer = Sim800(Serial1, APN, USERNAME, PASSWORD);
+Sim800 simServer = Sim800(Serial2, APN, USERNAME, PASSWORD);
 
 
 const char istserver[] = "istsos.org";
@@ -11,9 +11,9 @@ uint8_t temp=0;
 void ServiceBegin(){
     uint8_t temp= simServer.begin();
     if(temp)
-        printStr("SERVICE_OK",getLocalTime(),SERVICE_OK);
+        printStr("SERVICE_OK");
     else
-        printErrorCode("SERVICE_ERROR",getLocalTime(),SERVICE_ERROR);
+        printErrorCode("SERVICE_ERROR",SERVICE_ERROR);
 }
 
 
@@ -59,7 +59,7 @@ uint8_t executeRequest(double* externalHum,
               if(!temp)
                 printStr(F("DATA_SEND_SUCCESSFULLY:SLPIOT"),getLocalTime(),DATA_SEND_SUCCESSFULLY);
               else{
-                printErrorCode(F("DATA_SEND_ERROR:SLPIOT"),getLocalTime(),DATA_SEND_ERROR);
+                printErrorCode(F("SLPIOT:RESENDING..."),getLocalTime(),DATA_SEND_ERROR);
                 writeErrorLogData(req);
               }
             }else if(type == POST_REQUEST){
@@ -86,7 +86,7 @@ uint8_t executeRequest(double* externalHum,
               if(!temp)
                 printStr(F("DATA_SEND_SUCCESSFULLY:ISTSOS"),getLocalTime(),DATA_SEND_SUCCESSFULLY);
               else{
-                printErrorCode(F("DATA_SEND_ERROR:ISTSOS"),getLocalTime(),DATA_SEND_ERROR);
+                printErrorCode(F("ISTSOS:RESENDING..."),getLocalTime(),DATA_SEND_ERROR);
                 writeErrorLogData(req);
               }
             }else if(type == JSON_POST_REQUEST){
@@ -115,7 +115,7 @@ uint8_t executeRequest(double* externalHum,
               if(temp)
                 printStr(F("DATA_SEND_SUCCESSFULLY:SLPIOT"),getLocalTime(),DATA_SEND_SUCCESSFULLY);
               else{
-                printErrorCode(F("DATA_SEND_ERROR:SLPIOT"),getLocalTime(),DATA_SEND_ERROR);
+                printErrorCode(F("SLPIOT:RESENDING..."),getLocalTime(),DATA_SEND_ERROR);
                 writeErrorLogData(req);
               }
             }else{

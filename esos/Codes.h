@@ -32,4 +32,7 @@
 
 #define DS18B20_ERROR 16
 
+//sm
+#define SM_ERROR 41
+
 #endif
