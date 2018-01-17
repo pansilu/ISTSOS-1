@@ -65,18 +65,17 @@ uint8_t executeRequest(double* externalHum,
             }else if(type == POST_REQUEST){
               req =  String(Guid);
               req.concat(";" ); req += TimeStamp;
-              req.concat(","); req.concat(*battry);
-              req.concat("," ); req.concat(*light_intensity/1000);
-              req.concat("," ); req.concat(*rainFall);
-              req.concat("," ); req.concat(*windSpeed);
-              req.concat("," ); req.concat(*windDirection);
-              req.concat("," ); req.concat(*waterlevel);
-              req.concat("," ); req.concat(*soilMoisture);
-              req.concat("," ); req.concat(*altitude);
-              req.concat("," ); req.concat(*pressure/1000);
-              req.concat("," ); req.concat(*externalTemp);
               req.concat("," ); req.concat(*externalHum);
-
+              req.concat("," ); req.concat(*externalTemp);
+              req.concat("," ); req.concat(*pressure/1000);
+              req.concat("," ); req.concat(*altitude);
+              req.concat("," ); req.concat(*soilMoisture);
+              req.concat("," ); req.concat(*waterlevel);
+              req.concat("," ); req.concat(*windDirection);
+              req.concat("," ); req.concat(*windSpeed); 
+              req.concat("," ); req.concat(*rainFall);
+              req.concat("," ); req.concat(*light_intensity/1000);
+              req.concat(","); req.concat(*battry);
               logData(req);
 
               char charBuf[req.length()];
@@ -146,5 +145,9 @@ DateTime ntpUpdate(){
   DateTime dt = DateTime((uint16_t) result[0], (uint8_t) result[1], (uint8_t) result[2], (uint8_t) result[3], (uint8_t) result[4], (uint8_t) result[5]);
   dt = dt + TimeSpan(0,5,30,0);
   return dt;
+}
+
+int readRSSI(){
+  return simServer.readRSSI();  
 }
 

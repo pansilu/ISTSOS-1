@@ -27,6 +27,7 @@ uint8_t executeRequest(double* externalHum,
     String& Guid);
 
 uint8_t executePostRequest(char server[],char url[],String &data);
+int readRSSI();
 
 DateTime ntpUpdate();
 

@@ -56,8 +56,22 @@ void writeFileSD(String fileName,String message)
 */
 
 void initLCD(){
+
+    uint8_t signal_0[8]  = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1f};
+    uint8_t signal_1[8]  = {0x0, 0x0, 0x0, 0x0, 0x0, 0x1f, 0x1f};
+    uint8_t signal_2[8]  = {0x0, 0x0, 0x0, 0x1f, 0x1f, 0x1f, 0x1f};
+    uint8_t signal_3[8]  = {0x0, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f};
+    uint8_t signal_4[8]  = {0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f};
+
     lcd.begin();
     lcd.backlight();
+
+    lcd.createChar(0, signal_0);
+    lcd.createChar(1, signal_1);
+    lcd.createChar(2, signal_2);
+    lcd.createChar(3, signal_3);
+    lcd.createChar(4, signal_4);
+    lcd.home();
 }
 
 void printLCDDouble(double val,int i,int j){ 
@@ -105,19 +119,21 @@ void printValues(String name_index,String value){
 void printValues(String name_index,String tx,double value){
     Serial.print(name_index + ":");
     Serial.println(value);
-    lcd.clear();
+    printLCDString("           ",0,0);
+    printLCDString("           ",1,0);
     printLCDString(name_index,0,0);
-    printLCDDouble(value,7,0);
+    printLCDDouble(value,5,0);
     printLCDString(tx.substring(2),0,1);
+    
     delay(1000);
 }
 
 void printValues(String name_index,String tx,String value){
     Serial.print(name_index);
     Serial.println(value);
-    lcd.clear();
-    printLCDString(name_index,0,0);
-    printLCDString(value,7,0);
+    printLCDString("           ",0,0);
+    printLCDString("           ",1,0);
+    printLCDString(value,5,0);
     printLCDString(tx.substring(2),0,1);
     delay(1000);
 }
@@ -197,3 +213,30 @@ void soundIndicator(int count1,int count2){
     delay(1000);
   }
 
+
+void showStrength(int x){
+  lcd.setCursor(12,0);
+    lcd.write(0);
+    lcd.write(0);
+    lcd.write(0);
+    lcd.write(0);
+  lcd.setCursor(12,0);
+  if(x< 10 && x>= 2)
+    lcd.write(1);
+  else if(x< 15 && x>= 10){
+    lcd.write(1);
+    lcd.write(2);
+  }
+  else if(x< 20 && x>= 15){
+    lcd.write(1);
+    lcd.write(2);
+    lcd.write(3);
+  }
+  else if(x<=30 && x>= 20){
+    lcd.write(1);
+    lcd.write(2);
+    lcd.write(3);
+    lcd.write(4);
+  }else
+    lcd.write(0);
+}

@@ -185,78 +185,105 @@ void getAvarageSensorValues(){
   battery_value /= loopCount;
 }
 
+void showSignalQuality(){
+  showStrength(readRSSI());
+}
+
 void readSensorValues(){
     loopCount++;
     // read External temperature
     if(EXT_TEMP_ENABLE){
+      showSignalQuality();
       ext_temperature += readExternalTemperature();
       printValues(F("EX_T"),getLocalTimeHHMM(),ext_temperature/loopCount);
+      
     }
 
     // read Internal temperature
     if(INT_TEMP_ENABLE){
+      showSignalQuality();
       int_temperature += readInternalTemperature();
       printValues(F("IN_T"),getLocalTimeHHMM(),int_temperature/loopCount);
     }
 
     // read Internal humidiy
     if(INT_HUM_ENABLE){
+      showSignalQuality();
       int_humidity += readInternalHumidity();
       printValues(F("IN_H"),getLocalTimeHHMM(),int_humidity/loopCount);
+     
     }
 
     // read external humidity
     if(EXT_HUM_ENABLE){
+      showSignalQuality();
       ext_humidity += readExternalHumidity();
       printValues(F("EX_H"),getLocalTimeHHMM(),ext_humidity/loopCount);
+      
     }
 
     // soile mosture value
     if(SM_ENABLE){
+      showSignalQuality();
       soilemoisture_value += readSoileMoisture();
       printValues(F("SM"),getLocalTimeHHMM(),soilemoisture_value/loopCount);
+      
     }
 
     // pressure value
     if(PRESSURE_ENABLE){
+      showSignalQuality();
       pressure_value += readPressure();
       printValues(F("P"),getLocalTimeHHMM(),pressure_value/loopCount);
+     
     }
 
     // altitude value
     if(ALTITUDE_ENABLE){
+      showSignalQuality();
       altitude_value += readAltitude();
       printValues(F("AL"),getLocalTimeHHMM(),altitude_value/loopCount);
+      
     }
 
     // lux value
     if(LUX_ENABLE){
+      showSignalQuality();
       lux_value += readItensity();
       printValues(F("IN"),getLocalTimeHHMM(),lux_value/loopCount);
+      
     }
 
     // wind direction
     if(WD_ENABLE){
+      showSignalQuality();
       wind_direction = readWinDirection();
       printValues(F("WD"),getLocalTimeHHMM(),wind_direction);
+      
     }
 
     // wind speed
     if(WS_ENABLE){
+      showSignalQuality();
       wind_speed += readWindSpeed();
       printValues(F("WS"),getLocalTimeHHMM(),wind_speed/loopCount);
+      
     }
     
     // rain guarge
     if(RG_ENABLE){
+      showSignalQuality();
       rain_gauge += readRainGuarge();
       printValues(F("RG"),getLocalTimeHHMM(),(rain_gauge/loopCount));
+     
     }
 
     // get battery voltage
     if(BT_ENABLE){
+      showSignalQuality();
       battery_value = readBatteryVoltage();
       printValues(F("BT"),getLocalTimeHHMM(),battery_value);
+    
     }
 
     // Fan operator
@@ -443,6 +470,7 @@ void initialize(){
 
     // GPRS
     ServiceBegin();
+    delay(1000);
 
     if(rtc.lostPower()){
         printError(F("RTC_ADJESTING..."));
@@ -498,8 +526,6 @@ void initialize(){
 
 // fan on in the range of temperature high
 void funcFan(){
-    Serial.print("TP");
-    Serial.println(int_temperature/loopCount);
     if((int_temperature/loopCount)>TEMP_UP){
           digitalWrite(FAN_PIN,LOW);
     }

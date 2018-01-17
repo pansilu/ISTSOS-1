@@ -272,6 +272,25 @@ uint8_t Sim800::waitResponse(uint32_t timeout, const String expected)
     return status;
 }
 
+String Sim800::getResponseText(uint32_t timeout)
+{
+
+    unsigned long start = millis();
+
+    String response = String("");
+	
+	while((millis() - start)<timeout){
+		if(this->serialAT->available() > 0){
+			char ch= this->serialAT->read();;
+			response.concat(ch);  
+		if(response.indexOf("\r\nOK")>0)
+			break;
+		}  
+	} 
+	
+	return response;
+}
+
 uint8_t Sim800::executePostPure(const char server[], const char uri[], const String& data){
 
 	this->serialAT->flush();
@@ -516,7 +535,11 @@ bool Sim800::getResponse(){
     if (DEBUG_COM)
         Serial.println(response);
 
-    if (response.indexOf(F("\"success\": true")) < 0){
+    if (response.indexOf(F("+HTTPACTION: 1,200")) < 0){
+        return REQUEST_FAILURE;
+    }
+	
+	if (response.indexOf(F("\"success\": true")) < 0){
         return REQUEST_FAILURE;
     }
     return REQUEST_SUCCESS;
@@ -525,4 +548,22 @@ bool Sim800::getResponse(){
 void Sim800::disconnect(){
     this->sendCmd(F("AT+CIPSHUT\r\n"), 60000UL);
     this->sleepMode();
+}
+
+int Sim800::readRSSI(){
+	
+	
+	this->writeCmd(F("AT+CSQ\r\n"));
+    String h = this->getResponseText();
+	
+	if(h.indexOf("+CSQ")>0){
+		int y= h.indexOf("+CSQ:");
+		h = h.substring(y+6,y+8);
+		if(h.indexOf(",")>0){
+			h = h.substring(0,1);
+		}
+		return h.toInt();
+	}
+	return 0;
+	
 }

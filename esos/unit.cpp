@@ -45,6 +45,18 @@ void unitRun(){
         sprintf(str_time, "%04d-%02d-%02d %02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());     
         Serial.println(String(str_time));
     }
+
+    if(RSSI_TEST){
+      ServiceBegin();
+      initLCD();
+      int x=0;
+      for(;;){
+        x=readRSSI();
+        Serial.println(x);
+        showStrength(x);
+        delay(1000);  
+      }
+    }
     while(1);
 }
 

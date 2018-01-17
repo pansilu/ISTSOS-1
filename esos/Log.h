@@ -27,6 +27,7 @@ void printLCDDouble(double val,int i,int j);
 void printLCDCharArray(char *f,int i,int j);  
 void printLCDString(String f,int i,int j);
 void printLCD(char *f);
+void showStrength(int x);
 
 // printers
 void printValues(String name_index,double value);
