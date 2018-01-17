@@ -188,6 +188,7 @@ void showSignalQuality(){
 
 void readSensorValues(){
     loopCount++;
+    clearLCD();
     // read External temperature
     if(EXT_TEMP_ENABLE){
       showSignalQuality();

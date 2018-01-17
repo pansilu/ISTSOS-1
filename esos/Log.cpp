@@ -94,6 +94,10 @@ void printLCD(char *f){
     lcd.print(f);
 }
 
+void clearLCD(){
+  lcd.clear();  
+}
+
 /*
     Print Functions 
 */
