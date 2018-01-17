@@ -4,7 +4,7 @@
 #define TINY_GSM_MODEM_SIM800
 //#define TINY_GSM_MODEM_SIM900
 
-#define SIM_POWER 43
+#define SIM_POWER 9
 #define SIM_PIN_STATUS 40
 
 #define TIMEOUT 30000UL
@@ -17,7 +17,7 @@
 #define GPRS_FAILURE 4
 #define SERVER_FAILURE 5
 
-#define DEBUG_COM 0
+#define DEBUG_COM 1
 #define DEBUG_COM_ANS 1
 
 #define USE_SSL 1
@@ -62,12 +62,7 @@ private:
         Put the shield in sleep mode.
     */
     void sleepMode();
-    /**
-        Get shield status
-
-        @return bool status
-    */
-    bool getStatus();
+    
 
     /**
         To
@@ -102,10 +97,7 @@ private:
         Connect to the APN
     */
     bool connectToNetwork();
-    /**
-        Check if connected to the network
-    */
-    uint8_t getRegStatus();
+    
 
     /**
         Wait for a response
@@ -153,6 +145,11 @@ private:
         Clear buffer
     */
     void serialFlush();
+	
+	/**
+        get String response
+    */
+	String getResponseText(uint32_t timeout=3000UL);
 
 public:
 
@@ -177,7 +174,7 @@ public:
     uint8_t begin();
 
 
-
+	uint8_t Sim800::executePostPure(const char server[], const char uri[], const String& data);
     // call this methods inside loop()
     /**
         Execute GET requests.
@@ -187,7 +184,7 @@ public:
 
         @return uint8_t return code
     */
-    //uint8_t executeGet(const char server[], const char uri[]);
+    uint8_t executeGet(const char server[], const char uri[]);
     /**
         Execute POST requests.
 
@@ -198,7 +195,7 @@ public:
         @return uint8_t return code
     */
     uint8_t executePost(const char server[], const char uri[], const String& data);
-
+	
     /**
         Update the internal RTC and return the current date.
 
@@ -211,5 +208,52 @@ public:
         Disconnect from GPRS network.
     */
     void disconnect();
+	/**
+        Check if connected to the network
+    */
+    uint8_t getRegStatus();
+	/**
+        Get shield status
+
+        @return bool status
+    */
+    bool getStatus();
+	/**
+        Get Signal Quality
+
+        @return integer
+2	-109	Marginal
+3	-107	Marginal
+4	-105	Marginal
+5	-103	Marginal
+6	-101	Marginal
+7	-99	Marginal
+8	-97	Marginal
+9	-95	Marginal
+10	-93	OK
+11	-91	OK
+12	-89	OK
+13	-87	OK
+14	-85	OK
+15	-83	Good
+16	-81	Good
+17	-79	Good
+18	-77	Good
+19	-75	Good
+20	-73	Excellent
+21	-71	Excellent
+22	-69	Excellent
+23	-67	Excellent
+24	-65	Excellent
+25	-63	Excellent
+26	-61	Excellent
+27	-59	Excellent
+28	-57	Excellent
+29	-55	Excellent
+30	-53	Excellent
+
+    */
+	int readRSSI();
+	
 };
 #endif
