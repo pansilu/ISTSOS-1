@@ -1,6 +1,33 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+/*
+	GPRS Settings 
+*/
+
+// For Communication 
+
+#define APN "dialog"
+#define USERNAME ""
+#define PASSWORD ""
+
+// For SLPIOT Settings
+
+#define SERVER "slpiot.org"
+#define GUID_SLPIOT "e813b67c-3c7a-40"
+
+// For ISTSOS Settings
+
+#define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
+#define PROCEDURE "a0303bb4f9e311e7953f0800273cbaca"
+
+// for Enable Servers
+
+#define ENABLE_ISTSOS 1
+#define ENABLE_SLPIOT 1
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 // definitins
 #define EXTERNAL_TEMP_PIN 8  // External temperature pin
 #define DHT11_IN_PIN 4       // internal temperature
@@ -28,25 +55,10 @@
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
 #define WIND_VOLTAGE_MIN 10  // minimum voltage comes from wind speed sensor
 #define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        
-// GPRS SETTINGS FOR ISTSOS
-
-#define APN "dialog"
-#define USERNAME ""
-#define PASSWORD ""
-
-#define SERVER "slpiot.org"
-#define GUID_SLPIOT "e813b67c-3c7a-40"
-
-// istsos proceure
-#define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
-#define PROCEDURE "a0303bb4f9e311e7953f0800273cbaca"
 
 #define GET_REQUEST 10
 #define POST_REQUEST 20
 #define JSON_POST_REQUEST 30
-
-#define ENABLE_ISTSOS 1
-#define ENABLE_SLPIOT 1
 
 #define RF_TIMEOUT 5000
 
@@ -67,6 +79,5 @@
 #define WD_ENABLE 1
 #define RG_ENABLE 1
 #define BT_ENABLE 1
-extern int LostPower;
 
 #endif

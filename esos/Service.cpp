@@ -38,18 +38,29 @@ uint8_t executeRequest(double* externalHum,
               String req = String(F("http://slpiot.org/insert_data.php?"));
               req.concat("&GUID=" ); req += Guid;
               req.concat("&dt=" ); req += TimeStamp;
-              req.concat("&H="); req.concat(*externalHum);
-              req.concat("&TE=" ); req.concat(* externalTemp);
-              req.concat("&L=" ); req.concat(*light_intensity);
-              req.concat("&TI=" ); req.concat(*internalTemp);
-              req.concat("&WS=" ); req.concat(*windSpeed);
-              req.concat("&WD=" ); req.concat(*windDirection);
-              req.concat("&RG=" ); req.concat(*rainFall);
-              req.concat("&P=" ); req.concat(*pressure);
-              req.concat("&SM=" ); req.concat(*soilMoisture);
-              req.concat("&WL=" ); req.concat(*waterlevel);
-              req.concat("&AT=" ); req.concat(*altitude);
-              req.concat("&BV=" ); req.concat(*battry);
+			  if(EXT_HUM_ENABLE)
+				req.concat("&H="); req.concat(*externalHum);
+			  if(EXT_TEMP_ENABLE)
+				req.concat("&TE=" ); req.concat(* externalTemp);
+			  if(LUX_ENABLE)
+				req.concat("&L=" ); req.concat(*light_intensity);
+			  if(INT_TEMP_ENABLE)
+				req.concat("&TI=" ); req.concat(*internalTemp);
+			  if(WS_ENABLE)
+				req.concat("&WS=" ); req.concat(*windSpeed);
+			  if(WD_ENABLE)
+				req.concat("&WD=" ); req.concat(*windDirection);
+			  if(RG_ENABLE)
+				req.concat("&RG=" ); req.concat(*rainFall);
+			  if(PRESSURE_ENABLE)
+				req.concat("&P=" ); req.concat(*pressure);
+			  if(SM_ENABLE)
+				req.concat("&SM=" ); req.concat(*soilMoisture);
+			  if(ALTITUDE_ENABLE)
+				req.concat("&AT=" ); req.concat(*altitude);
+			  if(BT_ENABLE)
+				req.concat("&BV=" ); req.concat(*battry);
+			
               logData(req);
 
               char charBuf[req.length()];
@@ -65,17 +76,26 @@ uint8_t executeRequest(double* externalHum,
             }else if(type == POST_REQUEST){
               req =  String(Guid);
               req.concat(";" ); req += TimeStamp;
-              req.concat("," ); req.concat(*externalHum);
-              req.concat("," ); req.concat(*externalTemp);
-              req.concat("," ); req.concat(*pressure/1000);
-              req.concat("," ); req.concat(*altitude);
-              req.concat("," ); req.concat(*soilMoisture);
-              req.concat("," ); req.concat(*waterlevel);
-              req.concat("," ); req.concat(*windDirection);
-              req.concat("," ); req.concat(*windSpeed); 
-              req.concat("," ); req.concat(*rainFall);
-              req.concat("," ); req.concat(*light_intensity/1000);
-              req.concat(","); req.concat(*battry);
+			  if(EXT_HUM_ENABLE)
+				req.concat("," ); req.concat(*externalHum);
+			  if(EXT_TEMP_ENABLE)
+				req.concat("," ); req.concat(*externalTemp);
+			  if(PRESSURE_ENABLE)
+				req.concat("," ); req.concat(*pressure/1000);
+			  if(ALTITUDE_ENABLE)
+				req.concat("," ); req.concat(*altitude);
+		      if(SM_ENABLE)
+				req.concat("," ); req.concat(*soilMoisture);
+		      if(WD_ENABLE)
+				req.concat("," ); req.concat(*windDirection);
+		      if(WS_ENABLE)
+				req.concat("," ); req.concat(*windSpeed);
+			  if(RG_ENABLE) 	
+				req.concat("," ); req.concat(*rainFall);
+			  if(LUX_ENABLE)
+				req.concat("," ); req.concat(*light_intensity/1000);
+		      if(BT_ENABLE)
+				req.concat(","); req.concat(*battry);
               logData(req);
 
               char charBuf[req.length()];

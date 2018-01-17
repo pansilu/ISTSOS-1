@@ -54,7 +54,6 @@ double wind_direction=0;    // win direction value
 // wind speed 
 double wind_speed=0;        // wind speed value
 float sensor_voltage=0;
-double water_level=0;       // water level
 // rain gauge variables
 double rain_gauge=0;
 volatile unsigned long rain_count=0;
@@ -137,7 +136,6 @@ uint8_t sendSLPIOT(String &curruntDatetimeStr){
             &rain_gauge,
             &pressure_value,
             &soilemoisture_value,
-            &water_level,
             &altitude_value,
             &battery_value,
             JSON_POST_REQUEST,
@@ -160,7 +158,6 @@ uint8_t sendISTSOS(String &curruntDatetimeStr){
             &rain_gauge,
             &pressure_value,
             &soilemoisture_value,
-            &water_level,
             &altitude_value,
             &battery_value,
             POST_REQUEST,
