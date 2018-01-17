@@ -40,9 +40,10 @@ This Is a Whether station Internal code. this is requested to buy the hardware i
 ```
 
 4. Copy Libraries to your default Arduino library folder
+  ```
     For Windows : C:\Users\<Username>\Documents\Arduino\libraries Folder
     For OSx     : ~/Documents/Arduino/libraries/
-
+  ```
 ### Change Common GPRS Settings
 
 1. Open Settings.h file 
