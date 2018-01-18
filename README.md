@@ -1,4 +1,4 @@
-# ISTSOS Open source Whether station
+# ISTSOS Open source Weather station
 
 ISTSOS is a Free and Open Source Sensor Observation Service Data Management System.istSOS allows for 
 managing and dispatch observations from monitoring sensors according to the Sensor Observation Service standard.
@@ -12,7 +12,7 @@ Istsos has oppotunity to connect datacollectors wia REST API. This Source explai
  
 ## Getting Started
 
-This Is a Whether station Internal code. this is requested to buy the hardware implementation. this is fully Arduino based implemantation.
+This Is a Weather station Internal code. this is requested to buy the hardware implementation. this is fully Arduino based implemantation.
 
 ### Prerequisites
 
