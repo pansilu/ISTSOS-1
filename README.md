@@ -56,7 +56,7 @@ This Is a Weather station Internal code. this is requested to buy the hardware i
 ### Change ISTSOS Server Settings
 
 1. Open Settings.h file 
-2. Chnage POSTREQ for POST Request URL. (** Read [istSOS Document](http://istsos.org/en/latest/doc/) clearly Before Change this     parameter)
+2. Chanage POSTREQ for POST Request URL. (** Read [istSOS Document](http://istsos.org/en/latest/doc/) clearly Before Change this     parameter)
 3. Change PROCEDURE as your ISTSOS procedure ID
 
 ```
@@ -107,7 +107,7 @@ This will enable facility for changing sensor participation for whether station.
 
 ### Running 
 
-1. Run Arduino and open esos.ino file from arduino IDE.
+1. Run esos.ino file from arduino IDE.
 2. Upload the Changed source to your station
 3. Run the station.
 
