@@ -305,7 +305,6 @@ void clearSensorVariables(){
   wind_direction=0;
   wind_speed=0;
   sensor_voltage=0;
-  water_level=0;
   rain_gauge=0;
   rain_count=0;
 

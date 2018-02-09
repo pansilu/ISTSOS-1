@@ -10,16 +10,17 @@
 #define APN "dialog"
 #define USERNAME ""
 #define PASSWORD ""
+#define BASIC_AUTH "YWRtaW46QlYzWGp2clA="
 
 // For SLPIOT Settings
 
 #define SERVER "slpiot.org"
-#define GUID_SLPIOT "e813b67c-3c7a-40"
+#define GUID_SLPIOT "1814a140-be56-4d"
 
 // For ISTSOS Settings
 
-#define POSTREQ "/istsos/wa/istsos/services/sl/operations/fastinsert"
-#define PROCEDURE "a0303bb4f9e311e7953f0800273cbaca"
+#define POSTREQ "/4onse/wa/istsos/services/lka/operations/fastinsert"
+#define PROCEDURE "492e6c460ca311e8a93608002745029a"
 
 // for Enable Servers
 
