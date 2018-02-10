@@ -15,12 +15,12 @@
 // For SLPIOT Settings
 
 #define SERVER "slpiot.org"
-#define GUID_SLPIOT "1814a140-be56-4d"
+#define GUID_SLPIOT "e813b67c-3c7a-40"
 
 // For ISTSOS Settings
 
 #define POSTREQ "/4onse/wa/istsos/services/lka/operations/fastinsert"
-#define PROCEDURE "492e6c460ca311e8a93608002745029a"
+#define PROCEDURE "c6d0b8b60da711e8a93608002745029a"
 
 // for Enable Servers
 

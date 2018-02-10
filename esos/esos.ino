@@ -279,8 +279,8 @@ void readSensorValues(){
     // get battery voltage
     if(BT_ENABLE){
       showSignalQuality();
-      battery_value = readBatteryVoltage();
-      printValues(F("BT"),getLocalTimeHHMM(),battery_value);
+      battery_value += readBatteryVoltage();
+      printValues(F("BT"),getLocalTimeHHMM(),battery_value/loopCount);
     
     }
 
