@@ -15,7 +15,7 @@
 // For SLPIOT Settings
 
 #define SERVER "slpiot.org"
-#define GUID_SLPIOT "e77fd010-5a37-4b"
+#define GUID_SLPIOT " 1814a140-be56-4d"
 
 // For ISTSOS Settings
 

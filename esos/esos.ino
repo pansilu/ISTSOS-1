@@ -72,7 +72,6 @@ void setup() {
   #ifdef UNIT_CPP
     unitRun();
   #endif
-
   initialize();
 
   // initial sending data,
@@ -375,12 +374,13 @@ double readExternalHumidity(){
 
 // read soile moisture
 double readSoileMoisture(){
-  soilemoisture_value = analogRead(SM_PIN);
-  if(soilemoisture_value < 1023){
-    soilemoisture_value /= 957.35;
-    soilemoisture_value = log(soilemoisture_value);
-    soilemoisture_value = soilemoisture_value /(-0.029);
-    return soilemoisture_value;
+  double sm = analogRead(SM_PIN);
+  if(sm < 1018){
+    sm *= (- 0.0482);
+    sm += 49.017;
+    return sm;
+  }else if(sm < 1018){
+    return 100;
   }else{
     return 0;
   }  
