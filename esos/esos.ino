@@ -11,6 +11,7 @@
 #include "log.h"
 #include "Clocks.h"
 #include "Service.h"
+#include <Adafruit_SleepyDog.h>
 //#include "unit.h"
 
 // Factors
@@ -189,6 +190,8 @@ void showSignalQuality(){
 void readSensorValues(){
     loopCount++;
     clearLCD();
+    // Watch Dog ON
+    Watchdog.enable(WATCHDOG_TIME_OUT);
     // read External temperature
     if(EXT_TEMP_ENABLE){
       showSignalQuality();
@@ -196,6 +199,7 @@ void readSensorValues(){
       printValues(F("EX_T"),getLocalTimeHHMM(),ext_temperature/loopCount);
       
     }
+    Watchdog.reset();
 
     // read Internal temperature
     if(INT_TEMP_ENABLE){
@@ -203,7 +207,8 @@ void readSensorValues(){
       int_temperature += readInternalTemperature();
       printValues(F("IN_T"),getLocalTimeHHMM(),int_temperature/loopCount);
     }
-
+    Watchdog.reset();
+    
     // read Internal humidiy
     if(INT_HUM_ENABLE){
       showSignalQuality();
@@ -211,7 +216,8 @@ void readSensorValues(){
       printValues(F("IN_H"),getLocalTimeHHMM(),int_humidity/loopCount);
      
     }
-
+    Watchdog.reset();
+    
     // read external humidity
     if(EXT_HUM_ENABLE){
       showSignalQuality();
@@ -219,7 +225,8 @@ void readSensorValues(){
       printValues(F("EX_H"),getLocalTimeHHMM(),ext_humidity/loopCount);
       
     }
-
+    Watchdog.reset();
+    
     // soile mosture value
     if(SM_ENABLE){
       showSignalQuality();
@@ -227,7 +234,8 @@ void readSensorValues(){
       printValues(F("SM"),getLocalTimeHHMM(),soilemoisture_value/loopCount);
       
     }
-
+    Watchdog.reset();
+    
     // pressure value
     if(PRESSURE_ENABLE){
       showSignalQuality();
@@ -236,6 +244,8 @@ void readSensorValues(){
      
     }
 
+    Watchdog.reset();
+    
     // altitude value
     if(ALTITUDE_ENABLE){
       showSignalQuality();
@@ -243,6 +253,7 @@ void readSensorValues(){
       printValues(F("AL"),getLocalTimeHHMM(),altitude_value/loopCount);
       
     }
+    Watchdog.reset();
 
     // lux value
     if(LUX_ENABLE){
@@ -251,6 +262,7 @@ void readSensorValues(){
       printValues(F("IN"),getLocalTimeHHMM(),lux_value/loopCount);
       
     }
+    Watchdog.reset();
 
     // wind direction
     if(WD_ENABLE){
@@ -259,6 +271,7 @@ void readSensorValues(){
       printValues(F("WD"),getLocalTimeHHMM(),wind_direction);
       
     }
+    Watchdog.reset();
 
     // wind speed
     if(WS_ENABLE){
@@ -267,6 +280,7 @@ void readSensorValues(){
       printValues(F("WS"),getLocalTimeHHMM(),wind_speed/loopCount);
       
     }
+    Watchdog.reset();
     
     // rain guarge
     if(RG_ENABLE){
@@ -275,6 +289,7 @@ void readSensorValues(){
       printValues(F("RG"),getLocalTimeHHMM(),(rain_gauge/loopCount));
      
     }
+    Watchdog.reset();
 
     // get battery voltage
     if(BT_ENABLE){
@@ -283,13 +298,15 @@ void readSensorValues(){
       printValues(F("BT"),getLocalTimeHHMM(),battery_value/loopCount);
     
     }
+    Watchdog.reset();
 
     // Fan operator
     funcFan();
+    Watchdog.reset();
     // station is up
     soundIndicator(0,1);
 
-    
+    Watchdog.disable();
 }
 
 //clear variables setup to sensor Data
