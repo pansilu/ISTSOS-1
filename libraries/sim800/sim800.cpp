@@ -228,7 +228,7 @@ bool Sim800::connectToNetwork()
     return true;
 }
 
-uint8_t Sim800::waitResponse(uint32_t timeout, const String expected)
+uint8_t Sim800::waitResponse(uint32_t timeout = 60000UL, const String expected)
 {
 
     unsigned long start = millis();
@@ -445,7 +445,9 @@ uint32_t* Sim800::ntpUpdate(const char ntpServer[], int GMT){
 
     bool flag = false;
     if (this->serialAT->available()>0){
+		unsigned long start = millis();
         while (this->serialAT->available()>0){
+			
             char c = this->serialAT->read();
             if (c == '"'){
                 flag = true;
@@ -455,6 +457,7 @@ uint32_t* Sim800::ntpUpdate(const char ntpServer[], int GMT){
                 else
                     response += c;
             }
+			
         }
     }
 

@@ -6,7 +6,6 @@ File filef;
 int SDOK=0;
 const int chipSelect = 53;  // chip select pin for the SD module.it should be connected to 53 of module
 
-
 /*
     SD card Functions
 */
@@ -29,7 +28,8 @@ void createFileSD(String fileName)
   {
     filef = SD.open(fileName, FILE_WRITE);
     filef.close();
- 
+	
+	delay(2000);
     if (SD.exists(fileName)) 
         printErrorCode(F("SD_FILE_CREATION_ERROR : "),SD_FILE_CREATION_ERROR);
   }
@@ -236,7 +236,7 @@ void showStrength(int x){
     lcd.write(2);
     lcd.write(3);
   }
-  else if(x<=30 && x>= 20){
+  else if( x>= 20){
     lcd.write(1);
     lcd.write(2);
     lcd.write(3);
@@ -244,3 +244,6 @@ void showStrength(int x){
   }else
     lcd.write(0);
 }
+
+// log requests in temporary
+

@@ -100,6 +100,7 @@ void loop() {
   }
 }
 
+
 void sendData(){
   printStr("Sending ISTSOS");
   uint8_t count = ERROR_REPEATE_COUNT;
@@ -126,7 +127,7 @@ void sendData(){
 
 uint8_t sendSLPIOT(String &curruntDatetimeStr){
   uint8_t temp=2;
-  if(ENABLE_SLPIOT){
+  #ifdef SLPIOT 
     temp= executeRequest(&ext_humidity,
           &ext_temperature,
             &int_temperature,
@@ -141,13 +142,13 @@ uint8_t sendSLPIOT(String &curruntDatetimeStr){
             JSON_POST_REQUEST,
             curruntDatetimeStr,
             GUID_CODE);
-   }
+   #endif
    return temp;
 }
 
 uint8_t sendISTSOS(String &curruntDatetimeStr){
   uint8_t temp=2;
-  if(ENABLE_ISTSOS){
+  #ifdef ISTSOS 
     String sr =  String(PROCEDURE);
     temp= executeRequest(&ext_humidity,
           &ext_temperature,
@@ -163,7 +164,7 @@ uint8_t sendISTSOS(String &curruntDatetimeStr){
             POST_REQUEST,
             curruntDatetimeStr,
             sr);
-    } 
+    #endif
     return temp;
 }
 
@@ -487,22 +488,25 @@ void initialize(){
     delay(1000);
 
     if(rtc.lostPower()){
-        printError(F("RTC_ADJESTING..."));
+        printStr(F("RTC_ADJUSTING..."));
         setTimeExternal(ntpUpdate());
-        printError(F("RTC_SUCCESSFULL"));
+        printStr(F("RTC_SUCCESSFULL"));
         delay(1000);
     }
     
     
     // Dullas temperature 
     if(EXT_TEMP_ENABLE){
+	  printStr(F("DS18B20..."));	
       externalTemp.begin();
       externalTemp.getAddress(insideThermometer, 0);
       externalTemp.setResolution(insideThermometer, 12);
+	  printStr(F("DS18B20 DONE"));
     }
     
     // BME 280 calibration
     if(EXT_HUM_ENABLE || PRESSURE_ENABLE || ALTITUDE_ENABLE){
+	  printStr(F("BME280 ..."));	
       if(!bme280.init()){
         printErrorCode("BME_NOT_INIT",getLocalTime(),BME_NOT_INIT);
         is_bme280_working=0;
@@ -514,6 +518,7 @@ void initialize(){
 
     // start light meter
     if(LUX_ENABLE){
+	  printStr(F("LIGHT ..."));	
       lightMeter.begin(); 
     } 
 

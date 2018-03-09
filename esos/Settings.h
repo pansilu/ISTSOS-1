@@ -7,7 +7,7 @@
 
 // For Communication 
 
-#define APN "dialog"
+#define APN "mobitel"
 #define USERNAME ""
 #define PASSWORD ""
 #define BASIC_AUTH "YWRtaW46QlYzWGp2clA="
@@ -15,17 +15,19 @@
 // For SLPIOT Settings
 
 #define SERVER "slpiot.org"
-#define GUID_SLPIOT " 1814a140-be56-4d"
+#define GUID_SLPIOT "2851e9a0-b608-46"
 
 // For ISTSOS Settings
 
+#define IST_SERVER "geoservice.ist.supsi.ch";
 #define POSTREQ "/4onse/wa/istsos/services/lka/operations/fastinsert"
-#define PROCEDURE "492e6c460ca311e8a93608002745029a"
+#define PROCEDURE "24afc3c8213511e8a93608002745029a"
+
 
 // for Enable Servers
 
-#define ENABLE_ISTSOS 1
-#define ENABLE_SLPIOT 1
+#define ISTSOS 
+#define SLPIOT 
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -42,7 +44,7 @@
 // rain gauge
 #define RAIN_GAUGE_PIN 2
 #define RAIN_GAUGE_INT 0
-#define RAIN_FACTOR 0.2       // rain factor for one tip bucket
+#define RAIN_FACTOR 0.5       // rain factor for one tip bucket
 #define TEMP_UP 37            // upeer temp for the fan
 #define TEMP_DOWN 34          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
