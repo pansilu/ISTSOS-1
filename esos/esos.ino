@@ -33,7 +33,6 @@ BH1750 lightMeter;
 // Clock module     
 unsigned long lastSendTime;   // last send Time
 unsigned long lastRTCUpdatedTime;
-String curruntDatetimeStr;
 
 // dht 11 internal temperature
 dht internal_temperature_meter;
@@ -75,102 +74,114 @@ void setup() {
   initialize();
 
   // initial sending data,
-  //readSensorValues();
-  //getAvarageSensorValues();
+  readSensorValues();
+  saveAndSendData();
   
 }
 
 void loop() {
   // read sensor values onece
   readSensorValues();
-//  if((getUnixTime() - lastSendTime) > TIME_RATE * 60){
-//    getAvarageSensorValues();
-//    saveData();
-//  }  
-//
-//  if(RTC_UPDATE_BY_NTP){
-//    if((getUnixTime() - lastRTCUpdatedTime) > RTC_UPDATE_TIME_RATE){
-//      DateTime tsp = ntpUpdate();
-//      if(tsp.year()>2017){
-//        setTimeExternal(tsp);
-//        printStr("RTC_UPDATED_NTP",getLocalTime(),0);
-//      }
-//      lastRTCUpdatedTime = getUnixTime();
-//    }
-//  }
+  if((getUnixTime() - lastSendTime) > TIME_RATE * 60){
+    getAvarageSensorValues();
+    saveAndSendData();
+  }  
+
+  if(RTC_UPDATE_BY_NTP){
+    if((getUnixTime() - lastRTCUpdatedTime) > RTC_UPDATE_TIME_RATE){
+      DateTime tsp = ntpUpdate();
+      if(tsp.year()>2017){
+        setNTPTime();
+      }
+      lastRTCUpdatedTime = getUnixTime();
+    }
+  }
 }
 
-void saveData(){
+void saveAndSendData(){
+  getAvarageSensorValues();
+  String slpiot_request = getSlpiotRequest();
+  String istsos_request = getIstsosRequest();
+
+  Serial.println(slpiot_request);
+  Serial.println(istsos_request);
+
+  //send logs
+  sendLogData();
+
+  // send IST
+  #ifdef ISTSOS
+  const char istserver[] = IST_SERVER;
+  const char isturi[] = POSTREQ;
+  printSystemLog("SENDING...",IST_SERVER);
+  if(sendRequstMessage(istserver,isturi,istsos_request,1)== SEND_SUCCESS){
+    writeFileSD("DT_LOG/ISTSOS/",getFileNameDate(),istsos_request);
+  }else{
+    printSystemLog(SUCCESS_ERROR,SERVER,DATA_SEND_ERROR);
+    writeFileSD("MEM_LOG/ISTSOS/" ,getFileNameTime() ,istsos_request);
+  }
+  #endif
+
+  #ifdef SLPIOT
+  const char slpserver[] = SERVER;
+  const char slpuri[] = REQ_STR;
+  printSystemLog("SENDING...",SERVER);
   
-}
+  if(sendRequstMessage(slpserver,slpuri,slpiot_request,0)== SEND_SUCCESS){
+    writeFileSD("DT_LOG/SLPIOT/",getFileNameDate(),slpiot_request);
+  }else{
+    printSystemLog(SUCCESS_ERROR,IST_SERVER,DATA_SEND_ERROR);
+    writeFileSD("MEM_LOG/SLPIOT/",getFileNameTime(),slpiot_request);
+  }
+  #endif
 
-void sendData(){
-  printStr("Sending ISTSOS");
-  uint8_t count = ERROR_REPEATE_COUNT;
-  Serial.println(getLocalTime());
-  String t = getGrinichTime();
-  while(count>0){
-    if(sendISTSOS(t)==0)
-      break;
-    count--;
-  }
-  delay(2000);
-  printStr("Sending SLPIOT");
-  count = ERROR_REPEATE_COUNT;
-  t=getLocalTime();
-  while(count>0){
-    if(sendSLPIOT(t)==1)
-      break;
-    count--;
-  }
-   
   clearSensorVariables();
-  lastSendTime = getUnixTime();
 }
 
-uint8_t sendSLPIOT(String &curruntDatetimeStr){
-//  uint8_t temp=2;
-//  #ifdef SLPIOT 
-//    temp= executeRequest(&ext_humidity,
-//          &ext_temperature,
-//            &int_temperature,
-//            &lux_value,
-//            &wind_speed,
-//            &wind_direction,
-//            &rain_gauge,
-//            &pressure_value,
-//            &soilemoisture_value,
-//            &altitude_value,
-//            &battery_value,
-//            JSON_POST_REQUEST,
-//            curruntDatetimeStr,
-//            GUID_CODE);
-//   #endif
-//   return temp;
-}
 
-uint8_t sendISTSOS(String &curruntDatetimeStr){
-//  uint8_t temp=2;
-//  #ifdef ISTSOS 
-//    String sr =  String(PROCEDURE);
-//    temp= executeRequest(&ext_humidity,
-//          &ext_temperature,
-//            &int_temperature,
-//            &lux_value,
-//            &wind_speed,
-//            &wind_direction,
-//            &rain_gauge,
-//            &pressure_value,
-//            &soilemoisture_value,
-//            &altitude_value,
-//            &battery_value,
-//            POST_REQUEST,
-//            curruntDatetimeStr,
-//            sr);
-//    #endif
-//    return temp;
-}
+/*
+ * Get Request String
+ */
 
+ String getSlpiotRequest(){
+   return getRequestString(&ext_humidity,
+            &ext_temperature,
+            &int_temperature,
+            &lux_value,
+            &wind_speed,
+            &wind_direction,
+            &rain_gauge,
+            &pressure_value,
+            &soilemoisture_value,
+            &altitude_value,
+            &battery_value,
+            SLPIOT_REQUEST,
+            getLocalTime(),
+            GUID_CODE);
+ }
+
+ String getIstsosRequest(){
+   return getRequestString(&ext_humidity,
+          &ext_temperature,
+            &int_temperature,
+            &lux_value,
+            &wind_speed,
+            &wind_direction,
+            &rain_gauge,
+            &pressure_value,
+            &soilemoisture_value,
+            &altitude_value,
+            &battery_value,
+            ISTSOS_REQUEST,
+            getGrinichTime(),
+            PROCEDURE);
+ }
+
+/****************************************************
+ * SENSOR Reading functions
+ * **************************************************
+ */
+ 
 void getAvarageSensorValues(){
   ext_temperature /= loopCount;
   int_temperature /= loopCount;
@@ -251,7 +262,7 @@ void readSensorValues(){
     // wind direction
     if(WD_ENABLE){
       wind_direction = readWinDirection();
-      printValuesOnPanel(F("WD"),wind_direction/(loopCount),String((char)223));
+      printValuesOnPanel(F("WD"),wind_direction,String((char)223));
     }
     Watchdog.reset();
 
@@ -271,8 +282,8 @@ void readSensorValues(){
 
     // get battery voltage
     if(BT_ENABLE){
-      battery_value += readBatteryVoltage();
-      printValuesOnPanel(F("BT"),battery_value/(loopCount),"V");
+      battery_value = readBatteryVoltage();
+      printValuesOnPanel(F("BT"),battery_value,"V");
     }
     Watchdog.reset();
 
@@ -439,7 +450,9 @@ void rainGageClick()
     }
 }
 
-// initialize componants
+/*
+ * SYSTEM INITIALIZATION 
+ */
 void initialize(){
     // one wire intialization
     Wire.begin();

@@ -60,9 +60,8 @@
 #define WIND_VOLTAGE_MIN 10  // minimum voltage comes from wind speed sensor
 #define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        
 
-#define GET_REQUEST 10
-#define POST_REQUEST 20
-#define JSON_POST_REQUEST 30
+#define ISTSOS_REQUEST 1
+#define SLPIOT_REQUEST 2
 
 #define RF_TIMEOUT 5000
 #define WATCHDOG_TIME_OUT 8000
@@ -87,5 +86,5 @@
 
 // message
 #define SUCCESSFULL "SUCCESSFULL"
-#define SUCCESS_ERROR "SUCCESSFULL"
+#define SUCCESS_ERROR "ERROR"
 #endif

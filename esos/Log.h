@@ -47,6 +47,9 @@ void printString(String topLayer,String bottomLayer,int DefinitionCode);
 void printSystemLog(String topLayer,String bottomLayer );
 void printSystemLog(String topLayer,String bottomLayer,int DefinitionCode );
 void printValuesOnPanel(String name_index,double value,String unit);
+String getAPN();
+String getAPNUser();
+String getAPNPass();
 
 void printValues(String name_index,double value);
 void printValues(String name_index,String value);

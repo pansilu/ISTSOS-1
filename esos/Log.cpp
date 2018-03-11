@@ -27,6 +27,54 @@ void initSD(){
 
     SD.mkdir("MEM_LOG/SLPIOT");
     SD.mkdir("MEM_LOG/ISTSOS");
+
+    SD.mkdir("DT_LOG/SLPIOT");
+    SD.mkdir("DT_LOG/ISTSOS");
+}
+
+String getAPN(){
+  String res = readFileSD("","config.txt");
+  char c;
+  String apn;
+  int index = res.indexOf("APN:");
+  for(int i=index+4;i<res.length();i++){
+    c = res.charAt(i);
+    apn.concat(c);
+    if(c=='\n'){
+      break;
+    } 
+  }
+  return apn;
+}
+
+String getAPNUser(){
+  String res = readFileSD("","config.txt");
+  char c;
+  String apn;
+  int index = res.indexOf("USER:");
+  for(int i=index+5;i<res.length();i++){
+    c = res.charAt(i);
+    apn.concat(c);
+    if(c=='\n'){
+      break;
+    } 
+  }
+  return apn;
+}
+
+String getAPNPass(){
+  String res = readFileSD("","config.txt");
+  char c;
+  String apn;
+  int index = res.indexOf("PASS:");
+  for(int i=index+5;i<res.length();i++){
+    c = res.charAt(i);
+    apn.concat(c);
+    if(c=='\n'){
+      break;
+    } 
+  }
+  return apn;
 }
 
 void sendLogData(){
@@ -46,7 +94,8 @@ void sendLogData(){
         if(sendRequstMessage(istserver,isturi,req,1)== SEND_SUCCESS){
           if(removeFile("MEM_LOG/ISTSOS/",reader.name()))
             Serial.println(String(reader.name()) + " Removed");
-           continue;
+          writeFileSD("DT_LOG/ISTSOS/",getFileNameDate(),req);
+          continue;
         }
     }
     #endif
@@ -65,7 +114,8 @@ void sendLogData(){
         if(sendRequstMessage(slpserver,slpuri,req,0)== SEND_SUCCESS){
           if(removeFile("MEM_LOG/SLPIOT/",reader.name()))
             Serial.println(String(reader.name()) + " Removed");
-           continue;
+          writeFileSD("DT_LOG/SLPIOT/",getFileNameDate(),req);
+          continue;
         }
     }
     #endif
@@ -85,6 +135,10 @@ uint8_t sendRequstMessage(char server[],char uri[],String message,uint8_t auth){
   printSystemLog("SEND ERROR",String(server),DATA_SEND_ERROR);
   return SEND_ERROR;
 }
+
+/*
+ * Basics
+ */
 
 uint8_t removeFile(String folderpath,String fileName){
   fileName = folderpath + fileName;
@@ -191,16 +245,6 @@ void initLCD(){
     lcd.createChar(4, signal_4);
     lcd.home();
 }
-
-void printLCDDouble(double val,int i,int j){ 
-    lcd.setCursor(i,j);
-    lcd.print(String(val,2));
-}
-  
-void printLCDCharArray(char *f,int i,int j){
-    lcd.setCursor(i,j);
-    lcd.print(f);
-}
   
 void printLCDString(String f,int i,int j){
     lcd.setCursor(i,j);
@@ -216,101 +260,6 @@ void clearLCD(){
   lcd.clear();  
 }
 
-/*
-    Print Functions 
-*/
-
-void printValues(String name_index,double value){
-    Serial.print(name_index + ":");
-    Serial.println(value);
-    lcd.clear();
-    printLCDString(name_index,0,0);
-    printLCDDouble(value,0,1);
-    delay(1000);
-}
-
-void printValues(String name_index,String value){
-    Serial.print(name_index);
-    Serial.println(value);
-    lcd.clear();
-    printLCDString(name_index,0,0);
-    printLCDString(value,0,1);
-    delay(1000);
-}
-
-void printValues(String name_index,String tx,double value){
-    Serial.print(name_index + ":");
-    Serial.println(value);
-    printLCDString("           ",0,0);
-    printLCDString("           ",1,0);
-    printLCDString(name_index,0,0);
-    printLCDDouble(value,5,0);
-    printLCDString(tx.substring(2),0,1);
-    
-    delay(1000);
-}
-
-void printValues(String name_index,String tx,String value){
-    Serial.print(name_index);
-    Serial.println(value);
-    printLCDString("           ",0,0);
-    printLCDString("           ",1,0);
-    printLCDString(value,5,0);
-    printLCDString(tx.substring(2),0,1);
-    delay(1000);
-}
-
-void printError(String text){
-    Serial.println(text);
-    lcd.clear();
-    printLCDString(text,0,0);
-}
-
-void printStrOnDebug(String text){
-    Serial.print(text);
-}
-
-void printStr(String text){
-    Serial.println(text);
-    lcd.clear();
-    printLCDString(text,0,0);
-}
-
-void logData(String &text){
-    Serial.println(text);
-}
-
-void writeErrorLogData(String &text){
-  
-}
-
-void printStr(String text,String logTime,int DefinitionCode ){
-    Serial.println(text);
-    logTime.concat(" | ");
-    logTime.concat(text);
-    //writeFileSD("SYSLOG.txt",logTime);
-    lcd.clear();
-    printLCDString(text,0,0);
-    soundIndicator(DefinitionCode/10,DefinitionCode%10);
-}
-
-void printErrorCode(String text, int DefinitionCode){
-    Serial.println(text);
-    //writeFileSD("ERRLog.txt",text);
-    lcd.clear();
-    printLCDString(text,0,0);
-    soundIndicator(DefinitionCode/10,DefinitionCode%10);
-}
-
-void printErrorCode(String text,String logTime,int DefinitionCode ){
-    Serial.println(text);
-    logTime.concat(" | ");
-    logTime.concat(text);
-    //writeFileSD("ERRLog.txt",logTime);
-    lcd.clear();
-    printLCDString(text,0,0);
-    soundIndicator(DefinitionCode/10,DefinitionCode%10);
-}
 
 // sound soundIndicator
 void soundIndicator(int count1,int count2){

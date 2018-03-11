@@ -1,23 +1,22 @@
 #include "Service.h"
 
 const String server_url = String(SERVER);
-Sim800 simServer = Sim800(Serial2, APN, USERNAME, PASSWORD, BASIC_AUTH);
+Sim800 simServer = Sim800(Serial2, APN, USERNAME, PASSWORD, BASIC_AUTH);;
 
-const char istserver[] = IST_SERVER;
-const char isturi[] = POSTREQ;
 uint8_t temp = 0;
 
 void ServiceBegin()
 {
+  
   printString("SERVICE CHECK",APN);
 	uint8_t temp = simServer.begin();
 	if (temp)
 		printSystemLog(SUCCESSFULL,APN,SERVICE_OK);
 	else
-		printErrorCode(SUCCESS_ERROR,APN, SERVICE_ERROR);
+		printSystemLog(SUCCESS_ERROR,APN, SERVICE_ERROR);
 }
 
-uint8_t executeRequest(double *externalHum,
+String getRequestString(double *externalHum,
 											 double *externalTemp,
 											 double *internalTemp,
 											 double *light_intensity,
@@ -29,11 +28,11 @@ uint8_t executeRequest(double *externalHum,
 											 double *altitude,
 											 double *battry,
 											 int type,
-											 String &TimeStamp,
-											 String &Guid)
+											 String TimeStamp,
+											 String Guid)
 {
 	String req;
-	if (type == POST_REQUEST)
+	if (type == ISTSOS_REQUEST)
 	{
 		req = String(Guid);
 		req.concat(";");
@@ -83,21 +82,10 @@ uint8_t executeRequest(double *externalHum,
 			req.concat(",");
 			req.concat(*light_intensity / 1000);
 		}
-		logData(req);
 
-		char charBuf[req.length()];
-		req.toCharArray(charBuf, req.length());
-
-		temp = simServer.executePost(istserver, isturi, req);
-		if (temp)
-			printStr(F("DATA_SEND_SUCCESSFULLY:ISTSOS"), getLocalTime(), DATA_SEND_SUCCESSFULLY);
-		else
-		{
-			printErrorCode(F("ISTSOS:RESENDING..."), getLocalTime(), DATA_SEND_ERROR);
-			writeErrorLogData(req);
-		}
+    return req;
 	}
-	else if (type == JSON_POST_REQUEST)
+	else if (type == SLPIOT_REQUEST)
 	{
 
 		String req = String(F("{"));
@@ -143,27 +131,14 @@ uint8_t executeRequest(double *externalHum,
 		req.concat("\"BV\":\"");
 		req.concat(*battry);
 		req.concat("\"}");
-		logData(req);
 
-		char charBuf[req.length()];
-		req.toCharArray(charBuf, req.length());
-
-		temp = executePostRequest("www.slpiot.org", "/insert_data4.php", req);
-		if (temp)
-			printStr(F("DATA_SEND_SUCCESSFULLY:SLPIOT"), getLocalTime(), DATA_SEND_SUCCESSFULLY);
-		else
-		{
-			printErrorCode(F("SLPIOT:RESENDING..."), getLocalTime(), DATA_SEND_ERROR);
-			writeErrorLogData(req);
-		}
+    return req;
 	}
 	else
 	{
-
-		printErrorCode(F("SENDING_PARAMETERS_ARE_NOT_DEFINED"), getLocalTime(), DATA_SEND_ERROR);
-		return 1;
+		printSystemLog("ERROR","PARMS");
+		return "";
 	}
-	return temp;
 }
 
 uint8_t executePostRequest(char server[], char url[], String &data, uint8_t auth)

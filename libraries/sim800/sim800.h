@@ -17,8 +17,8 @@
 #define GPRS_FAILURE 4
 #define SERVER_FAILURE 5
 
-#define DEBUG_COM 1
-#define DEBUG_COM_ANS 1
+#define DEBUG_COM 0
+#define DEBUG_COM_ANS 0
 
 #define USE_SSL 1
 
@@ -165,7 +165,11 @@ public:
     */
     Sim800(Stream &serial, const char* apn, const char* user, const char* pass, const char* basic="", const char* pin="");
 
-    /**
+    
+	
+	
+	setParams(const char* apn, const char* user, const char* pass);
+	/**
         Initialize SIM enviroment.
         Call it inside setup()
 

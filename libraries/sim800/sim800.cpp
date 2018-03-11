@@ -11,6 +11,12 @@ Sim800::Sim800(Stream &serial, const char* apn, const char* user, const char* pa
     this->basic = basic;
 }
 
+Sim800::setParams(const char* apn, const char* user, const char* pass){
+	this->apn = apn;
+    this->user = user;
+    this->pass = pass;
+}
+
 uint8_t Sim800::begin()
 {
     pinMode(SIM_PIN_STATUS, INPUT);

@@ -51,7 +51,7 @@ String getFileNameDate(){
    DateTime now = rtc.now();
 
    char str_time[30];
-   sprintf(str_time, "%02d%02d%02d.TXT", now.year()/2000, now.month(), now.day());
+   sprintf(str_time, "%04d%02d%02d.TXT", now.year(), now.month(), now.day());
 
    return String(str_time);
 }

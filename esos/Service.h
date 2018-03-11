@@ -10,7 +10,7 @@
 extern Sim800 server ;
 
 void ServiceBegin();
-uint8_t executeRequest(double* externalHum,
+String getRequestString(double* externalHum,
     double *externalTemp,
     double *internalTemp,
     double *light_intensity,
@@ -22,8 +22,8 @@ uint8_t executeRequest(double* externalHum,
     double *altitude,
     double *battry,
     int type,
-    String& TimeStamp,
-    String& Guid);
+    String TimeStamp,
+    String Guid);
 
 uint8_t executePostRequest(char server[],char url[],String &data,uint8_t auth=0);
 int readRSSI();
