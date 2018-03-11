@@ -7,7 +7,7 @@
 
 // For Communication 
 
-#define APN "mobitel"
+#define APN "dialog"
 #define USERNAME ""
 #define PASSWORD ""
 #define BASIC_AUTH "YWRtaW46QlYzWGp2clA="
@@ -15,13 +15,14 @@
 // For SLPIOT Settings
 
 #define SERVER "slpiot.org"
+#define REQ_STR "/insert_data4.php"
 #define GUID_SLPIOT "2851e9a0-b608-46"
 
 // For ISTSOS Settings
 
-#define IST_SERVER "geoservice.ist.supsi.ch";
+#define IST_SERVER "geoservice.ist.supsi.ch"
 #define POSTREQ "/4onse/wa/istsos/services/lka/operations/fastinsert"
-#define PROCEDURE "24afc3c8213511e8a93608002745029a"
+#define PROCEDURE "b269adf01ba411e8a93608002745029a"
 
 
 // for Enable Servers
@@ -52,7 +53,7 @@
 #define RTC_UPDATE_TIME_RATE 604800UL
 #define RTC_UPDATE_INTERVAL 1 // the inteval et ween 2 RTC update from ntp (days)
 #define RTC_UPDATE_BY_NTP 1
-#define ERROR_REPEATE_COUNT 3
+#define ERROR_REPEATE_COUNT 3 // how much times shoulw try to send
 
 #define WIN_SPEED_PIN A1       // wind speed pin
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
@@ -84,4 +85,7 @@
 #define RG_ENABLE 1
 #define BT_ENABLE 1
 
+// message
+#define SUCCESSFULL "SUCCESSFULL"
+#define SUCCESS_ERROR "SUCCESSFULL"
 #endif

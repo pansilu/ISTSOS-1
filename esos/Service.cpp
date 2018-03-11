@@ -9,11 +9,12 @@ uint8_t temp = 0;
 
 void ServiceBegin()
 {
+  printString("SERVICE CHECK",APN);
 	uint8_t temp = simServer.begin();
 	if (temp)
-		printStr("SERVICE_OK");
+		printSystemLog(SUCCESSFULL,APN,SERVICE_OK);
 	else
-		printErrorCode("SERVICE_ERROR", SERVICE_ERROR);
+		printErrorCode(SUCCESS_ERROR,APN, SERVICE_ERROR);
 }
 
 uint8_t executeRequest(double *externalHum,
@@ -88,7 +89,7 @@ uint8_t executeRequest(double *externalHum,
 		req.toCharArray(charBuf, req.length());
 
 		temp = simServer.executePost(istserver, isturi, req);
-		if (!temp)
+		if (temp)
 			printStr(F("DATA_SEND_SUCCESSFULLY:ISTSOS"), getLocalTime(), DATA_SEND_SUCCESSFULLY);
 		else
 		{
@@ -165,8 +166,10 @@ uint8_t executeRequest(double *externalHum,
 	return temp;
 }
 
-uint8_t executePostRequest(char server[], char url[], String &data)
+uint8_t executePostRequest(char server[], char url[], String &data, uint8_t auth)
 {
+  if(auth)
+    return simServer.executePost(server, url, data);
 	return simServer.executePostPure(server, url, data);
 }
 

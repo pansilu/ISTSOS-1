@@ -75,31 +75,34 @@ void setup() {
   initialize();
 
   // initial sending data,
-  readSensorValues();
-  getAvarageSensorValues();
-  sendData();
+  //readSensorValues();
+  //getAvarageSensorValues();
+  
 }
 
 void loop() {
   // read sensor values onece
   readSensorValues();
-  if((getUnixTime() - lastSendTime) > TIME_RATE * 60){
-    getAvarageSensorValues();
-    sendData();
-  }  
-
-  if(RTC_UPDATE_BY_NTP){
-    if((getUnixTime() - lastRTCUpdatedTime) > RTC_UPDATE_TIME_RATE){
-      DateTime tsp = ntpUpdate();
-      if(tsp.year()>2017){
-        setTimeExternal(tsp);
-        printStr("RTC_UPDATED_NTP",getLocalTime(),0);
-      }
-      lastRTCUpdatedTime = getUnixTime();
-    }
-  }
+//  if((getUnixTime() - lastSendTime) > TIME_RATE * 60){
+//    getAvarageSensorValues();
+//    saveData();
+//  }  
+//
+//  if(RTC_UPDATE_BY_NTP){
+//    if((getUnixTime() - lastRTCUpdatedTime) > RTC_UPDATE_TIME_RATE){
+//      DateTime tsp = ntpUpdate();
+//      if(tsp.year()>2017){
+//        setTimeExternal(tsp);
+//        printStr("RTC_UPDATED_NTP",getLocalTime(),0);
+//      }
+//      lastRTCUpdatedTime = getUnixTime();
+//    }
+//  }
 }
 
+void saveData(){
+  
+}
 
 void sendData(){
   printStr("Sending ISTSOS");
@@ -126,46 +129,46 @@ void sendData(){
 }
 
 uint8_t sendSLPIOT(String &curruntDatetimeStr){
-  uint8_t temp=2;
-  #ifdef SLPIOT 
-    temp= executeRequest(&ext_humidity,
-          &ext_temperature,
-            &int_temperature,
-            &lux_value,
-            &wind_speed,
-            &wind_direction,
-            &rain_gauge,
-            &pressure_value,
-            &soilemoisture_value,
-            &altitude_value,
-            &battery_value,
-            JSON_POST_REQUEST,
-            curruntDatetimeStr,
-            GUID_CODE);
-   #endif
-   return temp;
+//  uint8_t temp=2;
+//  #ifdef SLPIOT 
+//    temp= executeRequest(&ext_humidity,
+//          &ext_temperature,
+//            &int_temperature,
+//            &lux_value,
+//            &wind_speed,
+//            &wind_direction,
+//            &rain_gauge,
+//            &pressure_value,
+//            &soilemoisture_value,
+//            &altitude_value,
+//            &battery_value,
+//            JSON_POST_REQUEST,
+//            curruntDatetimeStr,
+//            GUID_CODE);
+//   #endif
+//   return temp;
 }
 
 uint8_t sendISTSOS(String &curruntDatetimeStr){
-  uint8_t temp=2;
-  #ifdef ISTSOS 
-    String sr =  String(PROCEDURE);
-    temp= executeRequest(&ext_humidity,
-          &ext_temperature,
-            &int_temperature,
-            &lux_value,
-            &wind_speed,
-            &wind_direction,
-            &rain_gauge,
-            &pressure_value,
-            &soilemoisture_value,
-            &altitude_value,
-            &battery_value,
-            POST_REQUEST,
-            curruntDatetimeStr,
-            sr);
-    #endif
-    return temp;
+//  uint8_t temp=2;
+//  #ifdef ISTSOS 
+//    String sr =  String(PROCEDURE);
+//    temp= executeRequest(&ext_humidity,
+//          &ext_temperature,
+//            &int_temperature,
+//            &lux_value,
+//            &wind_speed,
+//            &wind_direction,
+//            &rain_gauge,
+//            &pressure_value,
+//            &soilemoisture_value,
+//            &altitude_value,
+//            &battery_value,
+//            POST_REQUEST,
+//            curruntDatetimeStr,
+//            sr);
+//    #endif
+//    return temp;
 }
 
 void getAvarageSensorValues(){
@@ -183,9 +186,6 @@ void getAvarageSensorValues(){
   battery_value /= loopCount;
 }
 
-void showSignalQuality(){
-  showStrength(readRSSI());
-}
 
 void readSensorValues(){
     loopCount++;
@@ -194,109 +194,85 @@ void readSensorValues(){
     Watchdog.enable(WATCHDOG_TIME_OUT);
     // read External temperature
     if(EXT_TEMP_ENABLE){
-      showSignalQuality();
       ext_temperature += readExternalTemperature();
-      printValues(F("EX_T"),getLocalTimeHHMM(),ext_temperature/loopCount);
-      
+      printValuesOnPanel(F("TM"),ext_temperature/loopCount,String((char)223)+"C");
     }
     Watchdog.reset();
 
     // read Internal temperature
     if(INT_TEMP_ENABLE){
-      showSignalQuality();
       int_temperature += readInternalTemperature();
-      printValues(F("IN_T"),getLocalTimeHHMM(),int_temperature/loopCount);
+      printValuesOnPanel(F("HT"),int_temperature/loopCount,String((char)223)+"C");
     }
     Watchdog.reset();
     
     // read Internal humidiy
     if(INT_HUM_ENABLE){
-      showSignalQuality();
       int_humidity += readInternalHumidity();
-      printValues(F("IN_H"),getLocalTimeHHMM(),int_humidity/loopCount);
-     
+      printValuesOnPanel(F("HM"),int_humidity/loopCount,"%");
     }
     Watchdog.reset();
     
     // read external humidity
     if(EXT_HUM_ENABLE){
-      showSignalQuality();
       ext_humidity += readExternalHumidity();
-      printValues(F("EX_H"),getLocalTimeHHMM(),ext_humidity/loopCount);
-      
     }
     Watchdog.reset();
     
     // soile mosture value
     if(SM_ENABLE){
-      showSignalQuality();
       soilemoisture_value += readSoileMoisture();
-      printValues(F("SM"),getLocalTimeHHMM(),soilemoisture_value/loopCount);
-      
+      printValuesOnPanel(F("SM"),soilemoisture_value/loopCount,"%");
     }
     Watchdog.reset();
     
     // pressure value
     if(PRESSURE_ENABLE){
-      showSignalQuality();
       pressure_value += readPressure();
-      printValues(F("P"),getLocalTimeHHMM(),pressure_value/loopCount);
-     
+      printValuesOnPanel(F("PR"),pressure_value/(loopCount),"kpa");
     }
 
     Watchdog.reset();
     
     // altitude value
     if(ALTITUDE_ENABLE){
-      showSignalQuality();
       altitude_value += readAltitude();
-      printValues(F("AL"),getLocalTimeHHMM(),altitude_value/loopCount);
-      
+      printValuesOnPanel(F("AL"),altitude_value/(loopCount),"m");
     }
     Watchdog.reset();
 
     // lux value
     if(LUX_ENABLE){
-      showSignalQuality();
       lux_value += readItensity();
-      printValues(F("IN"),getLocalTimeHHMM(),lux_value/loopCount);
-      
+      printValuesOnPanel(F("IN"),lux_value/(loopCount*1000),"klx");
     }
     Watchdog.reset();
 
     // wind direction
     if(WD_ENABLE){
-      showSignalQuality();
       wind_direction = readWinDirection();
-      printValues(F("WD"),getLocalTimeHHMM(),wind_direction);
-      
+      printValuesOnPanel(F("WD"),wind_direction/(loopCount),String((char)223));
     }
     Watchdog.reset();
 
     // wind speed
     if(WS_ENABLE){
-      showSignalQuality();
       wind_speed += readWindSpeed();
-      printValues(F("WS"),getLocalTimeHHMM(),wind_speed/loopCount);
-      
+      printValuesOnPanel(F("WS"),wind_speed/(loopCount),"m/s");
     }
     Watchdog.reset();
     
     // rain guarge
     if(RG_ENABLE){
-      showSignalQuality();
       rain_gauge += readRainGuarge();
-      printValues(F("RG"),getLocalTimeHHMM(),(rain_gauge/loopCount));
-     
+      printValuesOnPanel(F("RG"),rain_gauge/(loopCount),"mm");
     }
     Watchdog.reset();
 
     // get battery voltage
     if(BT_ENABLE){
-      showSignalQuality();
       battery_value += readBatteryVoltage();
-      printValues(F("BT"),getLocalTimeHHMM(),battery_value/loopCount);
-    
+      printValuesOnPanel(F("BT"),battery_value/(loopCount),"V");
     }
     Watchdog.reset();
 
@@ -333,14 +309,13 @@ double readExternalTemperature(){
   externalTemp.requestTemperatures();
   if(externalTemp.getTempCByIndex(0) <-120)
   {
-    printErrorCode("DS18B20_ERROR",getLocalTime(),DS18B20_ERROR);
     if(!isBME280Working()){
-      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
+      printSystemLog(F("I2C ERROR"),F("BME 280"),BME_I2C_ERROR);
       return 0;
     }
 
     if(bme280.getHumidity() == 0 ){
-      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
+      printSystemLog(F("I2C ERROR"),F("BME 280"),BME_I2C_ERROR);
       return 0;
     }
     return bme280.getTemperature(); 
@@ -362,12 +337,12 @@ double readInternalHumidity(){
 
 double readExternalHumidity(){
   if(!isBME280Working()){
-    printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
+    printSystemLog(F("I2C ERROR"),F("BME 280"),BME_I2C_ERROR);
     return 0;
   }
 
   if(bme280.getHumidity() == 0 ){
-    printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
+    printSystemLog(F("I2C ERROR"),F("BME 280"),BME_I2C_ERROR);
     return 0;
   }
   return bme280.getHumidity();
@@ -390,12 +365,12 @@ double readSoileMoisture(){
 // read Altitude
 double readAltitude(){
     if(!isBME280Working()){
-      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
+      printSystemLog(F("I2C ERROR"),F("BME 280"),BME_I2C_ERROR);
       return 0;
     }
     
     if(bme280.getPressure() > 118000 ){
-      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);\
+      printSystemLog(F("I2C ERROR"),F("BME 280"),BME_I2C_ERROR);
       return 0;
     }
     return bme280.calcAltitude(bme280.getPressure());
@@ -404,24 +379,19 @@ double readAltitude(){
 // read pressure value
 double readPressure(){
   if(!isBME280Working()){
-      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
+      printSystemLog(F("I2C ERROR"),F("BME 280"),BME_I2C_ERROR);
       return 0;
     }
     
     if(bme280.getPressure() > 118000 ){
-      printErrorCode("BME_I2C_ERROR",getLocalTime(),BME_I2C_ERROR);
+      printSystemLog(F("I2C ERROR"),F("BME 280"),BME_I2C_ERROR);
       return 0;
     }
-  return bme280.getPressure()*0.001; // kpa
+    return bme280.getPressure()*0.001; // kpa
 }
 
 // read lux value
 double readItensity(){
-    if(lightMeter.readLightLevel()>54000){
-      
-      printErrorCode("LIGHT_I2C_ERROR",getLocalTime(),LIGHT_I2C_ERROR);
-      return 0;
-    }
     return lightMeter.readLightLevel();
 }
 
@@ -488,37 +458,35 @@ void initialize(){
     delay(1000);
 
     if(rtc.lostPower()){
-        printStr(F("RTC_ADJUSTING..."));
-        setTimeExternal(ntpUpdate());
-        printStr(F("RTC_SUCCESSFULL"));
-        delay(1000);
+        setNTPTime();
     }
-    
-    
+       
     // Dullas temperature 
     if(EXT_TEMP_ENABLE){
-	  printStr(F("DS18B20..."));	
+	    printString(F("INITIALIZING"),F("DS18B20"));
       externalTemp.begin();
       externalTemp.getAddress(insideThermometer, 0);
       externalTemp.setResolution(insideThermometer, 12);
-	  printStr(F("DS18B20 DONE"));
+	    printSystemLog(F(SUCCESSFULL),F("DS18B20"));
+      delay(1000);
     }
     
     // BME 280 calibration
     if(EXT_HUM_ENABLE || PRESSURE_ENABLE || ALTITUDE_ENABLE){
-	  printStr(F("BME280 ..."));	
+	    printString(F("INITIALIZING"),F("BME280"));	
       if(!bme280.init()){
-        printErrorCode("BME_NOT_INIT",getLocalTime(),BME_NOT_INIT);
+        printSystemLog(F(SUCCESS_ERROR),F("BME280"),BME_NOT_INIT);
         is_bme280_working=0;
       }
       else
-        printStr(F("BME OK"),getLocalTime(),INIT_DONE);
+        printSystemLog(F(SUCCESSFULL),F("BME280"));
         is_bme280_working=1;
+      delay(1000);
     }
 
     // start light meter
     if(LUX_ENABLE){
-	  printStr(F("LIGHT ..."));	
+	    printString(F("INITIALIZING"),F("BH 1750"));
       lightMeter.begin(); 
     } 
 
@@ -537,7 +505,7 @@ void initialize(){
     digitalWrite(FAN_PIN,HIGH);
 
     clearSensorVariables();   // initialize all sensor variables 
-    printStr(F("INIT_DONE"),getLocalTime(),INIT_DONE);    
+    printSystemLog(F(SUCCESSFULL),F("SYSTEM INIT"),INIT_DONE);   
     delay(2000);
 }
 

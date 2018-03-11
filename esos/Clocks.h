@@ -16,8 +16,11 @@ void initRTC();
 String getLocalTime();
 String getLocalTimeHHMM();
 String getGrinichTime();
+String getFileNameDate();
+String getFileNameTime();
 void setTimeFromPC();
 void setTimeExternal(DateTime dt);
+void setNTPTime();
 DateTime getCurruntRTCDate();
 unsigned long getUnixTime();
 

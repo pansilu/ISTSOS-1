@@ -11,6 +11,7 @@
 #define RTC_INIT_DONE 0
 #define RTC_NOT_CONNECTED 13
 #define RTC_FAILED 14
+#define RTC_UPDATED 33
 
 // BME
 #define BME_NOT_INIT 31

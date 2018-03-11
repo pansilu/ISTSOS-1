@@ -4,10 +4,11 @@ RTC_DS3231 rtc;
 
 // begin RTC 
 void initRTC(){
+    printString(F("INITIALIZING"),F("RTC"));
     if(!rtc.begin())
-    printError(F("RTC_NOT_CONNECTED"));
+      printString(F("NOT CONNECTED"),F("RTC"));
     else
-    printStr(F("RTC_INIT_DONE ")); 
+      printString(F(SUCCESSFULL),F("RTC"));
 }
 
 // void set Time from PC
@@ -17,6 +18,13 @@ void setTimeFromPC(){
 
 void setTimeExternal(DateTime dt){
     rtc.adjust(dt);
+}
+
+void setNTPTime(){
+  printString(F("REFRESH..."),F("RTC"));
+  setTimeExternal(ntpUpdate());
+  printString(F(SUCCESSFULL),F("RTC"),RTC_UPDATED);
+  delay(1000);
 }
 
 // get the local time
@@ -35,6 +43,24 @@ String getLocalTimeHHMM(){
 
    char str_time[30];
    sprintf(str_time, "%04d-%02d-%02d %02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute());
+
+   return String(str_time);
+}
+
+String getFileNameDate(){
+   DateTime now = rtc.now();
+
+   char str_time[30];
+   sprintf(str_time, "%02d%02d%02d.TXT", now.year()/2000, now.month(), now.day());
+
+   return String(str_time);
+}
+
+String getFileNameTime(){
+   DateTime now = rtc.now();
+
+   char str_time[30];
+   sprintf(str_time, "%02d%02d%02d%02d.TXT", now.month(), now.day(), now.hour(), now.minute());
 
    return String(str_time);
 }

@@ -542,9 +542,13 @@ bool Sim800::getResponse(){
         return REQUEST_FAILURE;
     }
 	
-	if (response.indexOf(F("\"success\": true")) < 0){
-        return REQUEST_FAILURE;
-    }
+	if (response.indexOf(F("\"success\": true")) > 0) {
+        return REQUEST_SUCCESS;
+    }else if(response.indexOf(F("\"success\":true")) > 0){
+		return REQUEST_SUCCESS;
+	}else{
+		REQUEST_FAILURE;
+	}
     return REQUEST_SUCCESS;
 }
 

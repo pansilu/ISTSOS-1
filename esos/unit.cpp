@@ -4,8 +4,8 @@ void unitRun(){
     if(RTC_TEST){
         initRTC();  // RTC init
         
-        Serial.print(getLocalTime());
-        Serial.print(getGrinichTime());
+        Serial.println(getLocalTime());
+        Serial.println(getGrinichTime());
     }
 
     if(SERVICE_TEST){
@@ -57,6 +57,18 @@ void unitRun(){
         delay(1000);  
       }
     }
+
+    if(SD_TEST){
+      Serial.println(getFileNameTime());
+      delay(3000);
+      initSD();
+      writeFileSD("MEM_LOG/ISTSOS/",getFileNameTime(),"b269adf01ba411e8a93608002745029a;"+getGrinichTime()+",60.00,28.65,100.90,36.27,1023.00,0.00,94.07,19.53,0.00");
+      writeFileSD("MEM_LOG/SLPIOT/",getFileNameTime(),"{\"GUID\":\"5bf82c59-7ec0-4f\",\"dt\":\""+getLocalTime()+"\",\"H\":\"60.00\",\"TE\":\"28.65\",\"L\":\"7.00\",\"TI\":\"27.00\",\"WS\":\"19.53\",\"WD\":\"94.07\",\"RG\":\"0.00\",\"P\":\"100895.01\",\"SM\":\"1023.00\",\"WL\":\"0.00\",\"AT\":\"36.27\",\"BV\":\"12.53\"}");
+      
+      sendLogData();
+    }
+
+    
     while(1);
 }
 
