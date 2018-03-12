@@ -76,15 +76,16 @@ void setup() {
   // initial sending data,
   readSensorValues();
   saveAndSendData();
-  
+  lastSendTime = getUnixTime();
 }
 
 void loop() {
   // read sensor values onece
   readSensorValues();
   if((getUnixTime() - lastSendTime) > TIME_RATE * 60){
-    getAvarageSensorValues();
+    Serial.println();
     saveAndSendData();
+    lastSendTime = getUnixTime();
   }  
 
   if(RTC_UPDATE_BY_NTP){
@@ -96,28 +97,28 @@ void loop() {
       lastRTCUpdatedTime = getUnixTime();
     }
   }
+  Serial.print("#");
 }
 
 void saveAndSendData(){
   getAvarageSensorValues();
+  
+  //send logs
+  sendLogData();
+
   String slpiot_request = getSlpiotRequest();
   String istsos_request = getIstsosRequest();
 
   Serial.println(slpiot_request);
   Serial.println(istsos_request);
 
-  //send logs
-  sendLogData();
-
   // send IST
   #ifdef ISTSOS
   const char istserver[] = IST_SERVER;
   const char isturi[] = POSTREQ;
-  printSystemLog("SENDING...",IST_SERVER);
   if(sendRequstMessage(istserver,isturi,istsos_request,1)== SEND_SUCCESS){
     writeFileSD("DT_LOG/ISTSOS/",getFileNameDate(),istsos_request);
   }else{
-    printSystemLog(SUCCESS_ERROR,SERVER,DATA_SEND_ERROR);
     writeFileSD("MEM_LOG/ISTSOS/" ,getFileNameTime() ,istsos_request);
   }
   #endif
@@ -125,17 +126,16 @@ void saveAndSendData(){
   #ifdef SLPIOT
   const char slpserver[] = SERVER;
   const char slpuri[] = REQ_STR;
-  printSystemLog("SENDING...",SERVER);
   
   if(sendRequstMessage(slpserver,slpuri,slpiot_request,0)== SEND_SUCCESS){
     writeFileSD("DT_LOG/SLPIOT/",getFileNameDate(),slpiot_request);
   }else{
-    printSystemLog(SUCCESS_ERROR,IST_SERVER,DATA_SEND_ERROR);
     writeFileSD("MEM_LOG/SLPIOT/",getFileNameTime(),slpiot_request);
   }
   #endif
-
+    
   clearSensorVariables();
+  
 }
 
 

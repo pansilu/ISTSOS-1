@@ -86,7 +86,7 @@ void sendLogData(){
         File reader = dir.openNextFile();
         if(!reader)
           break;
-        Serial.println(reader.name());
+        printString("ISTSOS RESENDING",reader.name());
         String req = readFileSD("MEM_LOG/ISTSOS/",reader.name());
         Serial.println(req);
         const char istserver[] = IST_SERVER;
@@ -94,6 +94,7 @@ void sendLogData(){
         if(sendRequstMessage(istserver,isturi,req,1)== SEND_SUCCESS){
           if(removeFile("MEM_LOG/ISTSOS/",reader.name()))
             Serial.println(String(reader.name()) + " Removed");
+          printString(SUCCESSFULL,reader.name());
           writeFileSD("DT_LOG/ISTSOS/",getFileNameDate(),req);
           continue;
         }
@@ -106,7 +107,7 @@ void sendLogData(){
         File reader = dir.openNextFile();
         if(!reader)
           break;
-        Serial.println(reader.name());
+        printString("SLPIOT RESENDING",reader.name());
         String req = readFileSD("MEM_LOG/SLPIOT/",reader.name());
         Serial.println(req);
         const char slpserver[] = SERVER;
@@ -114,6 +115,7 @@ void sendLogData(){
         if(sendRequstMessage(slpserver,slpuri,req,0)== SEND_SUCCESS){
           if(removeFile("MEM_LOG/SLPIOT/",reader.name()))
             Serial.println(String(reader.name()) + " Removed");
+          printString(SUCCESSFULL,reader.name());
           writeFileSD("DT_LOG/SLPIOT/",getFileNameDate(),req);
           continue;
         }
@@ -123,16 +125,24 @@ void sendLogData(){
 
 uint8_t sendRequstMessage(char server[],char uri[],String message,uint8_t auth){
   int count = ERROR_REPEATE_COUNT;
-  printString("SENDING...",String(server));
+  printSystemLog(F("SENDING..."),String(server));
   while(count>0){
-      if(executePostRequest(server, uri, message,auth)){
+      int tmp = executePostRequest(server, uri, message,auth);
+      // network failiur
+      if(tmp == REQUEST_SUCCESS){
         printSystemLog(SUCCESSFULL,String(server),DATA_SEND_SUCCESSFULLY);
         return SEND_SUCCESS;
+      }else if(tmp == NETWORK_FAILURE){
+        printSystemLog(F("ERROR"),F("NETWORK_FAILURE"),DATA_SEND_ERROR);
+        return SEND_ERROR;
+      }else if(tmp == GPRS_FAILURE){
+        printSystemLog(F("ERROR"),F("GPRS_FAILURE"),DATA_SEND_ERROR);
+        return SEND_ERROR;
       }
-      printString("RESENDING...",String(server));
+      printSystemLog(F("RESENDING..."),String(server));
       count--;
   }
-  printSystemLog("SEND ERROR",String(server),DATA_SEND_ERROR);
+  printSystemLog(F("SEND ERROR"),String(server),DATA_SEND_ERROR);
   return SEND_ERROR;
 }
 
@@ -179,7 +189,7 @@ void writeFileSD(String folderpath,String fileName,String message)
 
 
 void printString(String topLayer,String bottomLayer){
-    Serial.println(topLayer + "\n" + bottomLayer);
+    Serial.println(getLocalTimeHHMM()+" : "+topLayer + ":" + bottomLayer);
     lcd.clear();
     printLCDString(topLayer,0,0);
     printLCDString(bottomLayer,0,1);
@@ -187,7 +197,7 @@ void printString(String topLayer,String bottomLayer){
 }
 
 void printString(String topLayer,String bottomLayer,int DefinitionCode){
-    Serial.println(topLayer + "\n" + bottomLayer);
+    Serial.println(getLocalTimeHHMM()+" : "+topLayer + ":" + bottomLayer);
     lcd.clear();
     printLCDString(topLayer,0,0);
     printLCDString(bottomLayer,0,1);
@@ -200,7 +210,7 @@ void printSystemLog(String topLayer,String bottomLayer ){
     lcd.clear();
     printLCDString(topLayer,0,0);
     printLCDString(bottomLayer,0,1);
-    writeFileSD("SYS_LOG/",getFileNameDate(),topLayer);
+    writeFileSD("SYS_LOG/",getFileNameDate(),getLocalTimeHHMM()+" : "+ topLayer + " " + bottomLayer);
     delay(1000);
 }
 
@@ -209,7 +219,7 @@ void printSystemLog(String topLayer,String bottomLayer,int DefinitionCode ){
     lcd.clear();
     printLCDString(topLayer,0,0);
     printLCDString(bottomLayer,0,1);
-    writeFileSD("SYS_LOG/",getFileNameDate(),topLayer);
+    writeFileSD("SYS_LOG/",getFileNameDate(),getLocalTimeHHMM()+" : "+ topLayer + " " + bottomLayer);
     delay(1000);
     soundIndicator(DefinitionCode/10,DefinitionCode%10);
 }

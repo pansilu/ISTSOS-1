@@ -16,14 +16,22 @@ void setTimeFromPC(){
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
-void setTimeExternal(DateTime dt){
-    rtc.adjust(dt);
+uint8_t setTimeExternal(DateTime dt){
+    if(dt.year()>=2018){
+      rtc.adjust(dt);
+      return 1;
+    }
+    else{
+      return 0;
+    }
 }
 
 void setNTPTime(){
   printString(F("REFRESH..."),F("RTC"));
-  setTimeExternal(ntpUpdate());
-  printString(F(SUCCESSFULL),F("RTC"),RTC_UPDATED);
+  if(setTimeExternal(ntpUpdate()))
+    printString(F(SUCCESSFULL),F("NTP"),RTC_UPDATED);
+  else
+    printString(F(SUCCESS_ERROR),F("NTP"),RTC_UPDATED);
   delay(1000);
 }
 

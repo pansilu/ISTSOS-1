@@ -367,6 +367,7 @@ uint8_t Sim800::executePost(const char server[], const char uri[], const String&
     int tmp = this->connectGprs();
 
     if( tmp != 0){
+		Serial.println(tmp);
         return tmp;
     }
 
@@ -429,7 +430,7 @@ void Sim800::writeCmd(T comm, Args... command)  // , uint32_t timeout, const Str
 
 template<typename T>
 void Sim800::writeCmd(T command)
-{
+{	
     this->serialAT->print(command);
 }
 
@@ -548,13 +549,10 @@ bool Sim800::getResponse(){
         return REQUEST_FAILURE;
     }
 	
-	if (response.indexOf(F("\"success\": true")) > 0) {
-        return REQUEST_SUCCESS;
-    }else if(response.indexOf(F("\"success\":true")) > 0){
-		return REQUEST_SUCCESS;
-	}else{
-		REQUEST_FAILURE;
-	}
+	if ((response.indexOf(F("\"success\": true")) < 0) && (response.indexOf(F("\"success\":true")) < 0)) {
+        return REQUEST_FAILURE;
+    }
+	
     return REQUEST_SUCCESS;
 }
 
@@ -568,7 +566,6 @@ int Sim800::readRSSI(){
 	
 	this->writeCmd(F("AT+CSQ\r\n"));
     String h = this->getResponseText();
-	
 	if(h.indexOf("+CSQ")>0){
 		int y= h.indexOf("+CSQ:");
 		h = h.substring(y+6,y+8);

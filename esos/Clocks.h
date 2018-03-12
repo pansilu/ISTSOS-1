@@ -19,7 +19,7 @@ String getGrinichTime();
 String getFileNameDate();
 String getFileNameTime();
 void setTimeFromPC();
-void setTimeExternal(DateTime dt);
+uint8_t setTimeExternal(DateTime dt);
 void setNTPTime();
 DateTime getCurruntRTCDate();
 unsigned long getUnixTime();

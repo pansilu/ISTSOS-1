@@ -11,9 +11,9 @@ void ServiceBegin()
   printString("SERVICE CHECK",APN);
 	uint8_t temp = simServer.begin();
 	if (temp)
-		printSystemLog(SUCCESSFULL,APN,SERVICE_OK);
+		printSystemLog(SUCCESSFULL,"SIM 800",SERVICE_OK);
 	else
-		printSystemLog(SUCCESS_ERROR,APN, SERVICE_ERROR);
+		printSystemLog(SUCCESS_ERROR,"SIM 800", SERVICE_ERROR);
 }
 
 String getRequestString(double *externalHum,
@@ -153,6 +153,8 @@ DateTime ntpUpdate()
 	uint32_t *result = simServer.ntpUpdate("metasntp11.admin.ch", 0);
 	uint8_t tmp = 5;
   long last= millis();
+  if(result == 0)
+    tmp=0;
 	while (tmp > 0 && result[0] < 2018)
 	{
 		result = simServer.ntpUpdate("metasntp11.admin.ch", 0);

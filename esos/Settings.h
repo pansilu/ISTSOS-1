@@ -16,7 +16,7 @@
 
 #define SERVER "slpiot.org"
 #define REQ_STR "/insert_data4.php"
-#define GUID_SLPIOT "2851e9a0-b608-46"
+#define GUID_SLPIOT "5bf82c59-7ec0-4f"
 
 // For ISTSOS Settings
 
@@ -49,7 +49,7 @@
 #define TEMP_UP 37            // upeer temp for the fan
 #define TEMP_DOWN 34          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
-#define TIME_RATE 5           // set as sending after every Time (minutes)
+#define TIME_RATE 10           // set as sending after every Time (minutes)
 #define RTC_UPDATE_TIME_RATE 604800UL
 #define RTC_UPDATE_INTERVAL 1 // the inteval et ween 2 RTC update from ntp (days)
 #define RTC_UPDATE_BY_NTP 1
@@ -87,4 +87,10 @@
 // message
 #define SUCCESSFULL "SUCCESSFULL"
 #define SUCCESS_ERROR "ERROR"
+
+#define REQUEST_SUCCESS 1
+#define REQUEST_FAILURE 0
+#define NETWORK_FAILURE 3
+#define GPRS_FAILURE 4
+
 #endif
