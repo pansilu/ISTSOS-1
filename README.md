@@ -77,12 +77,12 @@ This Is a Weather station Internal code. this is requested to buy the hardware i
 ### Enable Server Communication
 
 1. Open Settings.h file 
-2. Change ENABLE_ISTSOS as 1 for Communicate with ISTSOS Server (0 if not)
-3. Change ENABLE_SLPIOT as 1 for Communicate with SLPIOT Server (0 if not)
+2. define ENABLE_ISTSOS for Communicate with ISTSOS Server
+3. define ENABLE_SLPIOT  for Communicate with SLPIOT Server 
 
 ```
-   #define ENABLE_ISTSOS 1
-   #define ENABLE_SLPIOT 1
+   #define ENABLE_ISTSOS 
+   #define ENABLE_SLPIOT 
 ```
 
 ### Enable Sensor Participation
