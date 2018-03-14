@@ -82,14 +82,14 @@ void setup() {
 void loop() {
   // read sensor values onece
   readSensorValues();
-  if((getUnixTime() - lastSendTime) > TIME_RATE * 60){
+  if((getUnixTime() - lastSendTime) >= TIME_RATE * 60){
     Serial.println();
     saveAndSendData();
     lastSendTime = getUnixTime();
   }  
 
   if(RTC_UPDATE_BY_NTP){
-    if((getUnixTime() - lastRTCUpdatedTime) > RTC_UPDATE_TIME_RATE){
+    if((getUnixTime() - lastRTCUpdatedTime) >= RTC_UPDATE_TIME_RATE){
       DateTime tsp = ntpUpdate();
       if(tsp.year()>2017){
         setNTPTime();
@@ -117,9 +117,9 @@ void saveAndSendData(){
   const char istserver[] = IST_SERVER;
   const char isturi[] = POSTREQ;
   if(sendRequstMessage(istserver,isturi,istsos_request,1)== SEND_SUCCESS){
-    writeFileSD("DT_LOG/ISTSOS/",getFileNameDate(),istsos_request);
+    writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),istsos_request);
   }else{
-    writeFileSD("MEM_LOG/ISTSOS/" ,getFileNameTime() ,istsos_request);
+    writeFileSD(F("MEM_LOG/ISTSOS/"),getFileNameTime() ,istsos_request);
   }
   #endif
 
@@ -128,9 +128,9 @@ void saveAndSendData(){
   const char slpuri[] = REQ_STR;
   
   if(sendRequstMessage(slpserver,slpuri,slpiot_request,0)== SEND_SUCCESS){
-    writeFileSD("DT_LOG/SLPIOT/",getFileNameDate(),slpiot_request);
+    writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),slpiot_request);
   }else{
-    writeFileSD("MEM_LOG/SLPIOT/",getFileNameTime(),slpiot_request);
+    writeFileSD(F("MEM_LOG/SLPIOT/"),getFileNameTime(),slpiot_request);
   }
   #endif
     

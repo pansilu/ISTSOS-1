@@ -53,7 +53,7 @@
 #define RTC_UPDATE_TIME_RATE 604800UL
 #define RTC_UPDATE_INTERVAL 1 // the inteval et ween 2 RTC update from ntp (days)
 #define RTC_UPDATE_BY_NTP 1
-#define ERROR_REPEATE_COUNT 3 // how much times shoulw try to send
+#define ERROR_REPEATE_COUNT 1 // how much times shoulw try to send
 
 #define WIN_SPEED_PIN A1       // wind speed pin
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   

@@ -22,14 +22,20 @@ void initSD(){
     
     // create Folders
     SD.mkdir("MEM_LOG");
+    delay(100);
     SD.mkdir("DT_LOG");
+    delay(100);
     SD.mkdir("SYS_LOG");
-
+    delay(100);
+    
     SD.mkdir("MEM_LOG/SLPIOT");
+    delay(100);
     SD.mkdir("MEM_LOG/ISTSOS");
-
+    delay(100);
     SD.mkdir("DT_LOG/SLPIOT");
+    delay(100);
     SD.mkdir("DT_LOG/ISTSOS");
+    delay(100);
 }
 
 String getAPN(){
@@ -81,42 +87,42 @@ void sendLogData(){
 
     // send ISTSOS
     #ifdef ISTSOS
-    File dir =SD.open("MEM_LOG/ISTSOS");
+    File dir =SD.open(F("MEM_LOG/ISTSOS"));
     while(1){
         File reader = dir.openNextFile();
         if(!reader)
           break;
-        printString("ISTSOS RESENDING",reader.name());
-        String req = readFileSD("MEM_LOG/ISTSOS/",reader.name());
+        printString(F("ISTSOS RESENDING"),reader.name());
+        String req = readFileSD(F("MEM_LOG/ISTSOS/"),reader.name());
         Serial.println(req);
         const char istserver[] = IST_SERVER;
         const char isturi[] = POSTREQ;
         if(sendRequstMessage(istserver,isturi,req,1)== SEND_SUCCESS){
-          if(removeFile("MEM_LOG/ISTSOS/",reader.name()))
+          if(removeFile(F("MEM_LOG/ISTSOS/"),reader.name()))
             Serial.println(String(reader.name()) + " Removed");
           printString(SUCCESSFULL,reader.name());
-          writeFileSD("DT_LOG/ISTSOS/",getFileNameDate(),req);
+          writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),req);
           continue;
         }
     }
     #endif
 
     #ifdef SLPIOT
-    dir =SD.open("MEM_LOG/SLPIOT");
+    dir =SD.open(F("MEM_LOG/SLPIOT"));
     while(1){
         File reader = dir.openNextFile();
         if(!reader)
           break;
-        printString("SLPIOT RESENDING",reader.name());
-        String req = readFileSD("MEM_LOG/SLPIOT/",reader.name());
+        printString(F("SLPIOT RESENDING"),reader.name());
+        String req = readFileSD(F("MEM_LOG/SLPIOT/"),reader.name());
         Serial.println(req);
         const char slpserver[] = SERVER;
         const char slpuri[] = REQ_STR;
         if(sendRequstMessage(slpserver,slpuri,req,0)== SEND_SUCCESS){
-          if(removeFile("MEM_LOG/SLPIOT/",reader.name()))
+          if(removeFile(F("MEM_LOG/SLPIOT/"),reader.name()))
             Serial.println(String(reader.name()) + " Removed");
           printString(SUCCESSFULL,reader.name());
-          writeFileSD("DT_LOG/SLPIOT/",getFileNameDate(),req);
+          writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),req);
           continue;
         }
     }
@@ -176,6 +182,7 @@ void writeFileSD(String folderpath,String fileName,String message)
 {
     fileName = folderpath + fileName;
     filef = SD.open(fileName, FILE_WRITE);
+    delay(100);
     if (filef) 
     {
         filef.println(message);
