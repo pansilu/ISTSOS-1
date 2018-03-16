@@ -58,7 +58,7 @@
 #define WIN_SPEED_PIN A1       // wind speed pin
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
 #define WIND_VOLTAGE_MIN 10  // minimum voltage comes from wind speed sensor
-#define WIND_VOLTAGE_MAX 1024  // maximum voltage comes from wind speed sensor        
+#define WIND_VOLTAGE_MAX 1023  // maximum voltage comes from wind speed sensor        
 
 #define ISTSOS_REQUEST 1
 #define SLPIOT_REQUEST 2

@@ -68,7 +68,6 @@ void unitRun(){
         Serial.println(getAPNPass());
       sendLogData();
     }
-
     
     while(1);
 }

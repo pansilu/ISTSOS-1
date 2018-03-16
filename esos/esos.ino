@@ -11,7 +11,7 @@
 #include "log.h"
 #include "Clocks.h"
 #include "Service.h"
-#include <Adafruit_SleepyDog.h>
+
 //#include "unit.h"
 
 // Factors
@@ -60,6 +60,12 @@ volatile unsigned long rain_count=0;
 volatile unsigned long rain_last=0; 
 double battery_value=0;     // battry value
 int loopCount=0;
+
+
+const char istserver[] = IST_SERVER;
+const char isturi[] = POSTREQ;
+const char slpserver[] = SERVER;
+const char slpuri[] = REQ_STR;
  
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -114,8 +120,6 @@ void saveAndSendData(){
 
   // send IST
   #ifdef ISTSOS
-  const char istserver[] = IST_SERVER;
-  const char isturi[] = POSTREQ;
   if(sendRequstMessage(istserver,isturi,istsos_request,1)== SEND_SUCCESS){
     writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),istsos_request);
   }else{
@@ -124,8 +128,6 @@ void saveAndSendData(){
   #endif
 
   #ifdef SLPIOT
-  const char slpserver[] = SERVER;
-  const char slpuri[] = REQ_STR;
   
   if(sendRequstMessage(slpserver,slpuri,slpiot_request,0)== SEND_SUCCESS){
     writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),slpiot_request);
@@ -408,7 +410,8 @@ double readItensity(){
 
 // read battry values
 double readBatteryVoltage(){
-    return ((analogRead(BATT)*16.6f/1023));
+    return (analogRead(BATT)*16.6f/1023);
+    
 }
 
 // read wind direction
@@ -425,7 +428,6 @@ double readWinDirection(){
 
 // read Wind Speed
 double readWindSpeed(){
-
   sensor_voltage = analogRead(WIN_SPEED_PIN);  // convert to actual voltage
   if(sensor_voltage <= WIND_VOLTAGE_MIN)
     return 0;

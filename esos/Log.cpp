@@ -11,6 +11,7 @@ const int chipSelect = 53;  // chip select pin for the SD module.it should be co
 */
 
 void initSD(){
+    Watchdog.enable(WATCHDOG_TIME_OUT);
     printString(F("INITIALIZING"),F("MEMORY"));
     if(SDOK==0){
         if (SD.begin(chipSelect)) 
@@ -36,6 +37,7 @@ void initSD(){
     delay(100);
     SD.mkdir("DT_LOG/ISTSOS");
     delay(100);
+    Watchdog.disable();
 }
 
 String getAPN(){
@@ -157,16 +159,19 @@ uint8_t sendRequstMessage(char server[],char uri[],String message,uint8_t auth){
  */
 
 uint8_t removeFile(String folderpath,String fileName){
+  Watchdog.enable(WATCHDOG_TIME_OUT);
   fileName = folderpath + fileName;
   long last = millis();
   while((millis()-last)<10000UL){
     if(SD.remove(fileName))
       return 1;
   }
+  Watchdog.disable();
   return 0;
 }
 
 String readFileSD (String folderpath,String filename){
+  Watchdog.enable(WATCHDOG_TIME_OUT);
   filename = folderpath +filename;
   File file = SD.open(filename,FILE_READ);
   String strRead = String("");
@@ -174,12 +179,14 @@ String readFileSD (String folderpath,String filename){
      strRead.concat((char)file.read());    
   }
   file.close();
+  Watchdog.disable();
   return strRead; 
 }
 
 //Write the message on the Log
 void writeFileSD(String folderpath,String fileName,String message)
 {
+    Watchdog.enable(WATCHDOG_TIME_OUT);
     fileName = folderpath + fileName;
     filef = SD.open(fileName, FILE_WRITE);
     delay(100);
@@ -192,6 +199,7 @@ void writeFileSD(String folderpath,String fileName,String message)
     {
         Serial.println("SD_FILE_OPEN_ERROR :" + fileName);
     }
+    Watchdog.disable();
 }
 
 
@@ -244,13 +252,25 @@ void printValuesOnPanel(String name_index,double value,String unit){
     LCD Functions
 */
 
-void initLCD(){
-
     uint8_t signal_0[8]  = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1f};
     uint8_t signal_1[8]  = {0x0, 0x0, 0x0, 0x0, 0x0, 0x1f, 0x1f};
     uint8_t signal_2[8]  = {0x0, 0x0, 0x0, 0x1f, 0x1f, 0x1f, 0x1f};
     uint8_t signal_3[8]  = {0x0, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f};
     uint8_t signal_4[8]  = {0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f};
+
+//    uint8_t up_dev_left_upper_corner[8]  = {0x1f, 0x1f, 0x10, 0x18, 0x1C, 0x1E, 0x1f};
+//    uint8_t up_dev_left_lower_corner[8]  = {0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f};
+//    uint8_t up_dev_left_lower_corner_1[8]  = {0x10, 0x10, 0x18, 0x18, 0x1C, 0x1E, 0x1f};
+//    uint8_t upper_dev[8]  = {0x1f, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+//    uint8_t low_dev[8]  = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1f};
+//    uint8_t up_dev_right_upper_corner[8]  = {0x1f, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+//    uint8_t up_dev_right_lower_corner[8]  = {0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x1f};
+//    uint8_t node_low[8]  = {0x0, 0x0, 0x0, 0x0, 0x1C, 0x1C, 0x1C};
+//    uint8_t node_upper[8]  = {0x1C, 0x1C, 0x1C,0x0, 0x0, 0x0, 0x0};
+
+void initLCD(){
+
+   
 
     lcd.begin();
     lcd.backlight();
@@ -260,6 +280,7 @@ void initLCD(){
     lcd.createChar(2, signal_2);
     lcd.createChar(3, signal_3);
     lcd.createChar(4, signal_4);
+    
     lcd.home();
 }
   
@@ -327,6 +348,48 @@ void showStrength(int x){
   }else
     lcd.write(0);
 }
+//
+//void showBattryLowMark(){
+//  
+//
+//    lcd.createChar(5, up_dev_left_upper_corner);
+//    lcd.createChar(6, up_dev_left_lower_corner);
+//    lcd.createChar(7, upper_dev);
+//    lcd.createChar(8, low_dev);
+//    lcd.createChar(9, up_dev_right_upper_corner);
+//    lcd.createChar(10, up_dev_right_lower_corner);
+//    lcd.createChar(11, node_low);
+//    lcd.createChar(12, node_upper);
+//    lcd.createChar(13, up_dev_left_lower_corner_1);
+//    
+//  lcd.clear();
+//  lcd.setCursor(2,0);
+//  lcd.write(5);
+//  lcd.write(7);
+//  lcd.write(7);
+//  lcd.write(7);
+//  lcd.write(9);
+//  lcd.write(11);
+//  lcd.print(F(" BATTERY"));
+//  lcd.setCursor(2,1);
+//  lcd.write(6);
+//  lcd.write(13);
+//  lcd.write(8);
+//  lcd.write(8);
+//  lcd.write(10);
+//  lcd.write(12);
+//  lcd.print(F(" LOW!"));
+//  delay(1000);
+//  lcd.clear();
+//  delay(1000);
+//  lcd.createChar(0, signal_0);
+//    lcd.createChar(1, signal_1);
+//    lcd.createChar(2, signal_2);
+//    lcd.createChar(3, signal_3);
+//    lcd.createChar(4, signal_4);
+//
+//  
+//}
 
 // log requests in temporary
 

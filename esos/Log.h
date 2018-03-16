@@ -6,6 +6,7 @@
 #include "Settings.h"
 #include "Service.h"
 #include <LiquidCrystal_I2C.h>
+#include <Adafruit_SleepyDog.h>
 
 #define LCD_COLS 16
 #define LCD_ROWS 2
@@ -50,18 +51,9 @@ void printValuesOnPanel(String name_index,double value,String unit);
 String getAPN();
 String getAPNUser();
 String getAPNPass();
+void showBattryLowMark();
 
-void printValues(String name_index,double value);
-void printValues(String name_index,String value);
-void printValues(String name_index,String tx,double value);
-void printValues(String name_index,String tx,String value);
-void printError(String text);
-void printStrOnDebug(String text);
-void logData(String& text);
-void printStr(String text);
-void printStr(String text,String logTime,int DefinitionCode );
-void printErrorCode(String text,String logTime,int DefinitionCode );
-void printErrorCode(String text, int DefinitionCode);
+
 
 // sound indicate
 void soundIndicator(int count1,int count2);
