@@ -33,6 +33,7 @@ BH1750 lightMeter;
 // Clock module     
 unsigned long lastSendTime;   // last send Time
 unsigned long lastRTCUpdatedTime;
+unsigned long startedTime;
 
 // dht 11 internal temperature
 dht internal_temperature_meter;
@@ -102,6 +103,11 @@ void loop() {
       }
       lastRTCUpdatedTime = getUnixTime();
     }
+  }
+
+  if((getUnixTime() - startedTime)>RESET_TIMER){
+    printSystemLog("Reset Program","OK");
+    resetProgram();
   }
   Serial.print("#");
 }
@@ -521,7 +527,11 @@ void initialize(){
 
     clearSensorVariables();   // initialize all sensor variables 
     printSystemLog(F(SUCCESSFULL),F("SYSTEM INIT"),INIT_DONE);   
+
+    // set started time
+    startedTime = getUnixTime();
     delay(2000);
+    
 }
 
 
@@ -540,5 +550,9 @@ void funcFan(){
 // check the bme 280 initialized at the first place.
 uint8_t isBME280Working(){
   return is_bme280_working==1;
+}
+
+void resetProgram(){
+  asm volatile ("  jmp 0");  
 }
 
