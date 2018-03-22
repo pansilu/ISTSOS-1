@@ -61,6 +61,7 @@ volatile unsigned long rain_count=0;
 volatile unsigned long rain_last=0; 
 double battery_value=0;     // battry value
 int loopCount=0;
+uint8_t sendErrorCountslp=0,sendErrorCountist=0;
 
 
 const char istserver[] = IST_SERVER;
@@ -78,12 +79,19 @@ void setup() {
   #ifdef UNIT_CPP
     unitRun();
   #endif
-  initialize();
+    initialize();
 
+  // set NTP Time
+  DateTime tsp = ntpUpdate();
+  if(tsp.year()>2017){
+      setNTPTime();
+  }
   // initial sending data,
   readSensorValues();
   saveAndSendData();
   lastSendTime = getUnixTime();
+  startedTime = getUnixTime();
+  
 }
 
 void loop() {
@@ -95,18 +103,14 @@ void loop() {
     lastSendTime = getUnixTime();
   }  
 
-  if(RTC_UPDATE_BY_NTP){
-    if((getUnixTime() - lastRTCUpdatedTime) >= RTC_UPDATE_TIME_RATE){
-      DateTime tsp = ntpUpdate();
-      if(tsp.year()>2017){
-        setNTPTime();
-      }
-      lastRTCUpdatedTime = getUnixTime();
-    }
-  }
-
   if((getUnixTime() - startedTime)>RESET_TIMER){
     printSystemLog("Reset Program","OK");
+    delay(1000);
+    resetProgram();
+  }
+  
+  if(get_freeRam()<100){
+    printSystemLog(F("Reset Program"),F("Ram Refresh"));
     resetProgram();
   }
   Serial.print("#");
@@ -128,8 +132,10 @@ void saveAndSendData(){
   #ifdef ISTSOS
   if(sendRequstMessage(istserver,isturi,istsos_request,1)== SEND_SUCCESS){
     writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),istsos_request);
+    sendErrorCountist=0;
   }else{
     writeFileSD(F("MEM_LOG/ISTSOS/"),getFileNameTime() ,istsos_request);
+    sendErrorCountist++;
   }
   #endif
 
@@ -137,11 +143,14 @@ void saveAndSendData(){
   
   if(sendRequstMessage(slpserver,slpuri,slpiot_request,0)== SEND_SUCCESS){
     writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),slpiot_request);
+    sendErrorCountslp=0;
   }else{
     writeFileSD(F("MEM_LOG/SLPIOT/"),getFileNameTime(),slpiot_request);
+    sendErrorCountslp++;
   }
   #endif
-    
+  sendErrorCountist=0;
+  sendErrorCountslp=0;
   clearSensorVariables();
   
 }
@@ -528,8 +537,7 @@ void initialize(){
     clearSensorVariables();   // initialize all sensor variables 
     printSystemLog(F(SUCCESSFULL),F("SYSTEM INIT"),INIT_DONE);   
 
-    // set started time
-    startedTime = getUnixTime();
+    
     delay(2000);
     
 }

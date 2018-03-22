@@ -15,7 +15,7 @@
 // For SLPIOT Settings
 
 #define SERVER "slpiot.org"
-#define REQ_STR "/insert_data4.php"
+#define REQ_STR "/insert_data5.php"
 #define GUID_SLPIOT "5bf82c59-7ec0-4f"
 
 // For ISTSOS Settings
@@ -27,7 +27,7 @@
 
 // for Enable Servers
 
-#define ISTSOS 
+//#define ISTSOS 
 #define SLPIOT 
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -49,12 +49,9 @@
 #define TEMP_UP 37            // upeer temp for the fan
 #define TEMP_DOWN 34          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
-#define TIME_RATE 10           // set as sending after every Time (minutes)
-#define RTC_UPDATE_TIME_RATE 259200UL  // RTC update 3days
-#define RTC_UPDATE_INTERVAL 1 // the inteval et ween 2 RTC update from ntp (days)
-#define RTC_UPDATE_BY_NTP 1
+#define TIME_RATE 2           // set as sending after every Time (minutes)
 #define ERROR_REPEATE_COUNT 1 // how much times shoulw try to send
-#define RESET_TIMER 600UL  // Reset Program 7 days
+#define RESET_TIMER 84600UL  // Reset Program 1 days
 
 #define WIN_SPEED_PIN A1       // wind speed pin
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   

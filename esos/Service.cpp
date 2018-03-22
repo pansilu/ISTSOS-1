@@ -88,7 +88,7 @@ String getRequestString(double *externalHum,
 	else if (type == SLPIOT_REQUEST)
 	{
 
-		String req = String(F("{"));
+		req = String(F("{"));
 		req.concat("\"GUID\":\"");
 		req += Guid;
 		req.concat("\",");

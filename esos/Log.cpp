@@ -84,51 +84,65 @@ String getAPNPass(){
   }
   return apn;
 }
+uint8_t log_send_error_count=0;
+String request ;
+const char slpserver[] = SERVER;
+const char slpuri[] = REQ_STR;
+const char istserver[] = IST_SERVER;
+const char isturi[] = POSTREQ;
+File dir;
+File reader;
+File file;
+String strRead = String("");
 
 void sendLogData(){
 
     // send ISTSOS
+    
     #ifdef ISTSOS
-    File dir =SD.open(F("MEM_LOG/ISTSOS"));
-    while(1){
-        File reader = dir.openNextFile();
+    dir =SD.open(F("MEM_LOG/ISTSOS"));
+    while(log_send_error_count<100){
+        reader = dir.openNextFile();
         if(!reader)
           break;
         printString(F("ISTSOS RESENDING"),reader.name());
-        String req = readFileSD(F("MEM_LOG/ISTSOS/"),reader.name());
-        Serial.println(req);
-        const char istserver[] = IST_SERVER;
-        const char isturi[] = POSTREQ;
-        if(sendRequstMessage(istserver,isturi,req,1)== SEND_SUCCESS){
+        request= readFileSD(F("MEM_LOG/ISTSOS/"),reader.name());
+        Serial.println(request);
+        if(sendRequstMessage(istserver,isturi,request,1)== SEND_SUCCESS){
           if(removeFile(F("MEM_LOG/ISTSOS/"),reader.name()))
             Serial.println(String(reader.name()) + " Removed");
           printString(SUCCESSFULL,reader.name());
-          writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),req);
+          writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),request);
+          log_send_error_count=0;
           continue;
+        }else{
+          log_send_error_count +=1;  
         }
     }
     #endif
 
     #ifdef SLPIOT
     dir =SD.open(F("MEM_LOG/SLPIOT"));
-    while(1){
+    while(log_send_error_count<5){
         File reader = dir.openNextFile();
         if(!reader)
           break;
         printString(F("SLPIOT RESENDING"),reader.name());
-        String req = readFileSD(F("MEM_LOG/SLPIOT/"),reader.name());
-        Serial.println(req);
-        const char slpserver[] = SERVER;
-        const char slpuri[] = REQ_STR;
-        if(sendRequstMessage(slpserver,slpuri,req,0)== SEND_SUCCESS){
+        request = readFileSD(F("MEM_LOG/SLPIOT/"),reader.name());
+        Serial.println(request);
+        if(sendRequstMessage(slpserver,slpuri,request,0)== SEND_SUCCESS){
           if(removeFile(F("MEM_LOG/SLPIOT/"),reader.name()))
             Serial.println(String(reader.name()) + " Removed");
           printString(SUCCESSFULL,reader.name());
-          writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),req);
+          writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),request);
+          log_send_error_count=0;
           continue;
+        }else{
+          log_send_error_count +=1;
         }
     }
     #endif
+    log_send_error_count=0;
 }
 
 uint8_t sendRequstMessage(char server[],char uri[],String message,uint8_t auth){
@@ -173,8 +187,7 @@ uint8_t removeFile(String folderpath,String fileName){
 String readFileSD (String folderpath,String filename){
   Watchdog.enable(WATCHDOG_TIME_OUT);
   filename = folderpath +filename;
-  File file = SD.open(filename,FILE_READ);
-  String strRead = String("");
+  file = SD.open(filename,FILE_READ);
   while(file.available()){
      strRead.concat((char)file.read());    
   }
@@ -208,6 +221,7 @@ void printString(String topLayer,String bottomLayer){
     lcd.clear();
     printLCDString(topLayer,0,0);
     printLCDString(bottomLayer,0,1);
+    printFreeRam();
     delay(1000);
 }
 
@@ -216,6 +230,7 @@ void printString(String topLayer,String bottomLayer,int DefinitionCode){
     lcd.clear();
     printLCDString(topLayer,0,0);
     printLCDString(bottomLayer,0,1);
+    printFreeRam();
     delay(1000);
     soundIndicator(DefinitionCode/10,DefinitionCode%10);
 }
@@ -225,6 +240,7 @@ void printSystemLog(String topLayer,String bottomLayer ){
     lcd.clear();
     printLCDString(topLayer,0,0);
     printLCDString(bottomLayer,0,1);
+    printFreeRam();
     writeFileSD("SYS_LOG/",getFileNameDate(),getLocalTimeHHMM()+" : "+ topLayer + " " + bottomLayer);
     delay(1000);
 }
@@ -234,6 +250,7 @@ void printSystemLog(String topLayer,String bottomLayer,int DefinitionCode ){
     lcd.clear();
     printLCDString(topLayer,0,0);
     printLCDString(bottomLayer,0,1);
+    printFreeRam();
     writeFileSD("SYS_LOG/",getFileNameDate(),getLocalTimeHHMM()+" : "+ topLayer + " " + bottomLayer);
     delay(1000);
     soundIndicator(DefinitionCode/10,DefinitionCode%10);
@@ -347,6 +364,19 @@ void showStrength(int x){
     lcd.write(4);
   }else
     lcd.write(0);
+}
+
+void printFreeRam(){
+  #ifdef PRINT_RAM
+  Serial.print(F("Free Ram : "));
+  Serial.println(get_freeRam());
+  #endif  
+}
+int get_freeRam()
+{
+  //extern int __heap_start, *__brkval;
+  int v;
+  return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 }
 //
 //void showBattryLowMark(){

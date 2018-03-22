@@ -269,7 +269,7 @@ uint8_t Sim800::waitResponse(uint32_t timeout = 60000UL, const String expected)
                 goto finish;
             }
         }
-    }while( millis() - start < timeout);
+    }while( (millis() - start) < timeout);
 
   finish:
 
@@ -316,6 +316,7 @@ uint8_t Sim800::executePostPure(const char server[], const char uri[], const Str
 	this->sendCmd(F("AT+HTTPSSL=0\r\n"));
     this->writeCmd(F("AT+HTTPDATA="), String(data.length()), F(",5000\r\n"));
     this->serialAT->flush();
+	
     this->waitResponse(20000UL, "DOWNLOAD");
 
     this->sendCmd(data, 20000UL);
@@ -519,13 +520,14 @@ uint32_t* Sim800::ntpUpdate(const char ntpServer[], int GMT){
     return result;
 }
 
-bool Sim800::getResponse(){
+bool Sim800::getResponse(uint32_t timeout){
+	
 
     String response = String("");
     bool exit = false;
 
-    unsigned long timeout = millis();
-    while ((millis() - timeout) < 100000UL && !exit) {
+    unsigned long start = millis();
+    while ((millis() - start) < timeout && !exit) {
         // Print available data
         while (this->serialAT->available()) {
             char c = this->serialAT->read();

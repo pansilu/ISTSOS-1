@@ -7,12 +7,20 @@
 #include "Service.h"
 #include <LiquidCrystal_I2C.h>
 #include <Adafruit_SleepyDog.h>
+#include <MemoryUsage.h>
+#include <stdint.h>
 
 #define LCD_COLS 16
 #define LCD_ROWS 2
 
 #define SEND_ERROR 0
 #define SEND_SUCCESS 1
+
+#define PRINT_RAM  // print free ram space on debug
+
+
+extern uint8_t *__brkval;
+extern uint8_t *__heap_start;
 
 // saving log file
 extern File file;
@@ -21,6 +29,8 @@ extern const int chipSelect;  // chip select pin for the SD module.it should be 
 
 // SD functions
 void initSD();
+int get_freeRam();
+void printFreeRam();
 
 //basic
 void writeFileSD(String filderpath,String fileName,String message);

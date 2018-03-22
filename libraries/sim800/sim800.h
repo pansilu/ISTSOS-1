@@ -53,7 +53,7 @@ private:
     /**
         Read response from the server
     */
-    bool getResponse();
+    bool getResponse(uint32_t timeout=20000UL);
     /**
         Wake up shield if it's in sleep mode.
     */
