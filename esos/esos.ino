@@ -15,11 +15,11 @@
 //#include "unit.h"
 
 // Factors
-const int MIN_WIND_FACTOR=476;
-const int MAX_WIND_FACTOR=780;
+const PROGMEM int MIN_WIND_FACTOR=476;
+const PROGMEM int MAX_WIND_FACTOR=780;
 
 // Procedure 
-String GUID_CODE = String(GUID_SLPIOT);
+const PROGMEM String GUID_CODE = String(GUID_SLPIOT);
 
 
 // Dullas Temperature Mesurement
@@ -32,8 +32,7 @@ BH1750 lightMeter;
 
 // Clock module     
 unsigned long lastSendTime;   // last send Time
-unsigned long lastRTCUpdatedTime;
-unsigned long startedTime;
+unsigned long last_ntp_update;
 
 // dht 11 internal temperature
 dht internal_temperature_meter;
@@ -61,13 +60,6 @@ volatile unsigned long rain_count=0;
 volatile unsigned long rain_last=0; 
 double battery_value=0;     // battry value
 int loopCount=0;
-uint8_t sendErrorCountslp=0,sendErrorCountist=0;
-
-
-const char istserver[] = IST_SERVER;
-const char isturi[] = POSTREQ;
-const char slpserver[] = SERVER;
-const char slpuri[] = REQ_STR;
  
 void setup() {
   Serial.begin(9600);   // serial monitor for showing 
@@ -83,14 +75,14 @@ void setup() {
 
   // set NTP Time
   DateTime tsp = ntpUpdate();
-  if(tsp.year()>2017){
+  if(tsp.year()>=2018){
       setNTPTime();
   }
   // initial sending data,
   readSensorValues();
   saveAndSendData();
   lastSendTime = getUnixTime();
-  startedTime = getUnixTime();
+  last_ntp_update = getUnixTime();
   
 }
 
@@ -103,13 +95,15 @@ void loop() {
     lastSendTime = getUnixTime();
   }  
 
-  if((getUnixTime() - startedTime)>RESET_TIMER){
-    printSystemLog("Reset Program","OK");
-    delay(1000);
-    resetProgram();
+  if((getUnixTime() - last_ntp_update)>NTP_UPDATE){
+    DateTime tsp = ntpUpdate();
+    if(tsp.year()>=2018){
+        setNTPTime();
+    }
+    last_ntp_update = getUnixTime();
   }
   
-  if(get_freeRam()<100){
+  if(get_freeRam()<1000){
     printSystemLog(F("Reset Program"),F("Ram Refresh"));
     resetProgram();
   }
@@ -118,39 +112,38 @@ void loop() {
 
 void saveAndSendData(){
   getAvarageSensorValues();
-  
-  //send logs
-  sendLogData();
 
-  String slpiot_request = getSlpiotRequest();
-  String istsos_request = getIstsosRequest();
-
-  Serial.println(slpiot_request);
-  Serial.println(istsos_request);
-
-  // send IST
   #ifdef ISTSOS
-  if(sendRequstMessage(istserver,isturi,istsos_request,1)== SEND_SUCCESS){
-    writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),istsos_request);
-    sendErrorCountist=0;
-  }else{
-    writeFileSD(F("MEM_LOG/ISTSOS/"),getFileNameTime() ,istsos_request);
-    sendErrorCountist++;
-  }
+  sendIstsosRequest();
   #endif
 
   #ifdef SLPIOT
-  
-  if(sendRequstMessage(slpserver,slpuri,slpiot_request,0)== SEND_SUCCESS){
-    writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),slpiot_request);
-    sendErrorCountslp=0;
-  }else{
-    writeFileSD(F("MEM_LOG/SLPIOT/"),getFileNameTime(),slpiot_request);
-    sendErrorCountslp++;
-  }
+  sendSlpiotRequest();
   #endif
-  sendErrorCountist=0;
-  sendErrorCountslp=0;
+
+  
+//  String slpiot_request = getSlpiotRequest();
+//  Serial.println(slpiot_request);
+//  String istsos_request = getIstsosRequest();
+//  Serial.println(istsos_request);
+//
+//  // send IST
+//  #ifdef ISTSOS
+//  if(sendRequstMessage(IST_SERVER,POSTREQ,istsos_request,true)== SEND_SUCCESS){
+//    //writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),istsos_request);
+//  }else{
+//    //writeFileSD(F("MEM_LOG/ISTSOS/"),getFileNameTime() ,istsos_request);
+//  }
+//  #endif
+//
+//  #ifdef SLPIOT
+//  
+//  if(sendRequstMessage(slpserver,slpuri,slpiot_request,0)== SEND_SUCCESS){
+//    writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),slpiot_request);
+//  }else{
+//    writeFileSD(F("MEM_LOG/SLPIOT/"),getFileNameTime(),slpiot_request);
+//  }
+//  #endif
   clearSensorVariables();
   
 }
@@ -160,8 +153,8 @@ void saveAndSendData(){
  * Get Request String
  */
 
- String getSlpiotRequest(){
-   return getRequestString(&ext_humidity,
+ void sendSlpiotRequest(){
+   return sendRequestString(&ext_humidity,
             &ext_temperature,
             &int_temperature,
             &lux_value,
@@ -177,8 +170,8 @@ void saveAndSendData(){
             GUID_CODE);
  }
 
- String getIstsosRequest(){
-   return getRequestString(&ext_humidity,
+ void sendIstsosRequest(){
+   return sendRequestString(&ext_humidity,
           &ext_temperature,
             &int_temperature,
             &lux_value,
@@ -209,7 +202,6 @@ void getAvarageSensorValues(){
   pressure_value *= 1000;
   altitude_value /= loopCount;
   lux_value /= loopCount;
-  wind_speed /= loopCount;
   rain_gauge /= loopCount;
   battery_value /= loopCount;
 }
@@ -285,8 +277,8 @@ void readSensorValues(){
 
     // wind speed
     if(WS_ENABLE){
-      wind_speed += readWindSpeed();
-      printValuesOnPanel(F("WS"),wind_speed/(loopCount),"m/s");
+      wind_speed = readWindSpeed();
+      printValuesOnPanel(F("WS"),wind_speed,"m/s");
     }
     Watchdog.reset();
     

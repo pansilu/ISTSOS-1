@@ -1,9 +1,18 @@
 #include "Service.h"
 
-const String server_url = String(SERVER);
 Sim800 simServer = Sim800(Serial2, APN, USERNAME, PASSWORD, BASIC_AUTH);;
 
+const char slpserver[] = SERVER;
+const char slpuri[] = REQ_STR;
+const char istserver[] = IST_SERVER;
+const char isturi[] = POSTREQ;
+
 uint8_t temp = 0;
+
+File dir;
+File reader;
+
+uint8_t log_send_error_count=LOG_SEND_ERROR_COUNT;
 
 void ServiceBegin()
 {
@@ -16,7 +25,7 @@ void ServiceBegin()
 		printSystemLog(SUCCESS_ERROR,"SIM 800", SERVICE_ERROR);
 }
 
-String getRequestString(double *externalHum,
+void sendRequestString(double *externalHum,
 											 double *externalTemp,
 											 double *internalTemp,
 											 double *light_intensity,
@@ -32,8 +41,36 @@ String getRequestString(double *externalHum,
 											 String Guid)
 {
 	String req;
+
+
 	if (type == ISTSOS_REQUEST)
 	{
+
+   #ifdef SAVE_LOG_AND_SEND
+    
+    dir =SD.open(F("MEM_LOG/ISTSOS"));
+    while(log_send_error_count>0){
+        reader = dir.openNextFile();
+        if(!reader)
+          break;
+        printString(F("ISTSOS RESENDING"),reader.name());
+        req= readFileSD(F("MEM_LOG/ISTSOS/"),reader.name());
+        Serial.println(req);
+        if(sendRequstMessage(istserver,isturi,req,true)== SEND_SUCCESS){
+          if(removeFile(F("MEM_LOG/ISTSOS/"),reader.name()))
+            Serial.println(String(reader.name()) + " Removed");
+          printString(SUCCESSFULL,reader.name());
+          writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),req);
+          log_send_error_count=LOG_SEND_ERROR_COUNT;
+          continue;
+        }else{
+          log_send_error_count--;  
+        }
+    }
+      
+    #endif
+
+  
 		req = String(Guid);
 		req.concat(";");
 		req += TimeStamp;
@@ -83,11 +120,38 @@ String getRequestString(double *externalHum,
 			req.concat(*light_intensity / 1000);
 		}
 
-    return req;
+    if(sendRequstMessage(istserver,isturi,req,true)== SEND_SUCCESS){
+      writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),req);
+    }else{
+      writeFileSD(F("MEM_LOG/ISTSOS/"),getFileNameTime() ,req);
+    }
+    
 	}
 	else if (type == SLPIOT_REQUEST)
 	{
-
+    #ifdef SAVE_LOG_AND_SEND
+    
+      dir =SD.open(F("MEM_LOG/SLPIOT"));
+      while(log_send_error_count>0){
+      reader = dir.openNextFile();
+      if(!reader)
+        break;
+      printString(F("SLPIOT RESENDING"),reader.name());
+      req = readFileSD(F("MEM_LOG/SLPIOT/"),reader.name());
+      Serial.println(req);
+      if(sendRequstMessage(slpserver,slpuri,req,false)== SEND_SUCCESS){
+        if(removeFile(F("MEM_LOG/SLPIOT/"),reader.name()))
+          Serial.println(String(reader.name()) + " Removed");
+        printString(SUCCESSFULL,reader.name());
+        writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),req);
+        log_send_error_count=LOG_SEND_ERROR_COUNT;
+        continue;
+      }else{
+        log_send_error_count--;
+      }
+      }
+    #endif
+    
 		req = String(F("{"));
 		req.concat("\"GUID\":\"");
 		req += Guid;
@@ -132,20 +196,45 @@ String getRequestString(double *externalHum,
 		req.concat(*battry);
 		req.concat("\"}");
 
-    return req;
+    if(sendRequstMessage(slpserver,slpuri,req,false)== SEND_SUCCESS){
+      writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),req);
+    }else{
+      writeFileSD(F("MEM_LOG/SLPIOT/"),getFileNameTime(),req);
+    }
 	}
 	else
 	{
 		printSystemLog("ERROR","PARMS");
-		return "";
 	}
 }
 
-uint8_t executePostRequest(char server[], char url[], String &data, uint8_t auth)
-{
-  if(auth)
-    return simServer.executePost(server, url, data);
-	return simServer.executePostPure(server, url, data);
+uint8_t sendRequstMessage(char server_url[],char url[],String message,bool auth){
+  
+  uint8_t count = ERROR_REPEATE_COUNT;
+  String server = String(server_url); 
+  printSystemLog(F("SENDING..."),server);
+  
+  while(count>0){
+      uint8_t tmp = auth==true? simServer.executePost(server_url, url, message):simServer.executePostPure(server_url, url, message);
+      // network failiur
+      if(tmp == REQUEST_SUCCESS){
+        printSystemLog(SUCCESSFULL,server,DATA_SEND_SUCCESSFULLY);
+        return SEND_SUCCESS;
+      }else if(tmp == NETWORK_FAILURE){
+        printSystemLog(F("ERROR"),F("NETWORK_FAILURE"),DATA_SEND_ERROR);
+        return SEND_ERROR;
+      }else if(tmp == GPRS_FAILURE){
+        printSystemLog(F("ERROR"),F("GPRS_FAILURE"),DATA_SEND_ERROR);
+        return SEND_ERROR;
+      }else{
+        printSystemLog(F("ERROR"),F("REMOTE ERROR"),DATA_SEND_ERROR);
+      }
+      printSystemLog(F("RESENDING..."),server);
+      count--;
+  }
+  
+  printSystemLog(F("SEND ERROR"),server,DATA_SEND_ERROR);
+  return SEND_ERROR;
 }
 
 DateTime ntpUpdate()

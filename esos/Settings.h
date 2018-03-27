@@ -15,19 +15,19 @@
 // For SLPIOT Settings
 
 #define SERVER "slpiot.org"
-#define REQ_STR "/insert_data5.php"
-#define GUID_SLPIOT "5bf82c59-7ec0-4f"
+#define REQ_STR "/insert_data4.php"
+#define GUID_SLPIOT "5bf82c59-7ec0-4f "
 
 // For ISTSOS Settings
 
 #define IST_SERVER "geoservice.ist.supsi.ch"
 #define POSTREQ "/4onse/wa/istsos/services/lka/operations/fastinsert"
-#define PROCEDURE "b269adf01ba411e8a93608002745029a"
+#define PROCEDURE "24afc3c8213511e8a93608002745029a"
 
 
 // for Enable Servers
 
-//#define ISTSOS 
+#define ISTSOS 
 #define SLPIOT 
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -49,9 +49,10 @@
 #define TEMP_UP 37            // upeer temp for the fan
 #define TEMP_DOWN 34          // lower temperature or fan
 #define FAN_PIN 10            // fan pin
-#define TIME_RATE 2           // set as sending after every Time (minutes)
+#define TIME_RATE 10           // set as sending after every Time (minutes)
 #define ERROR_REPEATE_COUNT 1 // how much times shoulw try to send
-#define RESET_TIMER 84600UL  // Reset Program 1 days
+#define LOG_SEND_ERROR_COUNT 3
+#define NTP_UPDATE 604800UL   // NTP update 7 days
 
 #define WIN_SPEED_PIN A1       // wind speed pin
 #define WIND_FACTOR 32.2   // 1024 --> 32.2ms-1   
@@ -63,6 +64,8 @@
 
 #define RF_TIMEOUT 5000
 #define WATCHDOG_TIME_OUT 8000
+
+#define SAVE_LOG_AND_SEND
 
 // LCD
 #define LCD_ADDRESS 0x27

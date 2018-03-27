@@ -10,7 +10,7 @@
 extern Sim800 server ;
 
 void ServiceBegin();
-String getRequestString(double* externalHum,
+void sendRequestString(double* externalHum,
     double *externalTemp,
     double *internalTemp,
     double *light_intensity,
@@ -25,9 +25,8 @@ String getRequestString(double* externalHum,
     String TimeStamp,
     String Guid);
 
-uint8_t executePostRequest(char server[],char url[],String &data,uint8_t auth=0);
 int readRSSI();
-
+uint8_t sendRequstMessage(char server_url[],char url[],String message,bool auth);
 DateTime ntpUpdate();
 
 #endif

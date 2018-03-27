@@ -68,7 +68,7 @@ String getFileNameTime(){
    DateTime now = rtc.now();
 
    char str_time[30];
-   sprintf(str_time, "%02d%02d%02d%02.TXT", now.month(), now.day(), now.hour(), now.minute(),now.second());
+   sprintf(str_time, "%02d%02d%02d%02d.TXT", now.day(), now.hour(), now.minute(),now.second());
 
    return String(str_time);
 }
