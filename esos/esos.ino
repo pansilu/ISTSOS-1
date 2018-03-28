@@ -121,29 +121,6 @@ void saveAndSendData(){
   sendSlpiotRequest();
   #endif
 
-  
-//  String slpiot_request = getSlpiotRequest();
-//  Serial.println(slpiot_request);
-//  String istsos_request = getIstsosRequest();
-//  Serial.println(istsos_request);
-//
-//  // send IST
-//  #ifdef ISTSOS
-//  if(sendRequstMessage(IST_SERVER,POSTREQ,istsos_request,true)== SEND_SUCCESS){
-//    //writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),istsos_request);
-//  }else{
-//    //writeFileSD(F("MEM_LOG/ISTSOS/"),getFileNameTime() ,istsos_request);
-//  }
-//  #endif
-//
-//  #ifdef SLPIOT
-//  
-//  if(sendRequstMessage(slpserver,slpuri,slpiot_request,0)== SEND_SUCCESS){
-//    writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),slpiot_request);
-//  }else{
-//    writeFileSD(F("MEM_LOG/SLPIOT/"),getFileNameTime(),slpiot_request);
-//  }
-//  #endif
   clearSensorVariables();
   
 }

@@ -45,55 +45,6 @@ void initSD(){
 File file;
 String strRead = String("");
 
-void sendLogData(){
-
-    // send ISTSOS
-    
-//    #ifdef ISTSOS
-//    dir =SD.open(F("MEM_LOG/ISTSOS"));
-//    while(log_send_error_count<100){
-//        reader = dir.openNextFile();
-//        if(!reader)
-//          break;
-//        printString(F("ISTSOS RESENDING"),reader.name());
-//        request= readFileSD(F("MEM_LOG/ISTSOS/"),reader.name());
-//        Serial.println(request);
-//        if(sendRequstMessage(istserver,isturi,request,1)== SEND_SUCCESS){
-//          if(removeFile(F("MEM_LOG/ISTSOS/"),reader.name()))
-//            Serial.println(String(reader.name()) + " Removed");
-//          printString(SUCCESSFULL,reader.name());
-//          writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),request);
-//          log_send_error_count=0;
-//          continue;
-//        }else{
-//          log_send_error_count +=1;  
-//        }
-//    }
-//    #endif
-//
-//    #ifdef SLPIOT
-//    dir =SD.open(F("MEM_LOG/SLPIOT"));
-//    while(log_send_error_count<5){
-//        File reader = dir.openNextFile();
-//        if(!reader)
-//          break;
-//        printString(F("SLPIOT RESENDING"),reader.name());
-//        request = readFileSD(F("MEM_LOG/SLPIOT/"),reader.name());
-//        Serial.println(request);
-//        if(sendRequstMessage(slpserver,slpuri,request,0)== SEND_SUCCESS){
-//          if(removeFile(F("MEM_LOG/SLPIOT/"),reader.name()))
-//            Serial.println(String(reader.name()) + " Removed");
-//          printString(SUCCESSFULL,reader.name());
-//          writeFileSD(F("DT_LOG/SLPIOT/"),getFileNameDate(),request);
-//          log_send_error_count=0;
-//          continue;
-//        }else{
-//          log_send_error_count +=1;
-//        }
-//    }
-//    #endif
-//    log_send_error_count=0;
-}
 
 /*
  * Basics

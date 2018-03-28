@@ -37,8 +37,6 @@ void writeFileSD(String filderpath,String fileName,String message);
 uint8_t removeFile(String folderpath,String fileName);
 String readFileSD(String folderpath,String fileName);
 
-void sendLogData();
-
 void writeErrorLogData(String &text);
 // LCD functions
 extern LiquidCrystal_I2C lcd;
