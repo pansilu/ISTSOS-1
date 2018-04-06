@@ -16,19 +16,13 @@
 
 #define SERVER "slpiot.org"
 #define REQ_STR "/insert_data4.php"
-#define GUID_SLPIOT "5bf82c59-7ec0-4f "
+#define GUID_SLPIOT "5bf82c59-7ec0-4f"
 
 // For ISTSOS Settings
 
 #define IST_SERVER "geoservice.ist.supsi.ch"
 #define POSTREQ "/4onse/wa/istsos/services/lka/operations/fastinsert"
-#define PROCEDURE "24afc3c8213511e8a93608002745029a"
-
-
-// for Enable Servers
-
-#define ISTSOS 
-#define SLPIOT 
+#define PROCEDURE "492e6c460ca311e8a93608002745029a"
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -65,26 +59,6 @@
 #define RF_TIMEOUT 5000
 #define WATCHDOG_TIME_OUT 8000
 
-#define SAVE_LOG_AND_SEND
-
-// LCD
-#define LCD_ADDRESS 0x27
-
-
-// Sensor Enabling
-#define EXT_TEMP_ENABLE 1
-#define INT_TEMP_ENABLE 1
-#define EXT_HUM_ENABLE 1
-#define INT_HUM_ENABLE 1
-#define SM_ENABLE 1
-#define PRESSURE_ENABLE 1
-#define ALTITUDE_ENABLE 1
-#define LUX_ENABLE 1
-#define WS_ENABLE 1
-#define WD_ENABLE 1
-#define RG_ENABLE 1
-#define BT_ENABLE 1
-
 // message
 #define SUCCESSFULL "SUCCESSFULL"
 #define SUCCESS_ERROR "ERROR"
@@ -93,5 +67,34 @@
 #define REQUEST_FAILURE 0
 #define NETWORK_FAILURE 3
 #define GPRS_FAILURE 4
+
+// LCD
+#define LCD_ADDRESS 0x27
+
+//*****************************************************************************
+
+// for Enable Servers
+
+//#define ISTSOS 
+//#define SLPIOT 
+//#define NTP
+
+#define SAVE_LOG_AND_SEND
+
+// Sensor Enabling
+#define EXT_TEMP_ENABLE 0
+#define INT_TEMP_ENABLE 0
+#define EXT_HUM_ENABLE 0
+#define INT_HUM_ENABLE 0
+#define SM_ENABLE 0
+#define PRESSURE_ENABLE 0
+#define ALTITUDE_ENABLE 0
+#define LUX_ENABLE 0
+#define WS_ENABLE 1
+#define WD_ENABLE 0
+#define RG_ENABLE 0
+#define BT_ENABLE 0
+
+
 
 #endif

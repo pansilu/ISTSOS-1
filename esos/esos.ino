@@ -412,11 +412,16 @@ double readWinDirection(){
 
 // read Wind Speed
 double readWindSpeed(){
-  sensor_voltage = analogRead(WIN_SPEED_PIN);  // convert to actual voltage
-  if(sensor_voltage <= WIND_VOLTAGE_MIN)
+  for(int i=0;i<50;i++)
+    sensor_voltage += ((float)analogRead(WIN_SPEED_PIN)/1024.0)*5.0;  // convert to actual voltage
+  
+  sensor_voltage/=50;
+  sensor_voltage += 0.2;
+  
+  if(sensor_voltage == 0)
     return 0;
   else{
-    return abs(((sensor_voltage-WIND_VOLTAGE_MIN)* WIND_FACTOR / (WIND_VOLTAGE_MAX - WIND_VOLTAGE_MIN) ));  // convert it to leaniar relationship
+    return (sensor_voltage /4.5)*32.4;  // convert it to leaniar relationship
   }
   
 }

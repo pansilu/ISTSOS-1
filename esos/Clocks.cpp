@@ -27,12 +27,14 @@ uint8_t setTimeExternal(DateTime dt){
 }
 
 void setNTPTime(){
+  #ifdef NTP 
   printString(F("REFRESH..."),F("RTC"));
   if(setTimeExternal(ntpUpdate()))
     printString(F(SUCCESSFULL),F("NTP"),RTC_UPDATED);
   else
     printString(F(SUCCESS_ERROR),F("NTP"),RTC_UPDATED);
   delay(1000);
+  #endif
 }
 
 // get the local time

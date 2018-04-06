@@ -551,7 +551,7 @@ bool Sim800::getResponse(uint32_t timeout){
         return REQUEST_FAILURE;
     }
 	
-	if ((response.indexOf(F("\"success\": true")) < 0) && (response.indexOf(F("\"success\":true")) < 0)) {
+	if (response.indexOf(F("\"success\": true")) < 0) {
         return REQUEST_FAILURE;
     }
 	
