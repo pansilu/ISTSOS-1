@@ -538,7 +538,7 @@ bool Sim800::getResponse(uint32_t timeout){
             if (c == '}')
                 exit = true;
 
-            timeout = millis();
+            start = millis();
         }
     }
 
