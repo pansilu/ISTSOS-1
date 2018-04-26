@@ -416,7 +416,7 @@ double readWindSpeed(){
     sensor_voltage += ((float)analogRead(WIN_SPEED_PIN)/1024.0)*5.0;  // convert to actual voltage
   
   sensor_voltage/=50;
-  if(sensor_voltage <0.01)
+  if(sensor_voltage <0.1)
     return 0;
   else{
     return (sensor_voltage /4.5)*32.4;  // convert it to leaniar relationship

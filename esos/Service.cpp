@@ -186,9 +186,6 @@ void sendRequestString(double *externalHum,
 		req.concat("\"SM\":\"");
 		req.concat(*soilMoisture);
 		req.concat("\",");
-		req.concat("\"WL\":\"");
-		req.concat(0);
-		req.concat("\",");
 		req.concat("\"AT\":\"");
 		req.concat(*altitude);
 		req.concat("\",");
