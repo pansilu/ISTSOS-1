@@ -17,6 +17,10 @@
 #define BME_NOT_INIT 31
 #define BME_I2C_ERROR 32
 
+// Light
+#define SI1145_NOT_INIT 34
+#define SI1145_I2C_ERROR 35
+
 #define INIT_DONE 1
 
 // Service

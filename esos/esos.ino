@@ -3,7 +3,6 @@
 #include <DallasTemperature.h>
 #include <OneWire.h>
 #include <dht.h>
-#include <BH1750.h> 
 #include <RTClib.h>
 #include <SD.h>
 #include <Seeed_BME280.h>
@@ -11,6 +10,7 @@
 #include "log.h"
 #include "Clocks.h"
 #include "Service.h"
+#include "Adafruit_SI1145.h"
 
 //#include "unit.h"
 
@@ -28,7 +28,8 @@ DallasTemperature externalTemp(&oneWire);
 DeviceAddress insideThermometer;
 
 // light meter
-BH1750 lightMeter;
+Adafruit_SI1145 uv = Adafruit_SI1145();
+uint8_t is_SI1145_working =0;
 
 // Clock module     
 unsigned long lastSendTime;   // last send Time
@@ -375,7 +376,7 @@ double readAltitude(){
 
 // read pressure value
 double readPressure(){
-  if(!isBME280Working()){
+    if(!isBME280Working()){
       printSystemLog(F("I2C ERROR"),F("BME 280"),BME_I2C_ERROR);
       return 0;
     }
@@ -389,7 +390,16 @@ double readPressure(){
 
 // read lux value
 double readItensity(){
-    return lightMeter.readLightLevel();
+    if(!isSI11450Working()){
+      printSystemLog(F("I2C ERROR"),F("SI1145"),BME_I2C_ERROR);
+      return 0;
+    }
+
+    uint16_t uv_rate = uv.readVisible();
+    if(uv_rate < 265)
+      return 0;
+    else
+      return uv_rate ;
 }
 
 // read battry values
@@ -480,16 +490,24 @@ void initialize(){
         printSystemLog(F(SUCCESS_ERROR),F("BME280"),BME_NOT_INIT);
         is_bme280_working=0;
       }
-      else
+      else{
         printSystemLog(F(SUCCESSFULL),F("BME280"));
         is_bme280_working=1;
+      }
       delay(1000);
     }
 
     // start light meter
     if(LUX_ENABLE){
-	    printString(F("INITIALIZING"),F("BH 1750"));
-      lightMeter.begin(); 
+      printString(F("INITIALIZING"),F("SI 1145"));  
+      
+	    if (! uv.begin()) {
+        printSystemLog(F(SUCCESS_ERROR),F("SI 1145"),SI1145_NOT_INIT);
+        is_SI1145_working=0;
+      }else{
+        printSystemLog(F(SUCCESSFULL),F("SI 1145"));  
+        is_SI1145_working=1;
+      }
     } 
 
     // Rain guarge
@@ -530,6 +548,10 @@ void funcFan(){
 // check the bme 280 initialized at the first place.
 uint8_t isBME280Working(){
   return is_bme280_working==1;
+}
+
+uint8_t isSI11450Working(){
+  return is_SI1145_working==1;
 }
 
 void resetProgram(){
