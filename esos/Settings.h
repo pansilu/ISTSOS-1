@@ -7,7 +7,7 @@
 
 // For Communication 
 
-#define APN "dialog"
+#define APN "mobitel"
 #define USERNAME ""
 #define PASSWORD ""
 #define BASIC_AUTH "YWRtaW46QlYzWGp2clA="
@@ -75,9 +75,9 @@
 
 // for Enable Servers
 
-//#define ISTSOS 
+#define ISTSOS 
 #define SLPIOT 
-//#define NTP
+#define NTP
 
 //#define SAVE_LOG_AND_SEND
 
@@ -86,13 +86,13 @@
 #define INT_TEMP_ENABLE 1
 #define EXT_HUM_ENABLE 1
 #define INT_HUM_ENABLE 1
-#define SM_ENABLE 1
+#define SM_ENABLE 0
 #define PRESSURE_ENABLE 1
 #define ALTITUDE_ENABLE 1
 #define LUX_ENABLE 1
 #define WS_ENABLE 1
 #define WD_ENABLE 1
-#define RG_ENABLE 1
+#define RG_ENABLE 0
 #define BT_ENABLE 1
 
 

@@ -74,51 +74,51 @@ void sendRequestString(double *externalHum,
 		req = String(Guid);
 		req.concat(";");
 		req += TimeStamp;
-		if (EXT_HUM_ENABLE)
-		{
-			req.concat(",");
-			req.concat(*externalHum);
-		}
-		if (EXT_TEMP_ENABLE)
-		{
-			req.concat(",");
-			req.concat(*externalTemp);
-		}
-		if (PRESSURE_ENABLE)
-		{
-			req.concat(",");
-			req.concat(*pressure / 1000);
-		}
-		if (ALTITUDE_ENABLE)
-		{
-			req.concat(",");
-			req.concat(*altitude);
-		}
+
+    req.concat(",");
+    req.concat(*internalTemp);
+    
 		if (SM_ENABLE)
 		{
 			req.concat(",");
 			req.concat(*soilMoisture);
-		}
-		if (WD_ENABLE)
-		{
-			req.concat(",");
-			req.concat(*windDirection);
-		}
-		if (WS_ENABLE)
-		{
-			req.concat(",");
-			req.concat(*windSpeed);
-		}
-		if (RG_ENABLE)
-		{
-			req.concat(",");
-			req.concat(*rainFall);
 		}
 		if (LUX_ENABLE)
 		{
 			req.concat(",");
 			req.concat(*light_intensity / 1000);
 		}
+    if (PRESSURE_ENABLE)
+    {
+      req.concat(",");
+      req.concat(*pressure / 1000);
+    }
+    if (EXT_HUM_ENABLE)
+    {
+      req.concat(",");
+      req.concat(*externalHum);
+    }
+    if (EXT_TEMP_ENABLE)
+    {
+      req.concat(",");
+      req.concat(*externalTemp);
+    }
+    if (RG_ENABLE)
+    {
+      req.concat(",");
+      req.concat(*rainFall);
+    }
+    if (WD_ENABLE)
+    {
+      req.concat(",");
+      req.concat(*windDirection);
+    }
+    
+    if (WS_ENABLE)
+    {
+      req.concat(",");
+      req.concat(*windSpeed);
+    }
 
     if(sendRequstMessage(istserver,isturi,req,true)== SEND_SUCCESS){
       writeFileSD(F("DT_LOG/ISTSOS/"),getFileNameDate(),req);
