@@ -86,13 +86,13 @@
 #define INT_TEMP_ENABLE 1
 #define EXT_HUM_ENABLE 1
 #define INT_HUM_ENABLE 1
-#define SM_ENABLE 1
+#define SM_ENABLE 0
 #define PRESSURE_ENABLE 1
 #define ALTITUDE_ENABLE 1
 #define LUX_ENABLE 0
 #define WS_ENABLE 1
 #define WD_ENABLE 1
-#define RG_ENABLE 1
+#define RG_ENABLE 0
 #define BT_ENABLE 1
 
 
