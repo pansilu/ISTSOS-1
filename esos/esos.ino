@@ -271,7 +271,7 @@ void readSensorValues(){
     // get battery voltage
     if(BT_ENABLE){
       battery_value += readBatteryVoltage();
-      printValuesOnPanel(F("BT"),battery_value,"V");
+      printValuesOnPanel(F("BT"),battery_value/(loopCount),"V");
     }
     Watchdog.reset();
 
