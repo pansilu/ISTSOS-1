@@ -193,27 +193,28 @@ void readSensorValues(){
     // read External temperature
     if(EXT_TEMP_ENABLE){
       ext_temperature += readExternalTemperature();
-      printValuesOnPanel(F("TM"),ext_temperature/loopCount,String((char)223)+"C");
+      printValuesOnPanel(F("ExTemp"),ext_temperature/loopCount,String((char)223)+"C");
     }
     Watchdog.reset();
 
     // read Internal temperature
     if(INT_TEMP_ENABLE){
       int_temperature += readInternalTemperature();
-      printValuesOnPanel(F("HT"),int_temperature/loopCount,String((char)223)+"C");
+      printValuesOnPanel(F("InTemp"),int_temperature/loopCount,String((char)223)+"C");
     }
     Watchdog.reset();
     
     // read Internal humidiy
     if(INT_HUM_ENABLE){
       int_humidity += readInternalHumidity();
-      printValuesOnPanel(F("HM"),int_humidity/loopCount,"%");
+      printValuesOnPanel(F("InRH"),int_humidity/loopCount,"%");
     }
     Watchdog.reset();
     
     // read external humidity
     if(EXT_HUM_ENABLE){
       ext_humidity += readExternalHumidity();
+      printValuesOnPanel(F("RH"),ext_humidity/(loopCount),"%");
     }
     Watchdog.reset();
     
@@ -269,7 +270,7 @@ void readSensorValues(){
 
     // get battery voltage
     if(BT_ENABLE){
-      battery_value = readBatteryVoltage();
+      battery_value += readBatteryVoltage();
       printValuesOnPanel(F("BT"),battery_value,"V");
     }
     Watchdog.reset();
@@ -298,6 +299,7 @@ void clearSensorVariables(){
   sensor_voltage=0;
   rain_gauge=0;
   rain_count=0;
+  battery_value=0;
 
   loopCount=0;
 }
@@ -391,7 +393,7 @@ double readPressure(){
 // read lux value
 double readItensity(){
     if(!isSI11450Working()){
-      printSystemLog(F("I2C ERROR"),F("SI1145"),BME_I2C_ERROR);
+      printSystemLog(F("I2C ERROR"),F("SI1145"),SI1145_I2C_ERROR);
       return 0;
     }
 
@@ -404,7 +406,7 @@ double readItensity(){
 
 // read battry values
 double readBatteryVoltage(){
-    return (analogRead(BATT)*16.6f/1023);
+    return (analogRead(BATT)*16.0f/1023); // 16V ------->[ 4.5V ======>>>> 921  ]  ***** Relevant resistor value 790 ohms
     
 }
 
@@ -475,17 +477,17 @@ void initialize(){
        
     // Dullas temperature 
     if(EXT_TEMP_ENABLE){
-	    printString(F("INITIALIZING"),F("DS18B20"));
+      printString(F("INITIALIZING"),F("DS18B20"));
       externalTemp.begin();
       externalTemp.getAddress(insideThermometer, 0);
       externalTemp.setResolution(insideThermometer, 12);
-	    printSystemLog(F(SUCCESSFULL),F("DS18B20"));
+      printSystemLog(F(SUCCESSFULL),F("DS18B20"));
       delay(1000);
     }
     
     // BME 280 calibration
     if(EXT_HUM_ENABLE || PRESSURE_ENABLE || ALTITUDE_ENABLE){
-	    printString(F("INITIALIZING"),F("BME280"));	
+      printString(F("INITIALIZING"),F("BME280")); 
       if(!bme280.init()){
         printSystemLog(F(SUCCESS_ERROR),F("BME280"),BME_NOT_INIT);
         is_bme280_working=0;
@@ -501,7 +503,7 @@ void initialize(){
     if(LUX_ENABLE){
       printString(F("INITIALIZING"),F("SI 1145"));  
       
-	    if (! uv.begin()) {
+      if (! uv.begin()) {
         printSystemLog(F(SUCCESS_ERROR),F("SI 1145"),SI1145_NOT_INIT);
         is_SI1145_working=0;
       }else{
@@ -557,4 +559,3 @@ uint8_t isSI11450Working(){
 void resetProgram(){
   asm volatile ("  jmp 0");  
 }
-
